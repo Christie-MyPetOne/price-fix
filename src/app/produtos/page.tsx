@@ -127,8 +127,7 @@ export default function ProductsPage() {
 
         <h1 className="text-3xl font-bold mb-4 text-gray-800">Meus produtos</h1>
 
-        {/* Filters e Ações */}
-        <ProductFilters
+s        <ProductFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
