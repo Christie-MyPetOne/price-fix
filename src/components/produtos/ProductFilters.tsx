@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { Search, Filter, RefreshCcw } from "lucide-react";
-import { Button } from "../ui/Button"; // Usaremos um Button aqui, se não tiver, crie um simples
-import { Plus, Download } from "lucide-react"; // Certifique-se de importar esses ícones
+import { Search, Filter, RefreshCcw, Plus, Download } from "lucide-react"; // Importar Plus e Download
+import { Button } from "../ui/Button";
 
 interface ProductFiltersProps {
   onSearch: (searchTerm: string) => void;
@@ -18,21 +17,27 @@ export function ProductFilters({
   onSelectAll,
 }: ProductFiltersProps) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="bg-card p-6 rounded-lg shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 border border-border-dark">
       {/* Botões de Ação */}
       <div className="flex flex-wrap items-center gap-3">
-        <Button variant="outline" className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          className="flex items-center gap-1 text-text-secondary"
+        >
           <RefreshCcw className="w-4 h-4" />
           Sincronizar
         </Button>
         <Button variant="primary" className="flex items-center gap-1">
-          <Plus className="w-4 h-4" />{" "}
-          {/* Assumindo que você terá um ícone Plus */}
+          {" "}
+          {/* Usando a nova cor primary */}
+          <Plus className="w-4 h-4" />
           Novo Produto
         </Button>
-        <Button variant="outline" className="flex items-center gap-1">
-          <Download className="w-4 h-4" />{" "}
-          {/* Assumindo que você terá um ícone Download */}
+        <Button
+          variant="outline"
+          className="flex items-center gap-1 text-text-secondary"
+        >
+          <Download className="w-4 h-4" />
           Exportar Produtos
         </Button>
       </div>
@@ -40,18 +45,18 @@ export function ProductFilters({
       {/* Barra de Pesquisa e Filtros */}
       <div className="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
         <div className="relative flex-grow min-w-[200px] max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
           <input
             type="text"
             placeholder="Buscar produtos"
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            className="w-full pl-10 pr-4 py-2 border border-border-dark rounded-md focus:ring-primary focus:border-primary bg-background text-text"
             onChange={(e) => onSearch(e.target.value)}
           />
         </div>
 
         {/* Dropdowns de Filtro */}
         <select
-          className="p-2 border border-gray-300 rounded-md bg-white focus:ring-primary focus:border-primary"
+          className="p-2 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
           onChange={(e) => onFilterChange("line", e.target.value)}
         >
           <option value="">Linha</option>
@@ -59,16 +64,15 @@ export function ProductFilters({
           <option value="moda">Moda</option>
         </select>
         <select
-          className="p-2 border border-gray-300 rounded-md bg-white focus:ring-primary focus:border-primary"
+          className="p-2 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
           onChange={(e) => onFilterChange("origin", e.target.value)}
         >
           <option value="">Origem</option>
           <option value="nacional">Nacional</option>
           <option value="importado">Importado</option>
         </select>
-        {/* Adicione mais selects para Canal de Venda, Fornecedor, Problemas */}
         <select
-          className="p-2 border border-gray-300 rounded-md bg-white focus:ring-primary focus:border-primary"
+          className="p-2 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
           onChange={(e) => onFilterChange("channel", e.target.value)}
         >
           <option value="">Canal de Venda</option>
@@ -76,7 +80,7 @@ export function ProductFilters({
           <option value="fisica">Física</option>
         </select>
         <select
-          className="p-2 border border-gray-300 rounded-md bg-white focus:ring-primary focus:border-primary"
+          className="p-2 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
           onChange={(e) => onFilterChange("supplier", e.target.value)}
         >
           <option value="">Fornecedor</option>
@@ -84,7 +88,7 @@ export function ProductFilters({
           <option value="forn2">Fornecedor B</option>
         </select>
         <select
-          className="p-2 border border-gray-300 rounded-md bg-white focus:ring-primary focus:border-primary"
+          className="p-2 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
           onChange={(e) => onFilterChange("problems", e.target.value)}
         >
           <option value="">Problemas</option>
@@ -92,7 +96,10 @@ export function ProductFilters({
           <option value="preco">Preço desatualizado</option>
         </select>
 
-        <Button variant="secondary" className="flex items-center gap-1">
+        <Button
+          variant="secondary"
+          className="flex items-center gap-1 text-text-secondary"
+        >
           <Filter className="w-4 h-4" />
           FILTRAR
         </Button>

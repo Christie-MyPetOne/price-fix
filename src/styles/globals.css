@@ -8,10 +8,31 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif; /* Exemplo de fonte */
-  @apply bg-gray-50 text-gray-800;
+  font-family: "Inter", sans-serif;
+  background-color: theme("colors.background");
+  color: theme("colors.text");
 }
 
 #root {
   height: 100%;
+}
+
+/* Estilos para o scrollbar (opcional, mas comum em dark themes) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #333; /* Fundo da trilha */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555; /* Cor da barra de rolagem */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777; /* Cor da barra de rolagem ao passar o mouse */
 }

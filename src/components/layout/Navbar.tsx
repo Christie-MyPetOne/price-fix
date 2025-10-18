@@ -1,4 +1,4 @@
-"use client"; // Necessário para usar useState e outros hooks do React
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -13,42 +13,101 @@ import {
   HelpCircle,
   Bell,
 } from "lucide-react";
+import { usePathname } from "next/navigation"; // Para saber a rota atual
 // import Image from "next/image";
 
 export function Navbar() {
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);
+  const pathname = usePathname(); // Hook para pegar o caminho atual
 
   const toggleGerenciar = () => {
     setIsGerenciarOpen(!isGerenciarOpen);
   };
 
+  // Componente NavLink para encapsular a lógica de estilo de link ativo
+  interface NavLinkProps {
+    href: string;
+    children: React.ReactNode;
+    icon?: React.ElementType | null;
+  }
+
+  const NavLink: React.FC<NavLinkProps> = ({ href, children, icon: Icon }) => {
+    const isActive = pathname === href;
+    return (
+      <Link
+        href={href}
+        className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
+          ${
+            isActive
+              ? "bg-primary text-white font-semibold"
+              : "text-text-secondary hover:bg-card hover:text-text"
+          }`}
+      >
+        {Icon && <Icon className="w-5 h-5 mr-1" />}
+        {children}
+      </Link>
+    );
+  };
+
+  // Componente DropdownLink (usará estilos mais claros por ser em um card)
+  interface DropdownLinkProps {
+    href: string;
+    children: React.ReactNode;
+    icon?: React.ElementType | null;
+    onClick: () => void;
+  }
+
+  const DropdownLink: React.FC<DropdownLinkProps> = ({
+    href,
+    children,
+    icon: Icon,
+    onClick,
+  }) => {
+    return (
+      <Link
+        href={href}
+        onClick={onClick}
+        className="flex items-center px-4 py-2 text-sm text-text hover:bg-card-light hover:text-primary transition-colors duration-200"
+      >
+        {Icon && <Icon className="w-4 h-4 mr-2" />}
+        {children}
+      </Link>
+    );
+  };
+
   return (
-    <nav className="bg-white p-4 shadow-md flex justify-between items-center z-10">
+    <nav className="bg-card p-4 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
       {/* Lado Esquerdo: Logo e Navegação Principal */}
       <div className="flex items-center space-x-6">
         <Link
           href="/"
-          className="flex items-center text-2xl font-bold text-gray-800"
+          className="flex items-center text-2xl font-bold text-primary"
         >
           {/* <Image
             src="/logo.svg"
             alt="Preço Certo Logo"
-            className="h-8  mr-2"
+            className="h-8 w-auto mr-2"
           /> */}
           Preço Certo
         </Link>
 
         {/* Links de Navegação */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden md:flex items-center space-x-2">
+          {" "}
+          {/* Reduzi o espaço entre links */}
           <NavLink href="/" icon={Home}>
             Dashboard
           </NavLink>
-
           {/* Dropdown "Gerenciar" */}
           <div className="relative">
             <button
               onClick={toggleGerenciar}
-              className="flex items-center text-gray-600 hover:text-primary transition-colors duration-200 focus:outline-none"
+              className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
+                ${
+                  isGerenciarOpen
+                    ? "bg-card-light text-text font-semibold"
+                    : "text-text-secondary hover:bg-card hover:text-text"
+                } focus:outline-none`}
             >
               Gerenciar
               <ChevronDown
@@ -58,7 +117,7 @@ export function Navbar() {
               />
             </button>
             {isGerenciarOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+              <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark">
                 <DropdownLink
                   href="/produtos"
                   icon={Package}
@@ -83,11 +142,9 @@ export function Navbar() {
               </div>
             )}
           </div>
-
           <NavLink href="/relatorios" icon={BarChart}>
             Relatórios
           </NavLink>
-          {/* Adicione outros links principais aqui (Otimizar, Histórico, Configurar) */}
           <NavLink href="#" icon={null}>
             Otimizar
           </NavLink>
@@ -102,24 +159,28 @@ export function Navbar() {
 
       {/* Lado Direito: Ícones de Ação e Perfil */}
       <div className="flex items-center space-x-4">
-        <button className="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <span className="text-text-secondary text-sm hidden lg:inline">
+          Última sincronização: 17/10/2025 13:52
+        </span>
+        <button className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
           <HelpCircle className="w-5 h-5" />
         </button>
-        <button className="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <button className="relative text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
           <Bell className="w-5 h-5" />
-          {/* Opcional: Badge de notificação */}
-          <span className="absolute -mt-2 ml-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-error rounded-full">
             3
           </span>
         </button>
         <div className="relative group">
-          <button className="flex items-center text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
             <User className="w-5 h-5 mr-1" />
-            <span className="hidden md:inline">gustavo@mypeto...</span>
-            <ChevronDown className="w-4 h-4 ml-1" />
+            <span className="hidden md:inline text-text-secondary">
+              gustavo@mypeto...
+            </span>
+            <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
           </button>
           {/* Dropdown de usuário (opcional) */}
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-20 border border-border-dark">
             <DropdownLink href="/perfil" onClick={() => {}}>
               Perfil
             </DropdownLink>
@@ -133,50 +194,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  );
-}
-
-// Componente auxiliar para os links de navegação principais
-interface NavLinkProps {
-  href: string;
-  children: React.ReactNode;
-  icon: React.ElementType | null; // Lucide Icon component
-}
-
-function NavLink({ href, children, icon: Icon }: NavLinkProps) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center text-gray-600 hover:text-primary transition-colors duration-200"
-    >
-      {Icon && <Icon className="w-5 h-5 mr-1" />}
-      {children}
-    </Link>
-  );
-}
-
-// Componente auxiliar para os links de dropdown
-interface DropdownLinkProps {
-  href: string;
-  children: React.ReactNode;
-  icon?: React.ElementType | null;
-  onClick: () => void;
-}
-
-function DropdownLink({
-  href,
-  children,
-  icon: Icon,
-  onClick,
-}: DropdownLinkProps) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-    >
-      {Icon && <Icon className="w-4 h-4 mr-2" />}
-      {children}
-    </Link>
   );
 }

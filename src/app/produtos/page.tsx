@@ -95,7 +95,7 @@ export default function ProductsPage() {
   const filteredProducts = MOCK_PRODUCTS.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   ).filter((product) => {
-    return true; //
+    return true;
   });
 
   const handleSearch = (term: string) => {
@@ -124,16 +124,12 @@ export default function ProductsPage() {
             </button>
           </div>
         </div>
-
         <h1 className="text-3xl font-bold mb-4 text-gray-800">Meus produtos</h1>
-
-s        <ProductFilters
+        <ProductFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
         />
-
-        {/* Botão "Selecionar Todos" abaixo dos filtros, como na imagem */}
         <div className="mt-4">
           <button
             onClick={handleSelectAll}
@@ -142,8 +138,6 @@ s        <ProductFilters
             SELECIONAR TODOS
           </button>
         </div>
-
-        {/* Indicador de carregamento */}
         {loading ? (
           <div className="flex justify-center items-center h-48 bg-white mt-6 rounded-lg shadow-md">
             <span className="text-gray-500 flex items-center gap-2">
@@ -155,10 +149,7 @@ s        <ProductFilters
         )}
       </div>
 
-      {/* Sidebar de Indicadores Financeiros (Direita) */}
       <div className="lg:w-80 flex-shrink-0">
-        {" "}
-        {/* Define a largura fixa para a sidebar */}
         <FinanceIndicators />
       </div>
     </div>

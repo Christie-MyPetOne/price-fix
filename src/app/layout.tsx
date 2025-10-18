@@ -17,10 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body
+        className={`${inter.className} flex flex-col min-h-screen`}
+        suppressHydrationWarning
+      >
         <Navbar />
-        <main className="flex-1 p-6 bg-gray-100">{children}</main>
+        <main className="flex-1 p-6">{children}</main>
         <Footer />
       </body>
     </html>
