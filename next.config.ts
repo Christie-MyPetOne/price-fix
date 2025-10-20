@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+  swcMinify: true,
+  appDir: true,
+  images: {
+    domains: ["fakestoreapi.com"],
+  },
 };
 
 export default nextConfig;
