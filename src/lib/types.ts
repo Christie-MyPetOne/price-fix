@@ -12,14 +12,14 @@ export interface Product {
   salesChannel?: string;
   supplier?: string;
   problems?: string[];
-  
+  image: string;
 }
 
 export interface Venda {
   id: string;
   name: string;
   sales: number;
-  status: 'Precificado' | 'Pendente' | 'Erro';
+  status: "Precificado" | "Pendente" | "Erro";
   price: number;
   margin: number;
   consiliacao: string;
@@ -30,7 +30,6 @@ export interface Venda {
   salesChannel?: string;
   supplier?: string;
   problems?: string[];
-  
 }
 
 export interface User {

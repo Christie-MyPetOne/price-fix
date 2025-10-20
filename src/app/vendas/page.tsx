@@ -158,7 +158,7 @@ export default function ProductsPage() {
             </span>
           </div>
         ) : (
-          <VendasTable vendas ={filteredProducts} />
+          <VendasTable vendas />
         )}
 
       </div>
