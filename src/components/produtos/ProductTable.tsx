@@ -1,42 +1,112 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useProductStore } from "../../store/useProductStore";
-import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import { Product } from "../../lib/types";
+import { useProductStore } from "../../store/useProductStore";
+import { sortData, toggleSelection, toggleSelectAll } from "../../lib/utils";
 
-export function ProductTable() {
+// 1. Adicionamos a prop onRowClick para receber a função do componente pai
+interface ProductTableProps {
+  products?: Product[];
+  onRowClick: (product: Product) => void;
+}
+
+export const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  onRowClick,
+}) => {
   const {
-    sortedProducts,
-    selected,
-    sortConfig,
-    toggleOne,
-    toggleAll,
-    sortBy,
+    sortedProducts: storeSorted,
+    selected: storeSelected,
+    sortConfig: storeSortConfig,
+    toggleOne: storeToggleOne,
+    toggleAll: storeToggleAll,
+    sortBy: storeSortBy,
     fetchProducts,
   } = useProductStore();
+
+  const sourceProducts = products ?? storeSorted;
+
+  const [localSelected, setLocalSelected] = useState<string[]>(
+    products ? [] : storeSelected
+  );
+
+  const [localSort, setLocalSort] = useState<{
+    key: keyof Product | null;
+    direction: "asc" | "desc";
+  }>(products ? { key: null, direction: "asc" } : storeSortConfig);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    if (!products) fetchProducts();
+  }, [products, fetchProducts]);
 
-  const allSelected = selected.length === sortedProducts.length;
-  const totalPages = Math.ceil(sortedProducts.length / rowsPerPage);
+  useEffect(() => {
+    if (products) {
+      setLocalSelected([]);
+      setCurrentPage(1);
+    }
+  }, [products]);
 
-  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(e.target.value));
-    setCurrentPage(1); // resetar para a primeira página
+  const toggleOne = (id: string) => {
+    if (products) {
+      setLocalSelected((prev) => toggleSelection(prev, id));
+    } else {
+      storeToggleOne(id);
+    }
   };
 
-  const displayedProducts = sortedProducts.slice(
+  const toggleAll = () => {
+    if (products) {
+      setLocalSelected((prev) =>
+        toggleSelectAll(sourceProducts as Product[], prev)
+      );
+    } else {
+      storeToggleAll();
+    }
+  };
+
+  const handleSort = (key: keyof Product) => {
+    if (products) {
+      const direction =
+        localSort.key === key && localSort.direction === "asc" ? "desc" : "asc";
+      setLocalSort({ key, direction });
+    } else {
+      storeSortBy(key);
+    }
+  };
+
+  const orderedProducts = useMemo(() => {
+    if (!sourceProducts) return [];
+    if (products && localSort.key) {
+      return sortData(sourceProducts, localSort.key, localSort.direction);
+    }
+    return sourceProducts;
+  }, [sourceProducts, products, localSort]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(orderedProducts.length / rowsPerPage)
+  );
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages, currentPage]);
+
+  const displayedProducts = orderedProducts.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  const headers: { key: keyof (typeof sortedProducts)[0]; label: string }[] = [
+  const selected = products ? localSelected : storeSelected;
+  const allSelected =
+    selected.length === displayedProducts.length &&
+    displayedProducts.length > 0;
+
+  const headers: { key: keyof Product; label: string }[] = [
     { key: "name", label: "Nome" },
     { key: "sales", label: "Vendas" },
     { key: "status", label: "Status" },
@@ -53,8 +123,11 @@ export function ProductTable() {
           Mostrar
           <select
             value={rowsPerPage}
-            onChange={handleRowsPerPageChange}
-            className="border border-border-dark rounded px-2 py-1"
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="border border-border-dark rounded px-2 py-1 ml-2"
           >
             {[5, 10, 20, 50].map((n) => (
               <option key={n} value={n}>
@@ -64,6 +137,7 @@ export function ProductTable() {
           </select>
           itens
         </label>
+
         <p className="text-sm text-text-secondary hidden sm:block">
           Mostrando{" "}
           <span className="font-medium">
@@ -71,9 +145,9 @@ export function ProductTable() {
           </span>{" "}
           a{" "}
           <span className="font-medium">
-            {Math.min(currentPage * rowsPerPage, sortedProducts.length)}
+            {Math.min(currentPage * rowsPerPage, orderedProducts.length)}
           </span>{" "}
-          de <span className="font-medium">{sortedProducts.length}</span>{" "}
+          de <span className="font-medium">{orderedProducts.length}</span>{" "}
           resultados
         </p>
       </div>
@@ -93,8 +167,8 @@ export function ProductTable() {
 
               {headers.map(({ key, label }) => (
                 <th
-                  key={key}
-                  onClick={() => sortBy(key)}
+                  key={String(key)}
+                  onClick={() => handleSort(key)}
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-1">
@@ -102,11 +176,21 @@ export function ProductTable() {
                     <ArrowUpDown
                       size={14}
                       className={`transition-transform ${
-                        sortConfig.key === key
+                        (
+                          products
+                            ? localSort.key === key
+                            : storeSortConfig.key === key
+                        )
                           ? "text-primary"
                           : "text-gray-400"
                       } ${
-                        sortConfig.key === key && sortConfig.direction === "asc"
+                        (
+                          products
+                            ? localSort.key === key &&
+                              localSort.direction === "asc"
+                            : storeSortConfig.key === key &&
+                              storeSortConfig.direction === "asc"
+                        )
                           ? "rotate-180"
                           : ""
                       }`}
@@ -121,9 +205,12 @@ export function ProductTable() {
             {displayedProducts.map((product) => (
               <tr
                 key={product.id}
-                className="hover:bg-background transition-colors"
+                // 2. Adicionamos o onClick na linha e o cursor-pointer para feedback visual
+                onClick={() => onRowClick(product)}
+                className="hover:bg-background transition-colors cursor-pointer"
               >
-                <td className="px-4 py-3">
+                {/* 3. Impedimos que o clique no checkbox abra o modal */}
+                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={selected.includes(product.id)}
@@ -133,22 +220,21 @@ export function ProductTable() {
                 </td>
 
                 <td className="px-4 py-3 text-sm font-medium text-text flex items-center gap-2">
-                  {product.image && (
+                  {"image" in product && product.image ? (
                     <Image
-                      src={product.image}
+                      src={
+                        (product as Product & { image?: string })
+                          .image as string
+                      }
                       alt={product.name}
                       width={40}
                       height={40}
                       className="object-cover rounded"
                     />
-                  )}
-                  <span>
-                    {product.name}
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary-dark text-white">
-                      {product.origin || "N/A"}
-                    </span>
-                  </span>
+                  ) : null}
+                  <span>{product.name}</span>
                 </td>
+
                 <td className="px-4 py-3 text-sm text-text-secondary">
                   {product.sales}
                 </td>
@@ -205,17 +291,26 @@ export function ProductTable() {
                 </td>
               </tr>
             ))}
+            {displayedProducts.length === 0 && (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="px-4 py-6 text-center text-sm text-text-secondary"
+                >
+                  Nenhum produto encontrado.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
         <div className="flex gap-2">
           <button
             className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
             <ChevronLeft size={16} />
           </button>
@@ -237,7 +332,7 @@ export function ProductTable() {
           <button
             className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           >
             <ChevronRight size={16} />
           </button>
@@ -245,4 +340,4 @@ export function ProductTable() {
       </div>
     </div>
   );
-}
+};
