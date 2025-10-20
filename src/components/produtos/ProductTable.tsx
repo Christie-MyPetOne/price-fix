@@ -205,11 +205,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             {displayedProducts.map((product) => (
               <tr
                 key={product.id}
-                // 2. Adicionamos o onClick na linha e o cursor-pointer para feedback visual
                 onClick={() => onRowClick(product)}
                 className="hover:bg-background transition-colors cursor-pointer"
               >
-                {/* 3. Impedimos que o clique no checkbox abra o modal */}
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
@@ -220,18 +218,22 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 </td>
 
                 <td className="px-4 py-3 text-sm font-medium text-text flex items-center gap-2">
-                  {"image" in product && product.image ? (
-                    <Image
-                      src={
-                        (product as Product & { image?: string })
-                          .image as string
-                      }
-                      alt={product.name}
-                      width={40}
-                      height={40}
-                      className="object-cover rounded"
-                    />
-                  ) : null}
+                  {/* Container com tamanho fixo para a imagem */}
+                  <div className="w-10 h-10 flex-shrink-0 relative">
+                    {product.image ? (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover rounded"
+                      />
+                    ) : (
+                      // Placeholder para produtos sem imagem
+                      <div className="w-full h-full bg-border-dark rounded flex items-center justify-center">
+                        <span className="text-xs text-text-secondary"></span>
+                      </div>
+                    )}
+                  </div>
                   <span>{product.name}</span>
                 </td>
 

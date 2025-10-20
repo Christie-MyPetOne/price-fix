@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 import {
   Home,
   Package,
@@ -57,6 +59,24 @@ export function Navbar() {
     onClick: () => void;
   }
 
+  const ThemeToggleButton = () => {
+    const { theme, toggleTheme } = useTheme();
+
+    return (
+      <button
+        onClick={toggleTheme}
+        className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors"
+        aria-label="Alternar tema"
+      >
+        {theme === 'dark' ? (
+          <Sun className="w-5 h-5" />
+        ) : (
+          <Moon className="w-5 h-5" />
+        )}
+      </button>
+    );
+  };
+
   const DropdownLink: React.FC<DropdownLinkProps> = ({
     href,
     children,
@@ -67,7 +87,7 @@ export function Navbar() {
       <Link
         href={href}
         onClick={onClick}
-        className="flex items-center px-4 py-2 text-sm text-text hover:bg-card-light hover:text-primary transition-colors duration-200"
+        className="flex items-center px-4 py-2 text-sm text-text hover:bg-card hover:text-primary transition-colors duration-200"
       >
         {Icon && <Icon className="w-4 h-4 mr-2" />}
         {children}
@@ -105,7 +125,7 @@ export function Navbar() {
               className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
                 ${
                   isGerenciarOpen
-                    ? "bg-card-light text-text font-semibold"
+                    ? "bg-card text-text font-semibold"
                     : "text-text-secondary hover:bg-card hover:text-text"
                 } focus:outline-none`}
             >
@@ -162,6 +182,7 @@ export function Navbar() {
         <span className="text-text-secondary text-sm hidden lg:inline">
           Última sincronização: 17/10/2025 13:52
         </span>
+        <ThemeToggleButton />
         <button className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
           <HelpCircle className="w-5 h-5" />
         </button>

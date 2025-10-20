@@ -2,15 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Você pode adicionar seus estilos globais personalizados aqui */
+:root {
+  --color-background: #ebebeb;
+  --color-card: #ffffff;
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-primary-light: #34d399;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #4a4a4a;
+  --color-border-dark: #e0e0e0;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
+
+.dark {
+  --color-background: #1a1a1a;
+  --color-card: #2c2c2c;
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-primary-light: #34d399;
+  --color-text: #e0e0e0;
+  --color-text-secondary: #a0a0a0;
+  --color-border-dark: #4a4a4a;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Inter", sans-serif;
-  background-color: theme("colors.background");
-  color: theme("colors.text");
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 #root {
@@ -24,15 +53,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #333; /* Fundo da trilha */
+  background: var(--color-card); /* Fundo da trilha */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #555; /* Cor da barra de rolagem */
+  background: var(--color-text-secondary); /* Cor da barra de rolagem */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #777; /* Cor da barra de rolagem ao passar o mouse */
+  background: var(--color-text); /* Cor da barra de rolagem ao passar o mouse */
 }
