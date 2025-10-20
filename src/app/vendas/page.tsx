@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { ProductFilters } from "../../components/produtos/ProductFilters";
-import { VendasTable } from "../../components/produtos/VendasTable";
-import { FinanceIndicators } from "../../components/produtos/FinanceIndicators";
+import { VendasTable } from "../../components/Vendas/VendasTable";
 import { Venda } from "../../lib/types";
 import { RefreshCcw } from "lucide-react";
+import { Card } from '../../components/ui/Card';
+import CardVendas from "@/components/ui/CardVendas";
 
 const MOCK_PRODUCTS: Venda[] = [
   {
@@ -120,17 +121,6 @@ export default function ProductsPage() {
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       <div className="flex-1">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-md mb-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm">
-              <span className="font-semibold">Sincronização</span> não feita
-              ainda, clique no botão para sincronizar.
-            </p>
-            <button className="bg-white text-blue-600 px-4 py-2 rounded-md font-semibold hover:bg-blue-50 transition-colors">
-              CONFIGURAR CANAIS
-            </button>
-          </div>
-        </div>
 
         <h1 className="text-3xl font-bold mb-4 text-gray-800">Vendas</h1>
         <ProductFilters
@@ -138,6 +128,15 @@ export default function ProductsPage() {
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
         />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <Card>
+            <CardVendas/>
+          </Card>
+          <Card>
+          </Card>
+          <Card>
+          </Card>
+        </div>
 
         {/* Botão "Selecionar Todos" abaixo dos filtros, como na imagem */}
         <div className="mt-4">
@@ -148,7 +147,7 @@ export default function ProductsPage() {
             SELECIONAR TODOS
           </button>
         </div>
-
+        
         {/* Indicador de carregamento */}
         {loading ? (
           <div className="flex justify-center items-center h-48 bg-white mt-6 rounded-lg shadow-md">
@@ -159,9 +158,8 @@ export default function ProductsPage() {
         ) : (
           <VendasTable Vendas ={filteredProducts} />
         )}
+
       </div>
-
-
     </div>
   );
 }

@@ -11,79 +11,81 @@ interface ProductTableProps {
 export function VendasTable({ Vendas }: ProductTableProps) {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md mt-6 border border-border-dark ">
-      <table className="min-w-full divide-y divide-border-dark">
-        {/* Fundo do cabeçalho da tabela mais escuro */}
-        <thead className="bg-background ">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              <input
-                type="checkbox"
-                className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary"
-              />
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              Pedidos
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              Conciliação 
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              Valor da venda
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              Margem
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-              Lucro
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-card divide-y divide-border-dark">
-          {Vendas.map((Venda) => (
-            // Linhas com hover
-            <tr
-              key={Venda.id}
-              className="hover:bg-background transition-colors duration-150"
-            >
-              <td className="px-6 py-4 whitespace-nowrap">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-full divide-y divide-border-dark">
+          {/* Fundo do cabeçalho da tabela mais escuro */}
+          <thead className="bg-background ">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                 <input
                   type="checkbox"
                   className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary"
                 />
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text">
-                {Venda.name}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
-                {Venda.consiliacao}
-              </td>
-            
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
-                {Venda.price.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
-                {Venda.margin.toFixed(2)}%
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <span
-                  className={
-                    Venda.totalProfit < 0 ? "text-error" : "text-primary"
-                  }
-                >
-                  {/* primary para positivo */}
-                  {Venda.totalProfit.toLocaleString("pt-BR", {
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                Pedidos
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                Conciliação 
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                Valor da venda
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                Margem
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                Lucro
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-card divide-y divide-border-dark">
+            {Vendas.map((Venda) => (
+              // Linhas com hover
+              <tr
+                key={Venda.id}
+                className="hover:bg-background transition-colors duration-150"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary"
+                  />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text">
+                  {Venda.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                  {Venda.consiliacao}
+                </td>
+              
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
+                  {Venda.price.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
+                  {Venda.margin.toFixed(2)}%
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <span
+                    className={
+                      Venda.totalProfit < 0 ? "text-error" : "text-primary"
+                    }
+                  >
+                    {/* primary para positivo */}
+                    {Venda.totalProfit.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 sm:px-6">
