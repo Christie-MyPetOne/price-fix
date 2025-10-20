@@ -143,6 +143,18 @@ export function VendasTable() {
                 >
                   Valor da venda
                 </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("totalAmount")}
+                >
+                  Margem
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("totalAmount")}
+                >
+                  Lucro
+                </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Ações
                 </th>
@@ -189,6 +201,11 @@ export function VendasTable() {
                       currency: "BRL",
                     }) ?? "R$ 0,00"}
                   </td>
+                  {/* Margem */}
+                  <td className="px-4 py-3 text-sm text-text text-center">–</td>
+
+                  {/* Lucro */}
+                  <td className="px-4 py-3 text-sm text-text text-center">–</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => {
@@ -198,7 +215,7 @@ export function VendasTable() {
                       className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b] transition"
                     >
                       <Calculator size={16} />
-                      Calcular
+                      
                     </button>
                   </td>
                 </tr>
