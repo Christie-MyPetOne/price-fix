@@ -5,6 +5,7 @@ import { VendasFilters } from "../../components/Vendas/VendasFilters";
 import { VendasTable } from "../../components/Vendas/VendasTable";
 import { Card } from "../../components/ui/Card";
 import CardVendas from "@/components/ui/CardVendas";
+import MargensChart from "@/components/Vendas/MargensChart";
 
 export default function VendasPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,6 +22,21 @@ export default function VendasPage() {
   const handleSelectAll = () => {
     console.log("Selecionar todos os produtos");
   };
+
+  // Dados de exemplo para o gráfico
+  const buckets = [
+    { id: "alta", titulo: "Margem alta", orders: 43175, percent: 56.52, lucro: 620760.73, color: "bg-blue-600" },
+    { id: "media", titulo: "Margem média", orders: 8323, percent: 10.9, lucro: 105290.26, color: "bg-green-600" },
+    { id: "baixa", titulo: "Margem baixa", orders: 14575, percent: 19.08, lucro: 80552.51, color: "bg-amber-500" },
+    { id: "preju", titulo: "Prejuízo", orders: 5891, percent: 7.71, lucro: -33317.38, color: "bg-red-600" },
+    { id: "incompleto", titulo: "Incompletos", orders: 4420, percent: 5.79, lucro: 0, color: "bg-gray-600" },
+  ];
+
+  const legend = [
+    { label: "Alta", range: "> 20,00%" },
+    { label: "Média", range: "12,00% - 20,00%" },
+    { label: "Baixa", range: "< 12,00%" },
+  ];
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
@@ -45,14 +61,16 @@ export default function VendasPage() {
           </Card>
         </div>
 
-        <div className="mt-4">
-          <button
-            onClick={handleSelectAll}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
-          >
-            SELECIONAR TODOS
-          </button>
+        {/* Gráfico de Margens */}
+        <div className="mt-8">
+          <MargensChart
+            buckets={buckets}
+            legend={legend}
+            onChangeSelection={(ids) => console.log("Selecionados:", ids)}
+            onEditRanges={() => console.log("Editar faixas de margens")}
+          />
         </div>
+
 
         {/* Tabela de vendas */}
         <VendasTable />

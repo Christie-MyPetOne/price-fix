@@ -202,10 +202,10 @@ export function VendasTable() {
                     }) ?? "R$ 0,00"}
                   </td>
                   {/* Margem */}
-                  <td className="px-4 py-3 text-sm text-text text-center">–</td>
+                  <td className="px-4 py-3 text-sm text-text text-center">faltam dados!</td>
 
                   {/* Lucro */}
-                  <td className="px-4 py-3 text-sm text-text text-center">–</td>
+                  <td className="px-4 py-3 text-sm text-text text-center">faltam dados!</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => {
