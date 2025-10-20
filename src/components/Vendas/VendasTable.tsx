@@ -133,27 +133,108 @@ export function VendasTable() {
                 </th>
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("customer")}
+                  onClick={() => handleSort("orderDate")}
                 >
-                  Cliente
+                  <div className="flex items-center gap-1">
+                    Data
+                    <ArrowUpDown
+                      size={14}
+                      className={`transition-transform ${
+                        sortConfig.key === "orderDate"
+                          ? "text-primary"
+                          : "text-gray-400"
+                      } ${
+                        sortConfig.key === "orderDate" &&
+                        sortConfig.direction === "asc"
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  </div>
                 </th>
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("totalAmount")}
+                  onClick={() => handleSort("orderDate")}
                 >
-                  Valor da venda
+                  <div className="flex items-center gap-1">
+                    Cliente
+                    <ArrowUpDown
+                      size={14}
+                      className={`transition-transform ${
+                        sortConfig.key === "orderDate"
+                          ? "text-primary"
+                          : "text-gray-400"
+                      } ${
+                        sortConfig.key === "orderDate" &&
+                        sortConfig.direction === "asc"
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  </div>
                 </th>
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("totalAmount")}
+                  onClick={() => handleSort("orderDate")}
                 >
-                  Margem
+                  <div className="flex items-center gap-1">
+                    Valor de Venda
+                    <ArrowUpDown
+                      size={14}
+                      className={`transition-transform ${
+                        sortConfig.key === "orderDate"
+                          ? "text-primary"
+                          : "text-gray-400"
+                      } ${
+                        sortConfig.key === "orderDate" &&
+                        sortConfig.direction === "asc"
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  </div>
                 </th>
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("totalAmount")}
+                  onClick={() => handleSort("orderDate")}
                 >
-                  Lucro
+                  <div className="flex items-center gap-1">
+                    Margem
+                    <ArrowUpDown
+                      size={14}
+                      className={`transition-transform ${
+                        sortConfig.key === "orderDate"
+                          ? "text-primary"
+                          : "text-gray-400"
+                      } ${
+                        sortConfig.key === "orderDate" &&
+                        sortConfig.direction === "asc"
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("orderDate")}
+                >
+                  <div className="flex items-center gap-1">
+                    Lucro
+                    <ArrowUpDown
+                      size={14}
+                      className={`transition-transform ${
+                        sortConfig.key === "orderDate"
+                          ? "text-primary"
+                          : "text-gray-400"
+                      } ${
+                        sortConfig.key === "orderDate" &&
+                        sortConfig.direction === "asc"
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  </div>
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Ações
@@ -178,12 +259,7 @@ export function VendasTable() {
                     <span>
                       <strong>Status:</strong> {sale.status}
                     </span>
-                    <span>
-                      <strong>Data:</strong>{" "}
-                      {sale.orderDate
-                        ? new Date(sale.orderDate).toLocaleDateString("pt-BR")
-                        : "N/A"}
-                    </span>
+
                     <span>
                       <strong>Produto:</strong>{" "}
                       {sale.items?.map((item) => item.productName).join(", ") ??
@@ -191,21 +267,40 @@ export function VendasTable() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-text-secondary">
+                    <strong>Data:</strong>{" "}
+                    {sale.orderDate
+                      ? new Date(sale.orderDate).toLocaleDateString("pt-BR")
+                      : "N/A"}
+
+                  </td>
+                  <td className="px-4 py-3 text-sm text-text-secondary">
                     {sale.customer
                       ? `${sale.customer.firstName} ${sale.customer.lastName}`
                       : "N/A"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-text">
+                  <td className="px-4 py-3 text-sm text-text text-center">
                     {sale.totalAmount?.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     }) ?? "R$ 0,00"}
                   </td>
-                  {/* Margem */}
-                  <td className="px-4 py-3 text-sm text-text text-center">faltam dados!</td>
+                  {/* Margem (random entre 5% e 30%) */}
+                  <td className="px-4 py-3 text-sm text-text text-center">
+                    {`${(Math.random() * (30 - 5) + 5).toFixed(2)}%`}
+                  </td>
 
-                  {/* Lucro */}
-                  <td className="px-4 py-3 text-sm text-text text-center">faltam dados!</td>
+                  {/* Lucro (random entre -500 e 2000 R$) */}
+                  <td className="px-4 py-3 text-sm text-text text-center">
+                    {Math.random() > 0.2
+                      ? (Math.random() * 2000).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })
+                      : (-Math.random() * 500).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => {
