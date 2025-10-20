@@ -21,9 +21,6 @@ export function VendasFilters({
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         {/* Código do pedido */}
         <div className="w-full">
-            <label className="block text-sm text-text-secondary mb-1">
-            Digite o código do pedido
-            </label>
             <input
             type="text"
             placeholder="Ex: PED-12345"
@@ -34,7 +31,6 @@ export function VendasFilters({
 
         {/* Data */}
         <div className="w-full">
-            <label className="block text-sm text-text-secondary mb-1">Data</label>
             <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
             <input
@@ -47,13 +43,13 @@ export function VendasFilters({
 
         {/* Empresas */}
         <div className="w-full">
-            <label className="block text-sm text-text-secondary mb-1">Empresas</label>
+            
             <select
             className={`${fieldBase} appearance-none`} // mesma altura do input
             onChange={(e) => onFilterChange("empresa", e.target.value)}
             defaultValue=""
             >
-            <option value="" disabled>Selecione</option>
+            <option value="" disabled>Empresas</option>
             <option value="empresa-a">Empresa A</option>
             <option value="empresa-b">Empresa B</option>
             </select>
@@ -61,13 +57,12 @@ export function VendasFilters({
 
         {/* Canais de vendas */}
         <div className="w-full">
-            <label className="block text-sm text-text-secondary mb-1">Canais de vendas</label>
             <select
             className={`${fieldBase} appearance-none`}
             onChange={(e) => onFilterChange("canal", e.target.value)}
             defaultValue=""
             >
-            <option value="" disabled>Selecione</option>
+            <option value="" disabled>Canais de vendas</option>
             <option value="ecommerce">E-commerce</option>
             <option value="marketplace">Marketplace</option>
             <option value="loja-fisica">Loja Física</option>
@@ -76,13 +71,12 @@ export function VendasFilters({
 
         {/* Produtos */}
         <div className="w-full">
-            <label className="block text-sm text-text-secondary mb-1">Produtos</label>
             <select
             className={`${fieldBase} appearance-none`}
             onChange={(e) => onFilterChange("produto", e.target.value)}
             defaultValue=""
             >
-            <option value="" disabled>Selecione</option>
+            <option value="" disabled>Produtos</option>
             <option value="produto-a">Produto A</option>
             <option value="produto-b">Produto B</option>
             </select>

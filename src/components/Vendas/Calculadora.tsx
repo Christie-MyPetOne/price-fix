@@ -42,128 +42,157 @@ export default function CalculadoraMargem({
 
   const margemFinal = receitaTotal - custosTotais;
 
-  return (
-    <div className="bg-card rounded-lg shadow-md p-4 border border-border-dark">
-      <h2 className="text-lg font-semibold mb-4">Simulador de preços</h2>
+  const inputBase =
+    "no-spinner w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text focus:ring-2 focus:ring-primary focus:outline-none";
 
-      {/* Preço e Margem desejada */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+  return (
+    <div className="bg-card rounded-lg shadow-md p-6 border border-border-dark">
+      <h2 className="text-xl font-bold mb-6 text-primary">Simulador de Preços</h2>
+
+      {/* Preço e Margem desejada (destaque) */}
+      <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Preço</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1">
+            Preço
+          </label>
           <input
             type="number"
             value={preco}
-            onChange={(e) => setPreco(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setPreco(parseFloat(e.target.value) || 0)}
+            className={`${inputBase} text-lg font-semibold`}
+            placeholder="R$ 0,00"
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Margem desejada (%)</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1">
+            Margem desejada (%)
+          </label>
           <input
             type="number"
             value={margem}
-            onChange={(e) => setMargem(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setMargem(parseFloat(e.target.value) || 0)}
+            className={`${inputBase} text-lg font-semibold`}
+            placeholder="0%"
           />
         </div>
       </div>
 
       {/* Custos e taxas */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Custo da mercadoria</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Custo da mercadoria
+          </label>
           <input
             type="number"
             value={custoMercadoria}
-            onChange={(e) => setCustoMercadoria(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setCustoMercadoria(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Taxa de frete</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Taxa de frete
+          </label>
           <input
             type="number"
             value={taxaFrete}
-            onChange={(e) => setTaxaFrete(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setTaxaFrete(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Receita de frete</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Receita de frete
+          </label>
           <input
             type="number"
             value={receitaFrete}
-            onChange={(e) => setReceitaFrete(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setReceitaFrete(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Custo de envio</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Custo de envio
+          </label>
           <input
             type="number"
             value={custoEnvio}
-            onChange={(e) => setCustoEnvio(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setCustoEnvio(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Desconto</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Desconto
+          </label>
           <input
             type="number"
             value={desconto}
-            onChange={(e) => setDesconto(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setDesconto(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">Subsídio de desconto</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            Subsídio de desconto
+          </label>
           <input
             type="number"
             value={subsidio}
-            onChange={(e) => setSubsidio(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setSubsidio(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">% de imposto efetivo</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            % de imposto efetivo
+          </label>
           <input
             type="number"
             value={imposto}
-            onChange={(e) => setImposto(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setImposto(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">% de comissão</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            % de comissão
+          </label>
           <input
             type="number"
             value={comissao}
-            onChange={(e) => setComissao(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setComissao(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">% taxa de venda</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            % taxa de venda
+          </label>
           <input
             type="number"
             value={taxaVenda}
-            onChange={(e) => setTaxaVenda(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setTaxaVenda(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
         <div>
-          <label className="block text-sm text-text-secondary mb-1">% outros custos</label>
+          <label className="block text-sm text-text-secondary mb-1">
+            % outros custos
+          </label>
           <input
             type="number"
             value={outrosCustos}
-            onChange={(e) => setOutrosCustos(parseFloat(e.target.value))}
-            className="w-full h-10 px-3 rounded-md border border-border-dark bg-background text-text"
+            onChange={(e) => setOutrosCustos(parseFloat(e.target.value) || 0)}
+            className={inputBase}
           />
         </div>
       </div>
 
       {/* Opção ignorar receita frete */}
-      <div className="mb-4">
+      <div className="mb-6">
         <label className="flex items-center gap-2 text-sm text-text">
           <input
             type="checkbox"
@@ -175,9 +204,15 @@ export default function CalculadoraMargem({
       </div>
 
       {/* Resultado */}
-      <div className="bg-background p-3 rounded-md border border-border-dark">
-        <p className="text-sm text-text-secondary">Margem de contribuição nominal estimada:</p>
-        <p className="text-2xl font-bold text-primary">
+      <div className="bg-background p-4 rounded-md border border-border-dark">
+        <p className="text-sm text-text-secondary mb-1">
+          Margem de contribuição nominal estimada:
+        </p>
+        <p
+          className={`text-3xl font-bold ${
+            margemFinal >= 0 ? "text-green-600" : "text-red-600"
+          }`}
+        >
           {margemFinal.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
