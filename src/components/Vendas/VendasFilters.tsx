@@ -16,7 +16,7 @@ export function VendasFilters({
   onFilterChange,
 }: VendasFiltersProps) {
   return (
-    <div className="bg-card p-6 rounded-lg shadow-md border border-border-dark">
+    <div className="bg-card p-2 rounded-lg shadow-md border border-border-dark">
       {/* Grid de filtros + botão */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         {/* Código do pedido */}
