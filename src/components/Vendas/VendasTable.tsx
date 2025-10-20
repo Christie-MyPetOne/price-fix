@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { sortData, toggleSelection, toggleSelectAll } from "../../lib/utils";
 import Drawer from "../ui/Drawer";
-import CalculadoraMargem from "../Vendas/Calculadora";
+import CalculadoraMargem from "./Calculadora";
 
 export function VendasTable() {
   const { sales, fetchSales, loading } = useSalesStore();

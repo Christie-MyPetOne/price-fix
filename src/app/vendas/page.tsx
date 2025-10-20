@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { VendasFilters } from "../../components/Vendas/VendasFilters";
-import { VendasTable } from "../../components/Vendas/VendasTable";
+import { VendasFilters } from "../../components/vendas/VendasFilters";
+import { VendasTable } from "../../components/vendas/VendasTable";
 import { Card } from "../../components/ui/Card";
 import CardVendas from "@/components/ui/CardVendas";
-import MargensChart from "@/components/Vendas/MargensChart";
+import MargensChart from "@/components/vendas/MargensChart";
 
 export default function VendasPage() {
   const [searchTerm, setSearchTerm] = useState("");
