@@ -1,9 +1,8 @@
-"use client"; // Necessário para usar hooks como useState
+"use client";
 
 import React, { useState } from "react";
 import { ProductFilters } from "../../components/produtos/ProductFilters";
 import { ProductTable } from "../../components/produtos/ProductTable";
-import { FinanceIndicators } from "../../components/produtos/FinanceIndicators";
 import { Product } from "../../lib/types";
 import { RefreshCcw } from "lucide-react";
 
@@ -94,37 +93,20 @@ export default function ProductsPage() {
 
   const filteredProducts = MOCK_PRODUCTS.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ).filter((product) => {
-    return true;
-  });
+  );
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-  };
-
-  const handleFilterChange = (filterName: string, value: string) => {
+  const handleSearch = (term: string) => setSearchTerm(term);
+  const handleFilterChange = (filterName: string, value: string) =>
     setFilters((prev) => ({ ...prev, [filterName]: value }));
-  };
 
-  const handleSelectAll = () => {
-    console.log("Selecionar todos os produtos");
-  };
+  const handleSelectAll = () => console.log("Selecionar todos os produtos");
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-full">
-      <div className="flex-1">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-md mb-6">
-          <div className="flex justify-between items-center">
-            <p className="text-sm">
-              <span className="font-semibold">Sincronização</span> não feita
-              ainda, clique no botão para sincronizar.
-            </p>
-            <button className="bg-white text-blue-600 px-4 py-2 rounded-md font-semibold hover:bg-blue-50 transition-colors">
-              CONFIGURAR CANAIS
-            </button>
-          </div>
-        </div>
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">Meus produtos</h1>
+    <div className="flex flex-col lg:flex-row gap-6 h-full w-full px-3 sm:px-4 md:px-6 pb-6">
+      <div className="flex-1 min-w-0">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-800">
+          Meus produtos
+        </h1>
         <ProductFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
@@ -133,24 +115,20 @@ export default function ProductsPage() {
         <div className="mt-4">
           <button
             onClick={handleSelectAll}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+            className="w-full sm:w-auto px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium text-sm"
           >
             SELECIONAR TODOS
           </button>
         </div>
         {loading ? (
           <div className="flex justify-center items-center h-48 bg-white mt-6 rounded-lg shadow-md">
-            <span className="text-gray-500 flex items-center gap-2">
+            <span className="text-gray-500 flex items-center gap-2 text-sm">
               <RefreshCcw className="animate-spin" /> Carregando...
             </span>
           </div>
         ) : (
           <ProductTable products={filteredProducts} />
         )}
-      </div>
-
-      <div className="lg:w-80 flex-shrink-0">
-        <FinanceIndicators />
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ import {
   HelpCircle,
   Bell,
 } from "lucide-react";
-import { usePathname } from "next/navigation"; // Para saber a rota atual
+import { usePathname } from "next/navigation";
 // import Image from "next/image";
 
 export function Navbar() {
@@ -88,7 +88,7 @@ export function Navbar() {
             alt="Preço Certo Logo"
             className="h-8 w-auto mr-2"
           /> */}
-          Preço Certo
+          Price Fix
         </Link>
 
         {/* Links de Navegação */}
@@ -123,7 +123,7 @@ export function Navbar() {
                   icon={Package}
                   onClick={toggleGerenciar}
                 >
-                  Produtos de venda
+                  Meus Produtos
                 </DropdownLink>
                 <DropdownLink
                   href="/vendas"

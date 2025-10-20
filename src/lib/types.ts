@@ -1,14 +1,12 @@
-// frontend/src/lib/types.ts
-
 export interface Product {
   id: string;
   name: string;
   sales: number;
-  status: 'Precificado' | 'Pendente' | 'Erro';
+  status: "Precificado" | "Pendente" | "Erro";
   price: number;
   margin: number;
   totalProfit: number;
-  workingCapital: number; // Capital de giro
+  workingCapital: number;
   line?: string;
   origin?: string;
   salesChannel?: string;
@@ -21,5 +19,3 @@ export interface User {
   email: string;
   name?: string;
 }
-
-// Outras tipagens podem ser adicionadas aqui

@@ -7,16 +7,11 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    // Mova o objeto 'colors' para fora do 'extend'
     colors: {
-      // É importante manter as cores padrão que você pode precisar.
-      // Você pode adicionar 'transparent' e 'current' para consistência.
       transparent: "transparent",
       current: "currentColor",
       white: "#ffffff",
       black: "#000000",
-
-      // Suas cores personalizadas vêm aqui
       background: "#1a1a1a",
       card: "#2c2c2c",
       primary: "#10B981",
@@ -30,7 +25,6 @@ const config: Config = {
       warning: "#F59E0B",
       info: "#3B82F6",
     },
-    // Você pode manter o 'extend' para outras propriedades que não sejam cores
     extend: {
       // Exemplo:
       // borderRadius: {
