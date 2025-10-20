@@ -1,7 +1,7 @@
 "use client"; // Necessário para usar hooks como useState
 
 import React, { useState } from "react";
-import { ProductFilters } from "../../components/produtos/ProductFilters";
+import { VendasFilters } from "../../components/Vendas/VendasFilters";
 import { VendasTable } from "../../components/Vendas/VendasTable";
 import { Venda } from "../../lib/types";
 import { RefreshCcw } from "lucide-react";
@@ -120,21 +120,23 @@ export default function ProductsPage() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
-      <div className="flex-1">
+      <div className="flex-1"> 
 
         <h1 className="text-3xl font-bold mb-4 text-gray-800">Vendas</h1>
-        <ProductFilters
+        <VendasFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <Card>
-            <CardVendas/>
+            <CardVendas Nome="Faturamento" Valor="R$ 150,00" />
           </Card>
           <Card>
+            <CardVendas Nome="Margem" Valor="15%" />
           </Card>
           <Card>
+            <CardVendas Nome="Pedidos Realizados" Valor="75000" />
           </Card>
         </div>
 
@@ -156,7 +158,7 @@ export default function ProductsPage() {
             </span>
           </div>
         ) : (
-          <VendasTable Vendas ={filteredProducts} />
+          <VendasTable vendas ={filteredProducts} />
         )}
 
       </div>

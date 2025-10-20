@@ -1,179 +1,146 @@
 "use client";
+import React, { useState } from "react";
+import { Venda } from "../../lib/types";
+import { ChevronLeft, ChevronRight, ArrowUpDown, Calculator } from "lucide-react";
+import { sortData, toggleSelection, toggleSelectAll } from "../../lib/utils";
+import CalculadoraMargem from "./Calculadora";
+import Drawer from "../ui/Drawer"; // ajuste caminho
 
-import React from "react";
-import { Venda } from "../../lib/types"; // Supondo que você tenha esse type
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-interface ProductTableProps {
-  Vendas: Venda[];
+interface VendasTableProps {
+  vendas: Venda[];
 }
 
-export function VendasTable({ Vendas }: ProductTableProps) {
+export function VendasTable({ vendas }: VendasTableProps) {
+  const [sortedVendas, setSortedVendas] = useState(vendas);
+  const [sortConfig, setSortConfig] = useState<{ key: keyof Venda | null; direction: "asc" | "desc" }>({ key: null, direction: "asc" });
+  const [selected, setSelected] = useState<string[]>([]);
+
+  // drawer state
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [vendaSelecionada, setVendaSelecionada] = useState<Venda | null>(null);
+
+  const allSelected = selected.length === vendas.length;
+
+  const headers: { key: keyof Venda; label: string }[] = [
+    { key: "name", label: "Pedidos" },
+    { key: "consiliacao", label: "Conciliação" },
+    { key: "price", label: "Valor da venda" },
+    { key: "margin", label: "Margem" },
+    { key: "totalProfit", label: "Lucro" },
+  ];
+
+  const handleSort = (key: keyof Venda) => {
+    const direction = sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortedVendas(sortData(sortedVendas, key, direction));
+    setSortConfig({ key, direction });
+  };
+
+  const handleToggleAll = () => setSelected(toggleSelectAll(vendas, selected));
+  const handleToggleOne = (id: string) => setSelected(toggleSelection(selected, id));
+
   return (
-    <div className="bg-card p-6 rounded-lg shadow-md mt-6 border border-border-dark ">
-      <div className="w-full overflow-x-auto">
-        <table className="min-w-full divide-y divide-border-dark">
-          {/* Fundo do cabeçalho da tabela mais escuro */}
-          <thead className="bg-background ">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+    <div className="bg-card p-6 rounded-lg shadow-md mt-6 border border-border-dark overflow-x-auto">
+      <table className="min-w-full divide-y divide-border-dark">
+        <thead className="bg-background">
+          <tr>
+            <th className="px-6 py-3">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={handleToggleAll}
+                className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary cursor-pointer"
+              />
+            </th>
+            {headers.map(({ key, label }) => (
+              <th
+                key={key}
+                onClick={() => handleSort(key)}
+                className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+              >
+                <div className="flex items-center gap-1">
+                  {label}
+                  <ArrowUpDown
+                    size={14}
+                    className={`transition-transform ${
+                      sortConfig.key === key ? "text-primary" : "text-gray-400"
+                    } ${
+                      sortConfig.key === key && sortConfig.direction === "asc" ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+              </th>
+            ))}
+            <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
+              Ações
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="bg-card divide-y divide-border-dark">
+          {sortedVendas.map((venda) => (
+            <tr key={venda.id} className="hover:bg-background transition-colors">
+              <td className="px-6 py-4 whitespace-nowrap">
                 <input
                   type="checkbox"
-                  className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary"
+                  checked={selected.includes(venda.id)}
+                  onChange={() => handleToggleOne(venda.id)}
+                  className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary cursor-pointer"
                 />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                Pedidos
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                Conciliação 
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                Valor da venda
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                Margem
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                Lucro
-              </th>
+              </td>
+              <td className="px-6 py-4 text-sm font-medium text-text">{venda.name}</td>
+              <td className="px-6 py-4 text-sm text-text-secondary">{venda.consiliacao}</td>
+              <td className="px-6 py-4 text-sm text-text">
+                {venda.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </td>
+              <td className="px-6 py-4 text-sm text-text">{venda.margin.toFixed(2)}%</td>
+              <td className="px-6 py-4 text-sm">
+                <span className={venda.totalProfit < 0 ? "text-error" : "text-primary"}>
+                  {venda.totalProfit.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                </span>
+              </td>
+
+              <td className="px-6 py-4 text-right">
+                <button
+                  onClick={() => {
+                    setVendaSelecionada(venda);
+                    setOpenDrawer(true);
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b] transition"
+                >
+                  <Calculator size={16} />
+                  
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody className="bg-card divide-y divide-border-dark">
-            {Vendas.map((Venda) => (
-              // Linhas com hover
-              <tr
-                key={Venda.id}
-                className="hover:bg-background transition-colors duration-150"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    className="rounded border-border-dark bg-background text-primary shadow-sm focus:ring-primary"
-                  />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text">
-                  {Venda.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
-                  {Venda.consiliacao}
-                </td>
-              
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
-                  {Venda.price.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-text">
-                  {Venda.margin.toFixed(2)}%
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className={
-                      Venda.totalProfit < 0 ? "text-error" : "text-primary"
-                    }
-                  >
-                    {/* primary para positivo */}
-                    {Venda.totalProfit.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
 
       {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 sm:px-6">
-        <div className="flex flex-1 justify-between sm:hidden">
-          <a
-            href="#"
-            className="relative inline-flex items-center rounded-md border border-border-dark bg-background px-4 py-2 text-sm font-medium text-text-secondary hover:bg-card"
-          >
-            Anterior
-          </a>
-          <a
-            href="#"
-            className="relative ml-3 inline-flex items-center rounded-md border border-border-dark bg-background px-4 py-2 text-sm font-medium text-text-secondary hover:bg-card"
-          >
-            Próximo
-          </a>
-        </div>
-        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-text-secondary">
-              Mostrando <span className="font-medium">1</span> a{" "}
-              <span className="font-medium">10</span> de{" "}
-              <span className="font-medium">99</span> resultados
-            </p>
-          </div>
-          <div>
-            <nav
-              className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-              aria-label="Pagination"
-            >
-              <a
-                href="#"
-                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-text-secondary ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0"
-              >
-                <span className="sr-only">Previous</span>
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </a>
-              <a
-                href="#"
-                aria-current="page"
-                className="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                1
-              </a>
-              <a
-                href="#"
-                className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0"
-              >
-                2
-              </a>
-              <a
-                href="#"
-                className="relative hidden items-center px-4 py-2 text-sm font-semibold text-text ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0 md:inline-flex"
-              >
-                3
-              </a>
-              <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text-secondary ring-1 ring-inset ring-border-dark focus:outline-offset-0">
-                ...
-              </span>
-              <a
-                href="#"
-                className="relative hidden items-center px-4 py-2 text-sm font-semibold text-text ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0 md:inline-flex"
-              >
-                8
-              </a>
-              <a
-                href="#"
-                className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0"
-              >
-                9
-              </a>
-              <a
-                href="#"
-                className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0"
-              >
-                10
-              </a>
-              <a
-                href="#"
-                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-text-secondary ring-1 ring-inset ring-border-dark hover:bg-background focus:z-20 focus:outline-offset-0"
-              >
-                <span className="sr-only">Next</span>
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </a>
-            </nav>
-          </div>
+        <p className="text-sm text-text-secondary hidden sm:block">
+          Mostrando <span className="font-medium">1</span> a <span className="font-medium">10</span> de{" "}
+          <span className="font-medium">99</span> resultados
+        </p>
+        <div className="flex gap-2">
+          <button className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"><ChevronLeft size={16} /></button>
+          <button className="p-2 rounded-md bg-primary text-white font-semibold text-sm">1</button>
+          <button className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background">2</button>
+          <button className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"><ChevronRight size={16} /></button>
         </div>
       </div>
+
+      {/* Drawer da Calculadora */}
+      <Drawer
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        title={vendaSelecionada?.name ?? "Simulador de preços"}
+      >
+        <CalculadoraMargem
+          initialPreco={vendaSelecionada?.price ?? 0}
+          initialMargem={vendaSelecionada?.margin ?? 0}
+        />
+      </Drawer>
     </div>
   );
 }
