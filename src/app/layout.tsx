@@ -8,7 +8,7 @@ import { Footer } from "../components/layout/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Preço Certo Clone",
+  title: "Price Fix",
   description: "Sistema de gestão de vendas e produtos",
 };
 

@@ -15,25 +15,40 @@ export const useProductStore = create<ProductState>((set, get) => ({
     );
     const data = res.data;
 
-    const mapped: Product[] = data.map((item) => ({
-      id: String(item.id),
-      name: item.title,
-      price: item.price,
-      margin: Math.random() * 40 - 5,
-      totalProfit: Math.random() * 300 - 100,
-      workingCapital: Math.random() * 1000 - 500,
-      sales: Math.floor(Math.random() * 100),
-      status: "Precificado",
-      origin: item.category,
-      image: item.image,
-      stockLevel: Math.floor(Math.random() * 50),
-      salesHistory: Array.from({ length: 7 }, () =>
-        Math.floor(Math.random() * 20)
-      ),
-      profitHistory: Array.from({ length: 7 }, () =>
-        Math.floor(Math.random() * 100 - 50)
-      ),
-    }));
+    const mapped: Product[] = data.map((item, index) => {
+      const cost = parseFloat((item.price * 0.5).toFixed(2)); // custo = 50% do preço
+      const shipping = 15;
+      const marketplaceFee = 0.16; // 16%
+      const feeValue = item.price * marketplaceFee;
+      const totalCosts = cost + shipping + feeValue;
+      const profit = item.price - totalCosts;
+      const margin = item.price > 0 ? (profit / item.price) * 100 : 0;
+
+      const stockLevel = index % 3 === 0 ? 60 : Math.floor(Math.random() * 50);
+      const salesHistory =
+        index % 3 === 0
+          ? Array(7).fill(0)
+          : Array.from({ length: 7 }, () => Math.floor(Math.random() * 20));
+
+      return {
+        id: String(item.id),
+        name: item.title,
+        price: item.price,
+        cost,
+        margin,
+        totalProfit: Math.random() * 300 - 100,
+        workingCapital: Math.random() * 1000 - 500,
+        sales: salesHistory.reduce((a, b) => a + b, 0),
+        status: "Precificado",
+        origin: item.category,
+        image: item.image,
+        stockLevel,
+        salesHistory,
+        profitHistory: Array.from({ length: 7 }, () =>
+          Math.floor(Math.random() * 100 - 50)
+        ),
+      };
+    });
 
     set({ products: mapped, sortedProducts: mapped, selected: [] });
   },

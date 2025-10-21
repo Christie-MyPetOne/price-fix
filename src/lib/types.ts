@@ -67,7 +67,6 @@ export interface ProductDetailModalProps {
 }
 
 export type Tab = "calculator" | "competitors" | "history";
-
 export interface DrawerProps {
   open: boolean;
   onClose: () => void;
@@ -86,7 +85,6 @@ export interface FakeProduct {
   category: string;
   image: string;
 }
-
 export interface ProductState {
   products: Product[];
   sortedProducts: Product[];
@@ -96,4 +94,16 @@ export interface ProductState {
   toggleOne: (id: string) => void;
   toggleAll: () => void;
   sortBy: (key: keyof Product) => void;
+}
+export interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+  icon?: React.ElementType | null;
+}
+
+export interface DropdownLinkProps {
+  href: string;
+  children: React.ReactNode;
+  icon?: React.ElementType | null;
+  onClick: () => void;
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
-import { useTheme } from "../../context/ThemeContext";
-import { Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
+import { NavLinkProps, DropdownLinkProps } from "@/lib/types";
 import {
   Home,
   Package,
@@ -14,24 +15,17 @@ import {
   ChevronDown,
   HelpCircle,
   Bell,
+  Sun,
+  Moon,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
-// import Image from "next/image";
 
 export function Navbar() {
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);
-  const pathname = usePathname(); // Hook para pegar o caminho atual
+  const pathname = usePathname();
 
   const toggleGerenciar = () => {
     setIsGerenciarOpen(!isGerenciarOpen);
   };
-
-  // Componente NavLink para encapsular a lógica de estilo de link ativo
-  interface NavLinkProps {
-    href: string;
-    children: React.ReactNode;
-    icon?: React.ElementType | null;
-  }
 
   const NavLink: React.FC<NavLinkProps> = ({ href, children, icon: Icon }) => {
     const isActive = pathname === href;
@@ -51,16 +45,15 @@ export function Navbar() {
     );
   };
 
-  // Componente DropdownLink (usará estilos mais claros por ser em um card)
-  interface DropdownLinkProps {
-    href: string;
-    children: React.ReactNode;
-    icon?: React.ElementType | null;
-    onClick: () => void;
-  }
-
   const ThemeToggleButton = () => {
     const { theme, toggleTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+      setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
 
     return (
       <button
@@ -68,7 +61,7 @@ export function Navbar() {
         className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors"
         aria-label="Alternar tema"
       >
-        {theme === 'dark' ? (
+        {theme === "dark" ? (
           <Sun className="w-5 h-5" />
         ) : (
           <Moon className="w-5 h-5" />
@@ -76,7 +69,6 @@ export function Navbar() {
       </button>
     );
   };
-
   const DropdownLink: React.FC<DropdownLinkProps> = ({
     href,
     children,
@@ -97,7 +89,6 @@ export function Navbar() {
 
   return (
     <nav className="bg-card p-4 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
-      {/* Lado Esquerdo: Logo e Navegação Principal */}
       <div className="flex items-center space-x-6">
         <Link
           href="/"
@@ -113,12 +104,9 @@ export function Navbar() {
 
         {/* Links de Navegação */}
         <div className="hidden md:flex items-center space-x-2">
-          {" "}
-          {/* Reduzi o espaço entre links */}
           <NavLink href="/" icon={Home}>
             Dashboard
           </NavLink>
-          {/* Dropdown "Gerenciar" */}
           <div className="relative">
             <button
               onClick={toggleGerenciar}
@@ -177,7 +165,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Lado Direito: Ícones de Ação e Perfil */}
       <div className="flex items-center space-x-4">
         <span className="text-text-secondary text-sm hidden lg:inline">
           Última sincronização: 17/10/2025 13:52
@@ -200,7 +187,6 @@ export function Navbar() {
             </span>
             <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
           </button>
-          {/* Dropdown de usuário (opcional) */}
           <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-20 border border-border-dark">
             <DropdownLink href="/perfil" onClick={() => {}}>
               Perfil
