@@ -32,6 +32,23 @@
   --color-info: #3b82f6;
 }
 
+/* Skeleton piscando usando a cor --color-text-secondary */
+.shine {
+  background-color: var(--color-text-secondary);
+  border-radius: 0.5rem;
+  opacity: 0.5;
+  animation: pulseSkeleton 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseSkeleton {
+  0%, 100% {
+    opacity: 0.2; /* mais transparente */
+  }
+  50% {
+    opacity: 0.5; /* fica mais visível no pico */
+  }
+}
+
 html,
 body {
   height: 100%;

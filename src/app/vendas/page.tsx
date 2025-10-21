@@ -1,29 +1,67 @@
 "use client";
 
 import React, { useState } from "react";
-import { VendasFilters } from "../../components/Vendas/VendasFilters";
-import { VendasTable } from "../../components/Vendas/VendasTable";
+import { VendasFilters } from "../../components/vendas/VendasFilters";
+import { VendasTable } from "../../components/vendas/VendasTable";
 import { Card } from "../../components/ui/Card";
 import CardVendas from "@/components/ui/CardVendas";
-import MargensChart from "@/components/Vendas/MargensChart";
+import MargensChart from "@/components/vendas/MargensChart";
+import { useSalesStore } from "../../store/useSalesStore";
+
+type FiltersState = {
+  date: string;
+  empresa: string;
+  canal: string;
+  produto: string;
+};
 
 export default function VendasPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({});
+  const { filterSales, clearFilters } = useSalesStore();
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-  };
+  // estado local dos filtros do TOPO
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<FiltersState>({
+    date: "",
+    empresa: "",
+    canal: "",
+    produto: "",
+  });
+
+  // handlers do VendasFilters (TOPO)
+  const handleSearch = (term: string) => setSearchTerm(term);
 
   const handleFilterChange = (filterName: string, value: string) => {
+    if (filterName === "apply") {
+      const allEmpty =
+        !searchTerm &&
+        !filters.date &&
+        !filters.empresa &&
+        !filters.canal &&
+        !filters.produto;
+
+      if (allEmpty) {
+        clearFilters();
+      } else {
+        filterSales({
+          q: searchTerm,
+          date: filters.date,
+          empresa: filters.empresa,
+          canal: filters.canal,
+          produto: filters.produto,
+        });
+      }
+      return;
+    }
+
     setFilters((prev) => ({ ...prev, [filterName]: value }));
   };
 
-  const handleSelectAll = () => {
-    console.log("Selecionar todos os produtos");
+  const handleSelectAll = (checked: boolean) => {
+    // opcional: sincronizar com a tabela via store/contexto
+    console.log("Selecionar todos (topo):", checked);
   };
 
-  // Dados de exemplo para o gráfico
+  // Dados do gráfico (exemplo)
   const buckets = [
     { id: "alta", titulo: "Margem alta", orders: 43175, percent: 56.52, lucro: 620760.73, color: "bg-blue-600" },
     { id: "media", titulo: "Margem média", orders: 8323, percent: 10.9, lucro: 105290.26, color: "bg-green-600" },
@@ -41,14 +79,16 @@ export default function VendasPage() {
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       <div className="flex-1">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">Vendas</h1>
+        <h1 className="text-3xl font-bold mb-4 text-color-text">Vendas</h1>
 
+        {/* FILTROS DO TOPO — únicos */}
         <VendasFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
         />
 
+        {/* Cards de resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <Card>
             <CardVendas Nome="Faturamento" Valor="R$ 150,00" />
@@ -61,7 +101,7 @@ export default function VendasPage() {
           </Card>
         </div>
 
-        {/* Gráfico de Margens */}
+        {/* Gráfico de Margens (mantido) */}
         <div className="mt-8">
           <MargensChart
             buckets={buckets}
@@ -71,10 +111,10 @@ export default function VendasPage() {
           />
         </div>
 
-
-        {/* Tabela de vendas */}
+        {/* Tabela (sem filtros próprios) */}
         <VendasTable />
       </div>
     </div>
+    
   );
 }

@@ -59,18 +59,18 @@ export default function MargensChart({
   }, [selectedIds, onChangeSelection]);
 
   return (
-    <div className="w-full border-border-dark rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+    <div className="w-full bg-card rounded-lg shadow-sm border border-border-dark p-3 sm:p-4">
       <div className="flex gap-6">
         {/* Área principal */}
         <div className="flex-1">
           {/* Topo: contadores */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 pb-2">
             {buckets.map((b) => (
-              <div key={b.id} className="text-xs sm:text-sm text-gray-700">
+              <div key={b.id} className="text-xs sm:text-sm text-color-text">
                 <span className="font-semibold">
                   {b.orders.toLocaleString("pt-BR")} pedidos
                 </span>{" "}
-                <span className="text-gray-400">
+                <span className="text-color-text">
                   {b.percent.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
                 </span>
               </div>
@@ -123,7 +123,7 @@ export default function MargensChart({
             {buckets.map((b) => (
               <div
                 key={b.id}
-                className="flex items-start gap-2 px-2 py-2 rounded-md bg-gray-50 border border-gray-200"
+                className="flex items-start gap-2 px-2 py-2 rounded-md  border border-border-dark"
               >
                 <input
                   type="checkbox"
@@ -134,10 +134,10 @@ export default function MargensChart({
                   }
                 />
                 <div className="leading-tight">
-                  <div className="text-sm font-medium text-gray-700">
+                  <div className="text-sm font-medium text-color-text">
                     {b.titulo}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-color-text">
                     Lucro: {formatBRL(b.lucro)}
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export default function MargensChart({
         {/* Painel lateral (legenda) */}
         <aside className="w-40 shrink-0 hidden md:block">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-semibold text-gray-700">Margens</div>
+            <div className="text-sm font-semibold text-color-text">Margens</div>
             <button
               className="text-xs text-sky-600 hover:underline"
               onClick={onEditRanges}
@@ -161,8 +161,8 @@ export default function MargensChart({
           <ul className="space-y-2">
             {legend.map((l) => (
               <li key={l.label} className="flex justify-between text-sm">
-                <span className="text-gray-700">{l.label}</span>
-                <span className="text-gray-500">{l.range}</span>
+                <span className="text-color-text">{l.label}</span>
+                <span className="text-text-secondary">{l.range}</span>
               </li>
             ))}
           </ul>
