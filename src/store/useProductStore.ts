@@ -1,27 +1,7 @@
-import { create } from "zustand";
 import axios from "axios";
-import { Product } from "../lib/types";
-import { sortData, toggleSelection, toggleSelectAll } from "../lib/utils";
-
-// Tipo da API FakeStore
-interface FakeProduct {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  image: string;
-}
-
-interface ProductState {
-  products: Product[];
-  sortedProducts: Product[];
-  selected: string[];
-  sortConfig: { key: keyof Product | null; direction: "asc" | "desc" };
-  fetchProducts: () => Promise<void>;
-  toggleOne: (id: string) => void;
-  toggleAll: () => void;
-  sortBy: (key: keyof Product) => void;
-}
+import { create } from "zustand";
+import { Product, FakeProduct, ProductState } from "@/lib/types";
+import { sortData, toggleSelection, toggleSelectAll } from "@/lib/utils";
 
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
@@ -39,13 +19,20 @@ export const useProductStore = create<ProductState>((set, get) => ({
       id: String(item.id),
       name: item.title,
       price: item.price,
-      margin: Math.random() * 20,
-      totalProfit: Math.random() * 200,
-      workingCapital: Math.random() * 1000,
+      margin: Math.random() * 40 - 5,
+      totalProfit: Math.random() * 300 - 100,
+      workingCapital: Math.random() * 1000 - 500,
       sales: Math.floor(Math.random() * 100),
       status: "Precificado",
       origin: item.category,
       image: item.image,
+      stockLevel: Math.floor(Math.random() * 50),
+      salesHistory: Array.from({ length: 7 }, () =>
+        Math.floor(Math.random() * 20)
+      ),
+      profitHistory: Array.from({ length: 7 }, () =>
+        Math.floor(Math.random() * 100 - 50)
+      ),
     }));
 
     set({ products: mapped, sortedProducts: mapped, selected: [] });

@@ -2,16 +2,22 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
-import { Product } from "../../lib/types";
-import { useProductStore } from "../../store/useProductStore";
-import { sortData, toggleSelection, toggleSelectAll } from "../../lib/utils";
+import { Product, ProductTableProps } from "@/lib/types";
+import { sortData, toggleSelection, toggleSelectAll } from "@/lib/utils";
+import { useProductStore } from "@/store/useProductStore";
+import { ProductHealthIcons } from "./ProductHealthIcons";
 
-// 1. Adicionamos a prop onRowClick para receber a função do componente pai
-interface ProductTableProps {
-  products?: Product[];
-  onRowClick: (product: Product) => void;
-}
+const RechartsSparkline = dynamic(
+  () => import("./RechartsSparkline").then((mod) => mod.RechartsSparkline),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ width: 60, height: 20 }} className="inline-block ml-2" />
+    ),
+  }
+);
 
 export const ProductTable: React.FC<ProductTableProps> = ({
   products,
@@ -106,10 +112,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     selected.length === displayedProducts.length &&
     displayedProducts.length > 0;
 
-  const headers: { key: keyof Product; label: string }[] = [
+  const headers: { key: keyof Product | "alerts"; label: string }[] = [
     { key: "name", label: "Nome" },
-    { key: "sales", label: "Vendas" },
     { key: "status", label: "Status" },
+    { key: "alerts", label: "Alertas" },
+    { key: "sales", label: "Vendas" },
     { key: "price", label: "Preço" },
     { key: "margin", label: "Margem" },
     { key: "totalProfit", label: "Lucro total" },
@@ -164,37 +171,48 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
                 />
               </th>
-
               {headers.map(({ key, label }) => (
                 <th
                   key={String(key)}
-                  onClick={() => handleSort(key)}
-                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() =>
+                    key !== "alerts" && handleSort(key as keyof Product)
+                  }
+                  className={`px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider ${
+                    key !== "alerts"
+                      ? "cursor-pointer select-none"
+                      : "text-center"
+                  }`}
                 >
-                  <div className="flex items-center gap-1">
+                  <div
+                    className={`flex items-center gap-1 ${
+                      key === "alerts" ? "justify-center" : ""
+                    }`}
+                  >
                     {label}
-                    <ArrowUpDown
-                      size={14}
-                      className={`transition-transform ${
-                        (
-                          products
-                            ? localSort.key === key
-                            : storeSortConfig.key === key
-                        )
-                          ? "text-primary"
-                          : "text-gray-400"
-                      } ${
-                        (
-                          products
-                            ? localSort.key === key &&
-                              localSort.direction === "asc"
-                            : storeSortConfig.key === key &&
-                              storeSortConfig.direction === "asc"
-                        )
-                          ? "rotate-180"
-                          : ""
-                      }`}
-                    />
+                    {key !== "alerts" && (
+                      <ArrowUpDown
+                        size={14}
+                        className={`transition-transform ${
+                          (
+                            products
+                              ? localSort.key === key
+                              : storeSortConfig.key === key
+                          )
+                            ? "text-primary"
+                            : "text-gray-400"
+                        } ${
+                          (
+                            products
+                              ? localSort.key === key &&
+                                localSort.direction === "asc"
+                              : storeSortConfig.key === key &&
+                                storeSortConfig.direction === "asc"
+                          )
+                            ? "rotate-180"
+                            : ""
+                        }`}
+                      />
+                    )}
                   </div>
                 </th>
               ))}
@@ -216,9 +234,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
                   />
                 </td>
-
                 <td className="px-4 py-3 text-sm font-medium text-text flex items-center gap-2">
-                  {/* Container com tamanho fixo para a imagem */}
                   <div className="w-10 h-10 flex-shrink-0 relative">
                     {product.image ? (
                       <Image
@@ -228,17 +244,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         className="object-cover rounded"
                       />
                     ) : (
-                      // Placeholder para produtos sem imagem
                       <div className="w-full h-full bg-border-dark rounded flex items-center justify-center">
                         <span className="text-xs text-text-secondary"></span>
                       </div>
                     )}
                   </div>
                   <span>{product.name}</span>
-                </td>
-
-                <td className="px-4 py-3 text-sm text-text-secondary">
-                  {product.sales}
                 </td>
 
                 <td className="px-4 py-3 text-sm">
@@ -255,28 +266,60 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   </span>
                 </td>
 
+                <td className="px-4 py-3 text-sm">
+                  <ProductHealthIcons product={product} />
+                </td>
+
+                {/* Gráfico de linha pequeno (somente linha, centralizado) */}
+                <td className="px-4 py-3 text-sm text-text-secondary">
+                  <div className="flex items-center justify-between">
+                    <span>{product.sales}</span>
+                    <div className="flex items-center justify-center w-[80px]">
+                      <RechartsSparkline
+                        data={(product.salesHistory || []).map((value) => ({
+                          value,
+                        }))}
+                        color="var(--color-info)"
+                      />
+                    </div>
+                  </div>
+                </td>
+
                 <td className="px-4 py-3 text-sm text-text">
                   {product.price.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </td>
-
                 <td className="px-4 py-3 text-sm text-text">
                   {product.margin.toFixed(2)}%
                 </td>
 
                 <td className="px-4 py-3 text-sm">
-                  <span
-                    className={
-                      product.totalProfit < 0 ? "text-error" : "text-primary"
-                    }
-                  >
-                    {product.totalProfit.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`whitespace-nowrap ${
+                        product.totalProfit < 0 ? "text-error" : "text-primary"
+                      }`}
+                    >
+                      {product.totalProfit.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </span>
+                    <div className="flex items-center justify-center w-[80px]">
+                      <RechartsSparkline
+                        data={(product.profitHistory || []).map((value) => ({
+                          value,
+                        }))}
+                        color={
+                          product.totalProfit < 0
+                            ? "var(--color-error)"
+                            : "var(--color-primary)"
+                        }
+                      />
+                    </div>
+                  </div>
                 </td>
 
                 <td className="px-4 py-3 text-sm">
@@ -293,6 +336,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 </td>
               </tr>
             ))}
+
             {displayedProducts.length === 0 && (
               <tr>
                 <td
@@ -307,6 +351,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </table>
       </div>
 
+      {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
         <div className="flex gap-2">
           <button
@@ -316,7 +361,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           >
             <ChevronLeft size={16} />
           </button>
-
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
@@ -330,7 +374,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               {page}
             </button>
           ))}
-
           <button
             className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"
             disabled={currentPage === totalPages}

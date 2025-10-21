@@ -1,9 +1,5 @@
 import React from "react";
-
-interface CardVendasProps {
-  Nome: string;
-  Valor: string | number;
-}
+import { CardVendasProps } from "@/lib/types";
 
 const CardVendas: React.FC<CardVendasProps> = ({ Nome, Valor }) => {
   return (

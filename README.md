@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🛒 Price Fix
 
-## Getting Started
+Sistema de gestão de vendas e produtos com interface moderna, intuitiva e responsiva, desenvolvido em Next.js, TypeScript, Tailwind CSS e com gerenciamento de estado leve via Zustand. Suporta temas claro e escuro com persistência de preferência.
 
-First, run the development server:
+🏗️ Arquitetura
+frontend/
+├── public/ # Arquivos estáticos (imagens, ícones)
+├── src/
+│ ├── app/ # Rotas e layouts do Next.js (App Router)
+│ │ ├── layout.tsx # Layout principal (ThemeProvider, estrutura base)
+│ │ ├── page.tsx # Página inicial (Dashboard)
+│ │ ├── produtos/ # Páginas relacionadas a produtos
+│ │ └── vendas/ # Páginas relacionadas a vendas
+│ ├── components/ # Componentes reutilizáveis
+│ │ ├── layout/ # Navbar, Footer e estrutura de layout
+│ │ ├── produtos/ # Componentes específicos de produtos
+│ │ ├── vendas/ # Componentes específicos de vendas
+│ │ └── ui/ # Componentes genéricos (Button, Card, Modal)
+│ ├── context/ # Contexto de tema (ThemeContext)
+│ ├── store/ # Zustand (estado global)
+│ ├── lib/ # Utilitários, helpers e tipos
+│ └── styles/ # Estilos globais e tema (Tailwind)
+├── tailwind.config.ts # Configuração do Tailwind CSS
+├── tsconfig.json # Configuração do TypeScript
+└── package.json # Dependências e scripts do projeto
 
-```bash
+📋 Funcionalidades
+
+📊 Dashboard: Visão geral das métricas principais de vendas e produtos
+
+📦 Gestão de Produtos: CRUD completo (criação, edição, listagem e exclusão)
+
+🧾 Gestão de Vendas: Acompanhamento e controle de pedidos de venda
+
+📈 Relatórios: Visualização de dados analíticos e margens de lucro
+
+🌓 Tema Claro/Escuro: Alternância de tema com persistência em localStorage
+
+🛠️ Tecnologias e Bibliotecas
+
+Next.js 13+ (App Router)
+
+React
+
+TypeScript
+
+Tailwind CSS
+
+Zustand
+– Gerenciamento de estado leve
+
+Lucide Icons
+– Ícones modernos
+
+ShadCN/UI (opcional)
+– Componentes UI prontos e acessíveis
+
+🚀 Como Executar
+
+Clone o repositório:
+
+git clone https://github.com/seu-usuario/price-fix.git
+cd price-fix
+
+Instale as dependências:
+
+npm install
+
+# ou
+
+yarn install
+
+Execute o ambiente de desenvolvimento:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra no navegador:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Acesse http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🌙 Alternância de Tema
 
-## Learn More
+A troca entre os temas claro e escuro pode ser feita clicando no ícone ☀️🌙 no cabeçalho.
 
-To learn more about Next.js, take a look at the following resources:
+A preferência é armazenada localmente, mantendo o tema escolhido ao recarregar a página.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🔧 Configuração
+📁 Diretórios Importantes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+src/components/ui/: Botões, cards, modais reutilizáveis
 
-## Deploy on Vercel
+src/context/ThemeContext.tsx: Alternância de tema global
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+src/store/: Zustand (estado global simples)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+src/lib/: Helpers, formatação de dados, etc.
+
+📦 Scripts Disponíveis
+npm run dev # Inicia o servidor de desenvolvimento
+npm run build # Compila para produção
+npm run lint # Executa o linter
+
+🧪 Testes (opcional)
+
+Ainda não implementado. Pretende-se utilizar Jest e React Testing Library para testes unitários e de integração.
+
+🤝 Contribuição
+
+Faça um fork do projeto
+
+Crie uma branch:
+
+git checkout -b feature/sua-feature
+
+Commit suas mudanças:
+
+git commit -m 'feat: nova funcionalidade'
+
+Faça push para sua branch:
+
+git push origin feature/sua-feature
+
+Abra um Pull Request
+
+📄 Licença
+
+Este projeto está sob a Licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+👥 Equipe
+
+Desenvolvimento: Você mesmo ou sua equipe
+
+Última atualização: Outubro 2025

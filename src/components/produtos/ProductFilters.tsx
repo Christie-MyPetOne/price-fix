@@ -1,20 +1,13 @@
 "use client";
 
 import React from "react";
-import { Search, Filter, RefreshCcw, Plus, Download } from "lucide-react"; // Importar Plus e Download
+import { Search, Filter } from "lucide-react";
+import { ProductFiltersProps } from "@/lib/types";
 import { Button } from "../ui/Button";
-
-interface ProductFiltersProps {
-  onSearch: (searchTerm: string) => void;
-  onFilterChange: (filterName: string, value: string) => void;
-  onSelectAll: () => void;
-  // ... outras props de filtro
-}
 
 export function ProductFilters({
   onSearch,
   onFilterChange,
-  onSelectAll,
 }: ProductFiltersProps) {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6 border border-border-dark">
