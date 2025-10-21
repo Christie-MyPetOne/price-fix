@@ -1,13 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-
-interface DrawerProps {
-  open: boolean;
-  onClose: () => void;
-  title?: string;
-  children: React.ReactNode;
-  side?: "right" | "left";
-}
+import { DrawerProps } from "@/lib/types";
 
 export default function Drawer({
   open,
@@ -34,18 +27,31 @@ export default function Drawer({
 
       {/* Drawer */}
       <div
-        className={`absolute top-0 ${side === "right" ? "right-0" : "left-0"} h-full w-full max-w-xl
+        className={`absolute top-0 ${
+          side === "right" ? "right-0" : "left-0"
+        } h-full w-full max-w-xl
           bg-card border-l border-border-dark shadow-xl
           transition-transform duration-300
-          ${open ? "translate-x-0" : side === "right" ? "translate-x-full" : "-translate-x-full"}`}
+          ${
+            open
+              ? "translate-x-0"
+              : side === "right"
+              ? "translate-x-full"
+              : "-translate-x-full"
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-border-dark">
           <h3 className="text-lg font-semibold">{title}</h3>
-          <button onClick={onClose} className="px-2 py-1 rounded hover:bg-background">
+          <button
+            onClick={onClose}
+            className="px-2 py-1 rounded hover:bg-background"
+          >
             ✕
           </button>
         </div>
-        <div className="p-4 overflow-y-auto h-[calc(100%-56px)]">{children}</div>
+        <div className="p-4 overflow-y-auto h-[calc(100%-56px)]">
+          {children}
+        </div>
       </div>
     </div>
   );

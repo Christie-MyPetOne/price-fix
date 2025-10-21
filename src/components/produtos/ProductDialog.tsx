@@ -1,73 +1,78 @@
 "use client";
 
-import React from "react";
-import { Product } from "../../lib/types";
-import { X } from "lucide-react";
-
-// Props que o componente do modal espera receber
-interface ProductDetailModalProps {
-  product: Product | null; // O produto a ser exibido, ou null para não mostrar o modal
-  onClose: () => void; // Função para fechar o modal
-}
-
-// Componente auxiliar para os campos de input (apenas para exibição)
-const InfoField = ({
-  label,
-  value,
-  unit,
-  placeholder = "N/A",
-}: {
-  label: string;
-  value: string | number | undefined;
-  unit?: "R$" | "%" | "dias";
-  placeholder?: string;
-}) => (
-  <div>
-    <label className="block text-xs font-medium text-text-secondary mb-1">
-      {label}
-    </label>
-    <div className="relative">
-      {unit && (
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-text-secondary">
-          {unit}
-        </span>
-      )}
-      <input
-        type="text"
-        readOnly
-        value={value ?? ""}
-        placeholder={placeholder}
-        className={`w-full p-2 border border-border-dark rounded-md bg-background text-text text-sm ${
-          unit ? "pl-10" : ""
-        }`}
-      />
-    </div>
-  </div>
-);
+import React, { useState, useEffect, useMemo } from "react";
+import { X, TrendingUp, History, Users } from "lucide-react";
+import { Product, ProductDetailModalProps, type Tab } from "@/lib/types";
+import { PerformanceChart } from "./RechartsSparkline";
+import { TabButton } from "../ui/TabButton";
+import { CalculationInputField } from "../ui/CalculationInputField";
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
   onClose,
 }) => {
-  // Se não houver produto selecionado, não renderiza nada
-  if (!product) {
-    return null;
-  }
+  const [activeTab, setActiveTab] = useState<Tab>("calculator");
+  const [editableProduct, setEditableProduct] = useState<Product | null>(
+    product
+  );
+  const [price, setPrice] = useState(product?.price || 0);
+  const [cost, setCost] = useState(product?.cost || 0);
+  const [shipping, setShipping] = useState(15);
+  const [marketplaceFee, setMarketplaceFee] = useState(16);
+  const [targetMargin, setTargetMargin] = useState("");
+  const [targetProfit, setTargetProfit] = useState("");
+
+  useEffect(() => {
+    if (product) {
+      setEditableProduct(product);
+      setPrice(product.price);
+      setCost(product.cost || 0);
+      setTargetMargin("");
+      setTargetProfit("");
+    }
+  }, [product]);
+
+  const { profit, margin } = useMemo(() => {
+    const feeValue = price * (marketplaceFee / 100);
+    const totalCosts = cost + shipping + feeValue;
+    const calculatedProfit = price - totalCosts;
+    const calculatedMargin = price > 0 ? (calculatedProfit / price) * 100 : 0;
+    return { profit: calculatedProfit, margin: calculatedMargin };
+  }, [price, cost, shipping, marketplaceFee]);
+
+  const requiredPriceForMargin = useMemo(() => {
+    const marginNum = parseFloat(targetMargin);
+    if (isNaN(marginNum) || marginNum >= 100) return null;
+    const feePercentage = marketplaceFee / 100;
+    const requiredPrice =
+      (cost + shipping) / (1 - feePercentage - marginNum / 100);
+    return requiredPrice;
+  }, [targetMargin, cost, shipping, marketplaceFee]);
+
+  const salesNeededForProfit = useMemo(() => {
+    const profitNum = parseFloat(targetProfit);
+    if (isNaN(profitNum) || profit <= 0) return null;
+    return Math.ceil(profitNum / profit);
+  }, [targetProfit, profit]);
+
+  if (!product) return null;
 
   return (
-    // Overlay de fundo
     <div
       className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4"
-      onClick={onClose} // Fecha o modal ao clicar fora
+      onClick={onClose}
     >
-      {/* Conteúdo do Modal */}
       <div
         className="bg-card text-text rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col relative"
-        onClick={(e) => e.stopPropagation()} // Impede que o clique no modal o feche
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Cabeçalho do Modal */}
         <div className="flex justify-between items-center p-4 border-b border-border-dark">
-          <h2 className="text-xl font-bold">Detalhes do Produto</h2>
+          <div>
+            <h2 className="text-xl font-bold">
+              {editableProduct?.name || product.name}
+            </h2>
+            <p className="text-xs text-text-secondary">SKU: {product.id}</p>
+          </div>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-background"
@@ -76,112 +81,175 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </button>
         </div>
 
-        {/* Corpo do Modal (com scroll) */}
-        <div className="flex-grow overflow-y-auto p-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Seção Principal de Dados */}
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Coluna 1: Dados Básicos */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b border-border-dark pb-2">
-                  Dados básicos
-                </h3>
-                <InfoField label="Nome do produto" value={product.name} />
-                <InfoField label="Código do produto" value={product.id} />
-                <InfoField
-                  label="Unidades vendidas no mês"
-                  value={product.sales}
-                />
-                <InfoField label="Linha de produto" value={product.line} />
-                <InfoField label="Origem" value={product.origin} />
-                <InfoField
-                  label="Canal de Venda"
-                  value={product.salesChannel}
-                />
-              </div>
-
-              {/* Coluna 2: Informações Financeiras */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b border-border-dark pb-2">
-                  Informações Financeiras
-                </h3>
-                <InfoField label="Preço" value={product.price} unit="R$" />
-                <InfoField label="Margem" value={product.margin} unit="%" />
-                <InfoField
-                  label="Lucro Total"
-                  value={product.totalProfit}
-                  unit="R$"
-                />
-                <InfoField
-                  label="Capital de Giro"
-                  value={product.workingCapital}
-                  unit="R$"
-                />
-              </div>
-            </div>
-
-            {/* Sidebar de Resumo (Direita) */}
-            <div className="lg:w-64 flex-shrink-0 bg-background p-4 rounded-md space-y-3">
-              <div className="text-center pb-2 border-b border-border-dark">
-                <p className="text-sm text-text-secondary">Margem calculada</p>
-                <p className="text-2xl font-bold text-primary">
-                  {product.margin.toFixed(2)}%
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-text-secondary">
-                  Preço de venda sugerido
-                </p>
-                <p className="text-2xl font-bold text-primary">
-                  {product.price.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-text-secondary">
-                  Capital de giro unitário
-                </p>
-                <p
-                  className={`text-lg font-bold ${
-                    product.workingCapital < 0 ? "text-error" : "text-primary"
-                  }`}
-                >
-                  {product.workingCapital.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </p>
-              </div>
-
-              {/* Detalhamento de custos e impostos */}
-              <div className="text-sm space-y-1 pt-3">
-                <h4 className="font-semibold mb-2">Resumo</h4>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Preço de venda</span>
-                  <span>
-                    {product.price.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
-                </div>
-                <div className="flex justify-between font-bold pt-2 border-t border-border-dark mt-2">
-                  <span className="text-text-secondary">Lucro Total</span>
-                  <span>
-                    {product.totalProfit.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center px-6 border-b border-border-dark">
+          <TabButton
+            label="Calculadora e Simulador"
+            icon={TrendingUp}
+            isActive={activeTab === "calculator"}
+            onClick={() => setActiveTab("calculator")}
+          />
+          <TabButton
+            label="Concorrência"
+            icon={Users}
+            isActive={activeTab === "competitors"}
+            onClick={() => setActiveTab("competitors")}
+          />
+          <TabButton
+            label="Histórico"
+            icon={History}
+            isActive={activeTab === "history"}
+            onClick={() => setActiveTab("history")}
+          />
         </div>
 
-        {/* Rodapé do Modal com Ações */}
+        <div className="flex-grow overflow-y-auto p-6">
+          {activeTab === "calculator" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Precificação</h3>
+                <CalculationInputField
+                  label="Preço de Venda"
+                  value={price}
+                  onChange={(e) => setPrice(Number(e.target.value))}
+                  unit="R$"
+                />
+                <CalculationInputField
+                  label="Custo do Produto"
+                  value={cost}
+                  onChange={(e) => setCost(Number(e.target.value))}
+                  unit="R$"
+                />
+                <CalculationInputField
+                  label="Custo de Frete (Envio)"
+                  value={shipping}
+                  onChange={(e) => setShipping(Number(e.target.value))}
+                  unit="R$"
+                />
+                <CalculationInputField
+                  label="Taxa do Marketplace"
+                  value={marketplaceFee}
+                  onChange={(e) => setMarketplaceFee(Number(e.target.value))}
+                  unit="%"
+                />
+              </div>
+
+              <div className="space-y-4 bg-background p-4 rounded-md">
+                <h3 className="font-semibold text-lg">Resultados</h3>
+                <div className="text-center py-2">
+                  <p className="text-sm text-text-secondary">Lucro por Venda</p>
+                  <p
+                    className={`text-3xl font-bold ${
+                      profit < 0 ? "text-error" : "text-primary"
+                    }`}
+                  >
+                    {profit.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </p>
+                </div>
+                <div className="text-center py-2 border-t border-border-dark">
+                  <p className="text-sm text-text-secondary">Margem de Lucro</p>
+                  <p
+                    className={`text-3xl font-bold ${
+                      margin < 0 ? "text-error" : "text-primary"
+                    }`}
+                  >
+                    {margin.toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Simulador de Metas</h3>
+                <CalculationInputField
+                  label="Para ter X% de margem..."
+                  value={targetMargin}
+                  onChange={(e) => setTargetMargin(e.target.value)}
+                  unit="%"
+                  placeholder="Ex: 25"
+                />
+                {requiredPriceForMargin !== null && (
+                  <div className="bg-primary-dark/20 p-3 rounded-md text-center">
+                    <p className="text-xs text-primary">
+                      Preço de venda sugerido:
+                    </p>
+                    <p className="text-lg font-bold text-primary">
+                      {requiredPriceForMargin.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </p>
+                  </div>
+                )}
+                <CalculationInputField
+                  label="Para lucrar R$ Y..."
+                  value={targetProfit}
+                  onChange={(e) => setTargetProfit(e.target.value)}
+                  unit="R$"
+                  placeholder="Ex: 500"
+                />
+                {salesNeededForProfit !== null && (
+                  <div className="bg-primary-dark/20 p-3 rounded-md text-center">
+                    <p className="text-xs text-primary">Vendas necessárias:</p>
+                    <p className="text-lg font-bold text-primary">
+                      {salesNeededForProfit} unidades
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "competitors" && (
+            <div className="text-center bg-background p-8 rounded-md border border-dashed border-border-dark">
+              <h3 className="font-semibold text-lg mb-2">
+                Análise de Concorrência
+              </h3>
+              <p className="text-text-secondary">
+                Funcionalidade em desenvolvimento. Em breve será possível
+                comparar preços e margens automaticamente.
+              </p>
+            </div>
+          )}
+
+          {activeTab === "history" && (
+            <div>
+              <h3 className="font-semibold text-lg mb-4">
+                Histórico de Performance
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-background p-4 rounded-md">
+                  <p className="text-sm font-semibold mb-2 text-text-secondary">
+                    Vendas (últimos 7 dias)
+                  </p>
+                  <PerformanceChart
+                    data={(product.salesHistory || []).map((value, index) => ({
+                      name: `Dia ${index + 1}`,
+                      value,
+                    }))}
+                    color="var(--color-info)"
+                    yAxisLabel="Vendas"
+                  />
+                </div>
+                <div className="bg-background p-4 rounded-md">
+                  <p className="text-sm font-semibold mb-2 text-text-secondary">
+                    Lucro (últimos 7 dias)
+                  </p>
+                  <PerformanceChart
+                    data={(product.profitHistory || []).map((value, index) => ({
+                      name: `Dia ${index + 1}`,
+                      value,
+                    }))}
+                    color="var(--color-primary)"
+                    yAxisLabel="Lucro (R$)"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-end items-center p-4 border-t border-border-dark gap-3">
           <button
             onClick={onClose}
@@ -190,7 +258,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             FECHAR
           </button>
           <button className="px-4 py-2 rounded-md bg-primary hover:bg-primary-dark transition-colors text-white font-semibold">
-            CALCULAR
+            SALVAR ALTERAÇÕES
           </button>
         </div>
       </div>
