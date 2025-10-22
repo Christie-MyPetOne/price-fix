@@ -16,9 +16,9 @@ export const useProductStore = create<ProductState>((set, get) => ({
     const data = res.data;
 
     const mapped: Product[] = data.map((item, index) => {
-      const cost = parseFloat((item.price * 0.5).toFixed(2)); // custo = 50% do preço
+      const cost = parseFloat((item.price * 0.5).toFixed(2));
       const shipping = 15;
-      const marketplaceFee = 0.16; // 16%
+      const marketplaceFee = 0.16;
       const feeValue = item.price * marketplaceFee;
       const totalCosts = cost + shipping + feeValue;
       const profit = item.price - totalCosts;

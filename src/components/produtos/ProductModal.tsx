@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { X, TrendingUp, History, Users } from "lucide-react";
 import { Product, ProductDetailModalProps, type Tab } from "@/lib/types";
-import { PerformanceChart } from "./RechartsSparkline";
+import { PerformanceChart } from "./Charts";
 import { TabButton } from "../ui/TabButton";
 import { CalculationInputField } from "../ui/CalculationInputField";
 

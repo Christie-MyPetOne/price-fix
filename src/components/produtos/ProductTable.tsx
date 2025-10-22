@@ -10,7 +10,7 @@ import { useProductStore } from "@/store/useProductStore";
 import { ProductHealthIcons } from "./ProductHealthIcons";
 
 const RechartsSparkline = dynamic(
-  () => import("./RechartsSparkline").then((mod) => mod.RechartsSparkline),
+  () => import("./Charts").then((mod) => mod.RechartsSparkline),
   {
     ssr: false,
     loading: () => (
@@ -117,7 +117,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     { key: "status", label: "Status" },
     { key: "alerts", label: "Alertas" },
     { key: "sales", label: "Vendas" },
-    { key: "price", label: "Preço" },
+    { key: "price", label: "Faturamento" },
     { key: "margin", label: "Margem" },
     { key: "totalProfit", label: "Lucro total" },
     { key: "workingCapital", label: "Cap. de giro" },

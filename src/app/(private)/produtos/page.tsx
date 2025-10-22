@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ProductFilters } from "../../components/produtos/ProductFilters";
-import { ProductTable } from "../../components/produtos/ProductTable";
-import { ProductDetailModal } from "../../components/produtos/ProductDialog";
-import { useProductStore } from "../../store/useProductStore";
-import { Product } from "../../lib/types";
 import { RefreshCcw } from "lucide-react";
+import { Product } from "@/lib/types";
+import { useProductStore } from "@/store/useProductStore";
+import { ProductFilters } from "@/components/produtos/ProductFilters";
+import { ProductTable } from "@/components/produtos/ProductTable";
+import { ProductDetailModal } from "@/components/produtos/ProductModal";
 
 export default function ProductsPage() {
   const { sortedProducts, fetchProducts } = useProductStore();
@@ -14,7 +14,6 @@ export default function ProductsPage() {
   const [filters, setFilters] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // 1. Estado para controlar o produto selecionado e a visibilidade do modal
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -33,7 +32,6 @@ export default function ProductsPage() {
 
   const handleSelectAll = () => console.log("Selecionar todos os produtos");
 
-  // 2. Funções para abrir e fechar o modal
   const handleRowClick = (product: Product) => {
     setSelectedProduct(product);
   };
@@ -67,7 +65,6 @@ export default function ProductsPage() {
               </span>
             </div>
           ) : (
-            // 3. Passando a função onRowClick para a tabela
             <ProductTable
               products={filteredProducts}
               onRowClick={handleRowClick}
@@ -76,7 +73,6 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* 4. Renderizando o modal com as props necessárias */}
       <ProductDetailModal
         product={selectedProduct}
         onClose={handleCloseModal}

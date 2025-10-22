@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { VendasFilters } from "../../components/vendas/VendasFilters";
-import { VendasTable } from "../../components/vendas/VendasTable";
-import { Card } from "../../components/ui/Card";
+import { VendasFilters } from "@/components/vendas/VendasFilters";
+import { VendasTable } from "@/components/vendas/VendasTable";
+import { Card } from "@/components/ui/Card";
 import CardVendas from "@/components/ui/CardVendas";
 import MargensChart from "@/components/vendas/MargensChart";
-import { useSalesStore } from "../../store/useSalesStore";
+import { useSalesStore } from "@/store/useSalesStore";
 
 type FiltersState = {
   date: string;
@@ -63,11 +63,46 @@ export default function VendasPage() {
 
   // Dados do gráfico (exemplo)
   const buckets = [
-    { id: "alta", titulo: "Margem alta", orders: 43175, percent: 56.52, lucro: 620760.73, color: "bg-blue-600" },
-    { id: "media", titulo: "Margem média", orders: 8323, percent: 10.9, lucro: 105290.26, color: "bg-green-600" },
-    { id: "baixa", titulo: "Margem baixa", orders: 14575, percent: 19.08, lucro: 80552.51, color: "bg-amber-500" },
-    { id: "preju", titulo: "Prejuízo", orders: 5891, percent: 7.71, lucro: -33317.38, color: "bg-red-600" },
-    { id: "incompleto", titulo: "Incompletos", orders: 4420, percent: 5.79, lucro: 0, color: "bg-gray-600" },
+    {
+      id: "alta",
+      titulo: "Margem alta",
+      orders: 43175,
+      percent: 56.52,
+      lucro: 620760.73,
+      color: "bg-blue-600",
+    },
+    {
+      id: "media",
+      titulo: "Margem média",
+      orders: 8323,
+      percent: 10.9,
+      lucro: 105290.26,
+      color: "bg-green-600",
+    },
+    {
+      id: "baixa",
+      titulo: "Margem baixa",
+      orders: 14575,
+      percent: 19.08,
+      lucro: 80552.51,
+      color: "bg-amber-500",
+    },
+    {
+      id: "preju",
+      titulo: "Prejuízo",
+      orders: 5891,
+      percent: 7.71,
+      lucro: -33317.38,
+      color: "bg-red-600",
+    },
+    {
+      id: "incompleto",
+      titulo: "Incompletos",
+      orders: 4420,
+      percent: 5.79,
+      lucro: 0,
+      color: "bg-gray-600",
+    },
   ];
 
   const legend = [
@@ -115,6 +150,5 @@ export default function VendasPage() {
         <VendasTable />
       </div>
     </div>
-    
   );
 }
