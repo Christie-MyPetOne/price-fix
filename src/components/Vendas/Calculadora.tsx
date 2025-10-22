@@ -47,7 +47,7 @@ export default function CalculadoraMargem({
 
   return (
     <div className="bg-card rounded-lg shadow-md p-6 border border-border-dark">
-      <h2 className="text-xl font-bold mb-6 text-primary">Simulador de Preços</h2>
+      <h2 className="text-xl font-bold mb-4 text-primary">Simulador de Preços</h2>
 
       {/* Preço e Margem desejada (destaque) */}
       <div className="grid grid-cols-2 gap-6 mb-6">
@@ -78,7 +78,7 @@ export default function CalculadoraMargem({
       </div>
 
       {/* Custos e taxas */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-1">
         <div>
           <label className="block text-sm text-text-secondary mb-1">
             Custo da mercadoria
@@ -204,7 +204,7 @@ export default function CalculadoraMargem({
       </div>
 
       {/* Resultado */}
-      <div className="bg-background p-4 rounded-md border border-border-dark">
+      <div className="bg-background p-2 rounded-md border border-border-dark">
         <p className="text-sm text-text-secondary mb-1">
           Margem de contribuição nominal estimada:
         </p>

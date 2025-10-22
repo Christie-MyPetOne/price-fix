@@ -79,7 +79,7 @@ export default function VendasPage() {
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       <div className="flex-1">
-        <h1 className="text-3xl font-bold mb-4 text-color-text">Vendas</h1>
+        <h1 className="text-2xl font-bold mb-2 text-color-text">Vendas</h1>
 
         {/* FILTROS DO TOPO — únicos */}
         <VendasFilters
@@ -89,7 +89,7 @@ export default function VendasPage() {
         />
 
         {/* Cards de resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           <Card>
             <CardVendas Nome="Faturamento" Valor="R$ 150,00" />
           </Card>
@@ -102,7 +102,7 @@ export default function VendasPage() {
         </div>
 
         {/* Gráfico de Margens (mantido) */}
-        <div className="mt-8">
+        <div className="mt-6">
           <MargensChart
             buckets={buckets}
             legend={legend}

@@ -21,7 +21,7 @@ export function VendasFilters({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-card p-3 md:p-4 rounded-lg shadow-md border border-border-dark">
+    <div className="bg-card p-3 w-[84%] justify-self-center md:p-1 rounded-lg shadow-md border border-border-dark">
       {/* Header + botão toggle (somente no mobile) */}
       
       
@@ -53,7 +53,7 @@ export function VendasFilters({
           <div className="w-full">
             <input
               type="text"
-              placeholder="Buscar por código, cliente, produto..."
+              placeholder="Buscar por código"
               className={fieldBase}
               onChange={(e) => onSearch(e.target.value)}
             />

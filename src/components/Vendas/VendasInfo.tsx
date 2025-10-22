@@ -133,12 +133,69 @@ function calcItem(p: ProdutoDaVenda) {
 }
 
 /* =================== UI BASE =================== */
-const card: React.CSSProperties = { background: "var(--color-card)", border: "1px solid var(--color-border-dark)", borderRadius: 12, padding: 16 };
-const row: React.CSSProperties  = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--color-border-dark)", fontSize: 14 };
-const mutedTitle: React.CSSProperties = { fontSize: 12, textTransform: "uppercase", color: "var(--color-text-secondary)", marginBottom: 8, letterSpacing: 0.3 };
-const chip: React.CSSProperties = { background: "var(--color-background)", border: "1px solid var(--color-border-dark)", borderRadius: 10, padding: "12px 14px", minWidth: 160 };
-const pillBtn: React.CSSProperties = { border: "1px solid var(--color-border-dark)", borderRadius: 10, padding: "8px 12px", background: "var(--color-card)", color: "var(--color-text)", fontWeight: 700, cursor: "pointer" };
-const gridCols = (n: number): React.CSSProperties => ({ display: "grid", gridTemplateColumns: `repeat(${n}, minmax(0,1fr))`, gap: 12 });
+const DENSITY = { padCard: 12, gap: 10, rowV: 6 };
+
+const card: React.CSSProperties = {
+  background: "var(--color-card)",
+  border: "1px solid var(--color-border-dark)",
+  borderRadius: 12,
+  padding: DENSITY.padCard,
+};
+
+const row: React.CSSProperties  = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: `${DENSITY.rowV}px 0`,
+  borderBottom: "1px solid var(--color-border-dark)",
+  fontSize: 13,
+};
+
+const mutedTitle: React.CSSProperties = {
+  fontSize: 11,
+  textTransform: "uppercase",
+  color: "var(--color-text-secondary)",
+  marginBottom: 6,
+  letterSpacing: 0.3,
+};
+
+const chip: React.CSSProperties = {
+  background: "var(--color-background)",
+  border: "1px solid var(--color-border-dark)",
+  borderRadius: 10,
+  padding: "8px 10px",
+  minWidth: 140,
+};
+
+const pillBtn: React.CSSProperties = {
+  border: "1px solid var(--color-border-dark)",
+  borderRadius: 5,
+  padding: "2px 12px",
+  background: "var(--color-card)",
+  color: "var(--color-text)",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+/* Grids que mantêm CADA GRUPO como uma célula (não mistura grupos) */
+const gridGroups: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: DENSITY.gap,
+};
+
+/* Chips do topo: mantidos juntos; no mobile, rola horizontalmente */
+const kpiRow: React.CSSProperties = {
+  display: "flex",
+  gap: 8,
+  overflowX: "auto",
+  paddingBottom: 4,
+};
+
+const kpiValue: React.CSSProperties = {
+  fontWeight: 900,
+  fontSize: "clamp(14px, 2.2vw, 18px)",
+};
 
 /* Acordeão controlado por “Expandir/Minimizar tudo” */
 const Collapsible: React.FC<{ title: React.ReactNode; openAll: boolean | null; defaultOpen?: boolean; children?: React.ReactNode; right?: React.ReactNode; }> =
@@ -149,7 +206,7 @@ const Collapsible: React.FC<{ title: React.ReactNode; openAll: boolean | null; d
     <div style={{ ...card, padding: 0 }}>
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ width: "100%", textAlign: "left", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "transparent", border: "none", cursor: "pointer" }}
+        style={{ width: "100%", textAlign: "left", padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "transparent", border: "none", cursor: "pointer" }}
       >
         <div style={{ fontWeight: 800 }}>{title}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -159,7 +216,7 @@ const Collapsible: React.FC<{ title: React.ReactNode; openAll: boolean | null; d
           </svg>
         </div>
       </button>
-      {open && children && <div style={{ padding: 16, paddingTop: 0 }}>{children}</div>}
+      {open && children && <div style={{ padding: 12, paddingTop: 0 }}>{children}</div>}
     </div>
   );
 };
@@ -169,7 +226,8 @@ interface Props { open: boolean; onClose: () => void; data: VendasInfoData; }
 
 export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
   const K = useMemo(() => calcPedido(data), [data]);
-  const [openAll, setOpenAll] = useState<boolean | null>(true); // controla expandir/minimizar todos
+  const [openAll] = useState<boolean | null>(false); // start compacto
+  const isNarrow = typeof window !== "undefined" && window.innerWidth < 640;
 
   if (!open) return null;
 
@@ -182,13 +240,13 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ width: "min(940px,95vw)", maxHeight: "92vh", overflow: "auto", borderRadius: 16, background: "var(--color-card)", color: "var(--color-text)", border: "1px solid var(--color-border-dark)", boxShadow: "0 24px 60px rgba(0,0,0,.25)" }}>
         {/* Header */}
-        <div style={{ padding: 18, borderBottom: "1px solid var(--color-border-dark)", display: "flex", justifyContent: "space-between", gap: 12 }}>
+        <div style={{ padding: 12, borderBottom: "1px solid var(--color-border-dark)", display: "flex", justifyContent: "space-between", gap: 12 }}>
           <div style={{ display: "grid", gap: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {data.origemLabel && <span style={{ border: "1px solid var(--color-border-dark)", borderRadius: 8, padding: "4px 8px", fontSize: 12, fontWeight: 700 }}>{data.origemLabel}</span>}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              {data.origemLabel && <span style={{ border: "1px solid var(--color-border-dark)", borderRadius: 8, padding: "3px 6px", fontSize: 11, fontWeight: 700 }}>{data.origemLabel}</span>}
               <div style={{ fontWeight: 900 }}>Pedido {data.numeroPedido}</div>
             </div>
-            <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
               {new Date(data.dataPedido).toLocaleString("pt-BR")} ·{" "}
               <span style={{ color: statusColor, fontWeight: 800 }}>{data.status}</span>
             </div>
@@ -196,14 +254,8 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           <button onClick={onClose} style={pillBtn} aria-label="Fechar">✕</button>
         </div>
 
-        {/* Barra de ações */}
-        <div style={{ padding: 12, borderBottom: "1px solid var(--color-border-dark)", display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button style={pillBtn} onClick={() => setOpenAll(false)}>Minimizar tudo</button>
-          <button style={{ ...pillBtn, background: "var(--color-primary)", color: "#fff", borderColor: "var(--color-primary-dark)" }} onClick={() => setOpenAll(true)}>Expandir tudo</button>
-        </div>
-
         {/* Identificador / Canal */}
-        <div style={{ padding: 16, borderBottom: "1px solid var(--color-border-dark)" }}>
+        <div style={{ padding: 10, borderBottom: "1px solid var(--color-border-dark)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 34, height: 34, borderRadius: 10, background: "var(--color-background)", border: "1px solid var(--color-border-dark)" }} />
             <div style={{ flex: 1 }}>
@@ -213,18 +265,21 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           </div>
         </div>
 
-        {/* KPIs principais */}
-        <div style={{ padding: 16, ...gridCols(4) }}>
-          <div style={chip}><div style={mutedTitle}>Valor de venda</div><div style={{ fontWeight: 900, fontSize: 18 }}>{fmtBRL(data.valorVenda ?? K.receita)}</div></div>
-          <div style={chip}><div style={mutedTitle}>Lucro</div><div style={{ fontWeight: 900, fontSize: 18 }}>{fmtBRL(K.lucro)}</div></div>
-          <div style={chip}><div style={mutedTitle}>Margem</div><div style={{ fontWeight: 900, fontSize: 18, color: "var(--color-primary-dark)" }}>{fmtPct(K.margem)}</div></div>
-          <div style={chip}><div style={mutedTitle}>UF destino</div><div style={{ fontWeight: 900, fontSize: 18 }}>{data.estadoDestino ?? "—"}</div></div>
+        {/* KPIs principais – grupo junto (scroll no mobile) */}
+        <div style={{ padding: 12 }}>
+          <div style={card}>
+            <div style={kpiRow}>
+              <div style={chip}><div style={mutedTitle}>Valor de venda</div><div style={kpiValue}>{fmtBRL(data.valorVenda ?? K.receita)}</div></div>
+              <div style={chip}><div style={mutedTitle}>Lucro</div><div style={kpiValue}>{fmtBRL(K.lucro)}</div></div>
+              <div style={chip}><div style={mutedTitle}>Margem</div><div style={{ ...kpiValue, color: "var(--color-primary-dark)" }}>{fmtPct(K.margem)}</div></div>
+            </div>
+          </div>
         </div>
 
-        {/* ===== BLOCO ÚNICO: RECEITA + CUSTOS + IMPOSTOS ===== */}
-        <div style={{ padding: 16 }}>
-          <Collapsible title="Receita, custos e impostos" openAll={openAll} defaultOpen>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12 }}>
+        {/* ===== BLOCO ÚNICO: RECEITA + CUSTOS + IMPOSTOS (grupos juntos) ===== */}
+        <div style={{ padding: 12 }}>
+          <Collapsible title="Receita, custos e impostos" openAll={openAll} defaultOpen={!isNarrow}>
+            <div style={gridGroups}>
               {/* Receita */}
               <div style={card}>
                 <div style={mutedTitle}>Receita</div>
@@ -286,24 +341,23 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           </Collapsible>
         </div>
 
-        {/* ===== PRODUTOS (sempre visível) ===== */}
-        <div style={{ padding: 16 }}>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* ===== PRODUTOS ===== */}
+        <div style={{ padding: 16, paddingBottom: 0 }}>
+          <div style={{ fontWeight: 800, marginBottom: 8 }}>Produtos ({data.produtos.length})</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {data.produtos.map((p, i) => {
               const I = calcItem(p);
               const valorVendaItem = p.valorVenda ?? p.precoVenda;
 
               return (
                 <div key={i} style={{ ...card }}>
-                  <div style={{ fontWeight: 800 }}>Produtos ({data.produtos.length})</div>
-                  {/* Cabeçalho do item: SEMPRE visível */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                  {/* Cabeçalho do item (grupo junto) */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
                     <div style={{ width: 56, height: 56, borderRadius: 10, background: "var(--color-background)", border: "1px solid var(--color-border-dark)", overflow: "hidden", flex: "0 0 auto" }}>
                       {p.imagemUrl && <img src={p.imagemUrl} alt={p.nome} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
                     </div>
 
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ flex: 1, minWidth: 180 }}>
                       <div style={{ fontWeight: 800 }}>{p.qtd}x {p.nome}</div>
                       {(p.sku || p.codigo) && (
                         <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
@@ -312,8 +366,8 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
                       )}
                     </div>
 
-                    {/* KPIs do item: SEMPRE visíveis */}
-                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    {/* KPIs do item – juntos; rola no mobile */}
+                    <div style={{ ...kpiRow }}>
                       <div style={chip}>
                         <div style={mutedTitle}>Valor de venda</div>
                         <div style={{ fontWeight: 900 }}>{fmtBRL(valorVendaItem)}</div>
@@ -329,9 +383,9 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
                     </div>
                   </div>
 
-                  {/* Detalhes do item: escondidos por padrão, controlados por Expandir/Minimizar tudo */}
+                  {/* Detalhes do item – grupos juntos */}
                   <Collapsible title="Detalhes do item" openAll={openAll} defaultOpen={false}>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12 }}>
+                    <div style={gridGroups}>
                       {/* Receita do item */}
                       <div style={card}>
                         <div style={mutedTitle}>Receita do item</div>
@@ -405,9 +459,9 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           </div>
         </div>
 
-        {/* OUTRAS INFORMAÇÕES (colapsável) */}
+        {/* OUTRAS INFORMAÇÕES */}
         <div style={{ padding: 16 }}>
-          <Collapsible title="Outras informações" openAll={openAll} defaultOpen>
+          <Collapsible title="Outras informações" openAll={openAll} defaultOpen={!isNarrow}>
             <div style={{ ...card }}>
               <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>NFe emitida</span><strong>{data.nfeEmitida ? "Sim" : "Não"}</strong></div>
               <div style={{ ...row, borderBottom: "none" }}>

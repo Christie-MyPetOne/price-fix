@@ -31,6 +31,7 @@ export function Navbar() {
     href: string;
     children: React.ReactNode;
     icon?: React.ElementType | null;
+    className?: string;
   }
 
   const NavLink: React.FC<NavLinkProps> = ({ href, children, icon: Icon }) => {
@@ -45,7 +46,7 @@ export function Navbar() {
               : "text-text-secondary hover:bg-card hover:text-text"
           }`}
       >
-        {Icon && <Icon className="w-5 h-5 mr-1" />}
+        {Icon && <Icon className="w-4 h-4 mr-1" />}
         {children}
       </Link>
     );
@@ -96,7 +97,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-card p-4 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
+    <nav className="bg-card p-3 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
       {/* Lado Esquerdo: Logo e Navegação Principal */}
       <div className="flex items-center space-x-6">
         <Link
@@ -112,7 +113,7 @@ export function Navbar() {
         </Link>
 
         {/* Links de Navegação */}
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="text-sm hidden md:flex items-center space-x-2">
           {" "}
           {/* Reduzi o espaço entre links */}
           <NavLink href="/" icon={Home}>
@@ -125,8 +126,8 @@ export function Navbar() {
               className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
                 ${
                   isGerenciarOpen
-                    ? "bg-card text-text font-semibold"
-                    : "text-text-secondary hover:bg-card hover:text-text"
+                    ? " bg-card text-text font-semibold"
+                    : "text-sm text-text-secondary hover:bg-card hover:text-text"
                 } focus:outline-none`}
             >
               Gerenciar
@@ -162,7 +163,7 @@ export function Navbar() {
               </div>
             )}
           </div>
-          <NavLink href="/relatorios" icon={BarChart}>
+          <NavLink href="/relatorios" icon={BarChart} >
             Relatórios
           </NavLink>
           <NavLink href="#" icon={null}>
@@ -179,7 +180,7 @@ export function Navbar() {
 
       {/* Lado Direito: Ícones de Ação e Perfil */}
       <div className="flex items-center space-x-4">
-        <span className="text-text-secondary text-sm hidden lg:inline">
+        <span className="text-text-secondary text-xs hidden lg:inline">
           Última sincronização: 17/10/2025 13:52
         </span>
         <ThemeToggleButton />
@@ -195,7 +196,7 @@ export function Navbar() {
         <div className="relative group">
           <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
             <User className="w-5 h-5 mr-1" />
-            <span className="hidden md:inline text-text-secondary">
+            <span className="hidden md:inline text-xs text-text-secondary">
               gustavo@mypeto...
             </span>
             <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
