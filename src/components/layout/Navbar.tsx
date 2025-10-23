@@ -18,6 +18,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import { IconsBrand } from "../svgs/IconsBrand/IconsBrand";
 
 export function Navbar() {
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);
@@ -94,12 +95,7 @@ export function Navbar() {
           href="/"
           className="flex items-center text-2xl font-bold text-primary"
         >
-          {/* <Image
-            src="/logo.svg"
-            alt="Preço Certo Logo"
-            className="h-8 w-auto mr-2"
-          /> */}
-          Price Fix
+          <IconsBrand className="h-8 w-auto mr-2" />
         </Link>
 
         {/* Links de Navegação */}
