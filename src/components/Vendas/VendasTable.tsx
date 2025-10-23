@@ -1,57 +1,124 @@
+// VendasTable.tsx
+
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSalesStore } from "../../store/useSalesStore";
 import type { Sale } from "../../store/useSalesStore";
 import { ChevronLeft, ChevronRight, ArrowUpDown, Calculator } from "lucide-react";
-import { sortData, toggleSelection, toggleSelectAll } from "../../lib/utils";
+import { sortData, toggleSelection } from "../../lib/utils";
 import Drawer from "../ui/Drawer";
 import CalculadoraMargem from "./Calculadora";
-
-// 👉 importe o componente da modal de informações de venda
 import { VendasInfo, VendasInfoData } from "@/components/vendas/VendasInfo";
 
 type SortDir = "asc" | "desc";
-type SortKey = keyof Sale;
+// adicionamos chaves virtuais para manter consistência visual
+type SortKey = keyof Sale | "customerName" | "margin" | "profit";
 
-export function VendasTable() {
-  const { sales, fetchSales, loading } = useSalesStore();
+type Props = {
+  /** Se passar sales por props, o sort vira local (mesmo padrão do ProductTable). */
+  sales?: Sale[];
+};
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [sortConfig, setSortConfig] = useState<{ key: SortKey | null; direction: SortDir }>({
+export function VendasTable(props: Props = {}) {
+  // store base
+  const salesStore = useSalesStore();
+  const { fetchSales, loading } = salesStore;
+
+  // se vier por props, usamos elas; senão, usamos as da store
+  const sales: Sale[] = (props.sales ?? (salesStore.sales as Sale[])) ?? [];
+
+  // suporte opcional a sort via store (se existir na store)
+  const storeSortConfig = (salesStore as any).sortConfig as { key: SortKey; direction: SortDir } | undefined;
+  const storeSortBy = (salesStore as any).sortBy as ((key: SortKey) => void) | undefined;
+
+  // local sort (usado quando há sales por props)
+  const [localSort, setLocalSort] = useState<{ key: SortKey | null; direction: SortDir }>({
     key: "totalAmount",
     direction: "desc",
   });
 
+  const useLocalSort = !!props.sales; // igual seu padrão products ? local : store
+  const activeSort = useLocalSort ? localSort : (storeSortConfig ?? localSort); // fallback no local se store não tiver sort
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selected, setSelected] = useState<string[]>([]);
+
   const [openDrawer, setOpenDrawer] = useState(false);
   const [vendaSelecionada, setVendaSelecionada] = useState<Sale | null>(null);
 
-  // 👉 estados da modal VendasInfo
+  // modal info
   const [openInfo, setOpenInfo] = useState(false);
   const [infoData, setInfoData] = useState<VendasInfoData | null>(null);
 
+  // ref para o checkbox de "selecionar todos" (pra setar indeterminate)
+  const selectAllRef = useRef<HTMLInputElement | null>(null);
+
   useEffect(() => {
-    fetchSales(120);
-  }, [fetchSales]);
+    if (!props.sales) {
+      fetchSales(120);
+    }
+  }, [fetchSales, props.sales]);
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRowsPerPage(Number(e.target.value));
     setCurrentPage(1);
   };
 
+  // === handleSort no mesmo padrão que você mandou ===
   const handleSort = (key: SortKey) => {
-    setSortConfig((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-    }));
+    if (useLocalSort) {
+      const direction =
+        localSort.key === key && localSort.direction === "asc" ? "desc" : "asc";
+      setLocalSort({ key, direction });
+    } else {
+      // delega para a store se disponível; senão, cai no local como fallback
+      if (storeSortBy) {
+        storeSortBy(key);
+      } else {
+        const direction =
+          localSort.key === key && localSort.direction === "asc" ? "desc" : "asc";
+        setLocalSort({ key, direction });
+      }
+    }
+  };
+
+  // valores "fakes" mas determinísticos por linha (para Margem/Lucro ordenarem de forma estável)
+  const fakeById = (s: Sale) => {
+    const id = (s as any)?.id?.toString?.() ?? "";
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+    const rng = Math.abs(h % 1000) / 1000; // 0..1
+    const margin = 5 + rng * 25;          // 5%..30%
+    const profit = (rng - 0.2) * 2500;    // pode ser negativo
+    return { margin, profit };
   };
 
   const sortedSales = useMemo(() => {
-    if (!sortConfig.key) return sales;
-    return sortData<Sale>(sales, sortConfig.key, sortConfig.direction);
-  }, [sales, sortConfig]);
+    if (!activeSort.key) return sales;
+
+    if (activeSort.key === "customerName") {
+      const dir = activeSort.direction === "asc" ? 1 : -1;
+      return [...sales].sort((a: any, b: any) => {
+        const an = `${a?.customer?.firstName ?? ""} ${a?.customer?.lastName ?? ""}`.trim();
+        const bn = `${b?.customer?.firstName ?? ""} ${b?.customer?.lastName ?? ""}`.trim();
+        return an.localeCompare(bn, "pt-BR") * dir;
+      });
+    }
+
+    if (activeSort.key === "margin") {
+      const dir = activeSort.direction === "asc" ? 1 : -1;
+      return [...sales].sort((a, b) => (fakeById(a).margin - fakeById(b).margin) * dir);
+    }
+
+    if (activeSort.key === "profit") {
+      const dir = activeSort.direction === "asc" ? 1 : -1;
+      return [...sales].sort((a, b) => (fakeById(a).profit - fakeById(b).profit) * dir);
+    }
+
+    return sortData<Sale>(sales, activeSort.key as keyof Sale, activeSort.direction);
+  }, [sales, activeSort]);
 
   const totalPages = Math.max(1, Math.ceil(sortedSales.length / rowsPerPage));
   const displayedSales = sortedSales.slice(
@@ -59,32 +126,56 @@ export function VendasTable() {
     currentPage * rowsPerPage
   );
 
-  const toggleOne = (id: string) => setSelected(toggleSelection(selected, id));
-  const toggleAll = () => setSelected(toggleSelectAll(displayedSales, selected));
-  const allSelected = displayedSales.length > 0 && selected.length === displayedSales.length;
+  // IDs visíveis na página atual, em string (caso o id não exista, usa o índice local da página)
+  const visibleIds = useMemo(
+    () =>
+      displayedSales.map((s, idx) =>
+        (s as any)?.id?.toString?.() ?? String(idx)
+      ),
+    [displayedSales]
+  );
 
-  // ---------- NOVO: função de mapeamento Sale -> VendasInfoData ----------
+  const toggleOne = (id: string) => setSelected(toggleSelection(selected, id));
+
+  // --- Selecionar todos apenas sobre as linhas visíveis (página atual) ---
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const someSelected = visibleIds.some((id) => selected.includes(id)) && !allSelected;
+
+  // manter o estado visual "indeterminado"
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someSelected;
+    }
+  }, [someSelected]);
+
+  const toggleAll = () => {
+    setSelected((prev) => {
+      if (allSelected) {
+        // desmarca todas as visíveis
+        return prev.filter((id) => !visibleIds.includes(id));
+      }
+      // marca todas as visíveis (sem duplicar as já marcadas)
+      const merged = new Set([...prev, ...visibleIds]);
+      return Array.from(merged);
+    });
+  };
+
+  // mapeamento para VendasInfo
   const mapSaleToVendasInfoData = (sale: Sale): VendasInfoData => {
-    const items = sale.items ?? [];
+    const items = (sale as any).items ?? [];
     return {
-      numeroPedido: (sale.id as any)?.toString?.() ?? "—",
-      dataPedido: sale.orderDate ?? new Date().toISOString(),
-      // tenta mapear para os status aceitos; se vier algo diferente, uso "Pago" como neutro
+      numeroPedido: (sale as any)?.id?.toString?.() ?? "—",
+      dataPedido: (sale as any)?.orderDate ?? new Date().toISOString(),
       status:
         (["Pago","Aguardando pagamento","Cancelado","Enviado","Faturado","Concluído"] as const)
-          .includes((sale.status ?? "Pago") as any)
-          ? (sale.status as any)
+          .includes(((sale as any)?.status ?? "Pago") as any)
+          ? ((sale as any)?.status as any)
           : "Pago",
-
       marketplaceId: (sale as any).marketplaceId ?? undefined,
-
-      // Totais básicos (ajuste aqui se tiver campos próprios na sua store)
-      valorVenda: sale.totalAmount ?? 0,
-      receitaProdutos: sale.totalAmount ?? 0,
+      valorVenda: (sale as any)?.totalAmount ?? 0,
+      receitaProdutos: (sale as any)?.totalAmount ?? 0,
       receitaFrete: 0,
       descontos: 0,
-
-      // Se tiver esses números no Sale, preencha. Caso contrário, deixa como undefined para "Faltam dados".
       custosVariaveis: undefined,
       custoEnvio: undefined,
       custoProdutos: undefined,
@@ -96,10 +187,8 @@ export function VendasTable() {
       gastosFreteAdicionais: undefined,
       descontosAdicionais: undefined,
       impostosAdicionais: undefined,
-
       nfeEmitida: false,
       estadoDestino: (sale as any)?.shippingAddress?.state ?? undefined,
-
       produtos: items.map((it: any) => ({
         qtd: it.quantity ?? 1,
         nome: it.productName ?? "Produto",
@@ -109,7 +198,6 @@ export function VendasTable() {
         precoVenda: it.price ?? undefined,
         receitaFrete: 0,
         desconto: 0,
-        // custos/impostos por item — se você tiver, preencha aqui
         custosVariaveis: undefined,
         custoEnvio: undefined,
         custoProdutos: undefined,
@@ -126,12 +214,34 @@ export function VendasTable() {
     };
   };
 
-  // ---------- NOVO: handler ao clicar no produto ----------
   const handleAbrirInfo = (sale: Sale) => {
     const data = mapSaleToVendasInfoData(sale);
     setInfoData(data);
     setOpenInfo(true);
   };
+
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>, sale: Sale) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleAbrirInfo(sale);
+    }
+  };
+
+  // helper para montar a classe do ArrowUpDown no padrão que você enviou
+  const arrowClass = (key: SortKey) =>
+    `transition-transform ${
+      (useLocalSort
+        ? activeSort.key === key
+        : activeSort.key === key) // (aqui activeSort já representa store ou local)
+        ? "text-primary"
+        : "text-gray-400"
+    } ${
+      (useLocalSort
+        ? activeSort.key === key && activeSort.direction === "asc"
+        : activeSort.key === key && activeSort.direction === "asc")
+        ? "rotate-180"
+        : ""
+    }`;
 
   return (
     <div className="bg-card p-4 sm:p-6 rounded-lg shadow-md mt-6 border border-border-dark w-full">
@@ -181,122 +291,168 @@ export function VendasTable() {
           <table className="min-w-full divide-y divide-border-dark">
             <thead className="bg-background">
               <tr>
-                <th className="px-4 py-3">
+                {/* Checkbox de Selecionar Todos (permanece no mesmo lugar) */}
+                <th className="px-4 py-3 w-10">
                   <input
+                    ref={selectAllRef}
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
+                    onClick={(e) => e.stopPropagation()}
                     className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
-                    aria-label="Selecionar todos"
+                    aria-label="Selecionar todas as linhas visíveis"
                   />
                 </th>
 
+                {/* Pedido -> status */}
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
                   onClick={() => handleSort("status")}
                 >
                   <div className="flex items-center gap-1">
                     Pedido
-                    <ArrowUpDown size={14}
-                      className={`transition-transform ${sortConfig.key === "status" ? "text-primary" : "text-gray-400"} ${sortConfig.key === "status" && sortConfig.direction === "asc" ? "rotate-180" : ""}`}
-                    />
+                    <ArrowUpDown size={14} className={arrowClass("status")} />
                   </div>
                 </th>
 
+                {/* Data -> orderDate */}
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
                   onClick={() => handleSort("orderDate")}
                 >
                   <div className="flex items-center gap-1">
                     Data
-                    <ArrowUpDown size={14}
-                      className={`transition-transform ${sortConfig.key === "orderDate" ? "text-primary" : "text-gray-400"} ${sortConfig.key === "orderDate" && sortConfig.direction === "asc" ? "rotate-180" : ""}`}
-                    />
+                    <ArrowUpDown size={14} className={arrowClass("orderDate")} />
                   </div>
                 </th>
 
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                  Cliente
+                {/* Cliente -> customerName */}
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("customerName")}
+                >
+                  <div className="flex items-center gap-1">
+                    Cliente
+                    <ArrowUpDown size={14} className={arrowClass("customerName")} />
+                  </div>
                 </th>
 
+                {/* Valor de Venda -> totalAmount */}
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
                   onClick={() => handleSort("totalAmount")}
                 >
+                    <div className="flex items-center gap-1">
+                      Valor de Venda
+                      <ArrowUpDown size={14} className={arrowClass("totalAmount")} />
+                    </div>
+                </th>
+
+                {/* Margem -> margin */}
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("margin")}
+                >
                   <div className="flex items-center gap-1">
-                    Valor de Venda
-                    <ArrowUpDown size={14}
-                      className={`transition-transform ${sortConfig.key === "totalAmount" ? "text-primary" : "text-gray-400"} ${sortConfig.key === "totalAmount" && sortConfig.direction === "asc" ? "rotate-180" : ""}`}
-                    />
+                    Margem
+                    <ArrowUpDown size={14} className={arrowClass("margin")} />
                   </div>
                 </th>
 
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Margem</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Lucro</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">Ações</th>
+                {/* Lucro -> profit */}
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
+                  onClick={() => handleSort("profit")}
+                >
+                  <div className="flex items-center gap-1">
+                    Lucro
+                    <ArrowUpDown size={14} className={arrowClass("profit")} />
+                  </div>
+                </th>
+
+                <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
 
             <tbody className="bg-card divide-y divide-border-dark">
-              {displayedSales.map((sale: any, index: number) => (
-                <tr key={sale.id ?? index} className="hover:bg-background transition-colors">
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(sale.id)}
-                      onChange={() => toggleOne(sale.id)}
-                      className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
-                    />
-                  </td>
+              {displayedSales.map((sale: any, index: number) => {
+                const saleId = sale?.id?.toString?.() ?? String(index);
+                const isSelected = selected.includes(saleId);
+                const fake = fakeById(sale);
 
-                  <td className="px-4 py-3 text-sm font-medium text-text flex flex-col gap-1">
-                    <span><strong>Status:</strong> {sale.status}</span>
-
-                    {/* 👉 clique no(s) produto(s) para abrir a modal */}
-                    <button
-                      type="button"
-                      onClick={() => handleAbrirInfo(sale)}
-                      className="text-primary underline underline-offset-4 decoration-dotted text-left hover:opacity-80"
-                      title="Ver detalhes financeiros da venda"
+                return (
+                  <tr
+                    key={saleId}
+                    onClick={() => handleAbrirInfo(sale)}   // LINHA INTEIRA CLICÁVEL
+                    onKeyDown={(e) => handleRowKeyDown(e, sale)} // Acessibilidade
+                    role="button"
+                    tabIndex={0}
+                    className={`transition-colors hover:bg-background cursor-pointer ${
+                      isSelected ? "bg-background/60" : ""
+                    }`}
+                    aria-selected={isSelected}
+                  >
+                    {/* Checkbox por linha */}
+                    <td
+                      className="px-4 py-3 w-10"
+                      onClick={(e) => e.stopPropagation()} // não abrir modal ao clicar no checkbox
                     >
-                      <strong>Produto:</strong>{" "}
-                      {(sale.items?.map((i: any) => i.productName).join(", ")) ?? "N/A"}
-                    </button>
-                  </td>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleOne(saleId)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+                        aria-label={`Selecionar venda ${saleId}`}
+                      />
+                    </td>
 
-                  <td className="px-4 py-3 text-sm text-text-secondary">
-                    <strong>Data:</strong>{" "}
-                    {sale.orderDate ? new Date(sale.orderDate).toLocaleDateString("pt-BR") : "N/A"}
-                  </td>
+                    <td className="px-4 py-3 text-sm font-medium text-text flex flex-col gap-1">
+                      <span><strong>Status:</strong> {sale?.status ?? "—"}</span>
+                      <span className="text-text-secondary truncate">
+                        <strong>Produto:</strong>{" "}
+                        {(sale?.items?.map((i: any) => i?.productName).join(", ")) ?? "N/A"}
+                      </span>
+                    </td>
 
-                  <td className="px-4 py-3 text-sm text-text-secondary">
-                    {sale.customer ? `${sale.customer.firstName} ${sale.customer.lastName}` : "N/A"}
-                  </td>
+                    <td className="px-4 py-3 text-sm text-text-secondary">
+                      <strong>Data:</strong>{" "}
+                      {sale?.orderDate ? new Date(sale.orderDate).toLocaleDateString("pt-BR") : "N/A"}
+                    </td>
 
-                  <td className="px-4 py-3 text-sm text-text text-center">
-                    {sale.totalAmount?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "R$ 0,00"}
-                  </td>
+                    <td className="px-4 py-3 text-sm text-text-secondary">
+                      {sale?.customer ? `${sale.customer.firstName} ${sale.customer.lastName}` : "N/A"}
+                    </td>
 
-                  {/* placeholders */}
-                  <td className="px-4 py-3 text-sm text-text text-center">
-                    {`${(Math.random() * (30 - 5) + 5).toFixed(2)}%`}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-text text-center">
-                    {Math.random() > 0.2
-                      ? (Math.random() * 2000).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-                      : (-Math.random() * 500).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </td>
+                    <td className="px-4 py-3 text-sm text-text text-center">
+                      {sale?.totalAmount?.toLocaleString?.("pt-BR", { style: "currency", currency: "BRL" }) ?? "R$ 0,00"}
+                    </td>
 
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => { setVendaSelecionada(sale); setOpenDrawer(true); }}
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b] transition"
+                    {/* placeholders de Margem/Lucro determinísticos (para combinar com a ordenação) */}
+                    <td className="px-4 py-3 text-sm text-text text-center">
+                      {`${fake.margin.toFixed(2)}%`}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-text text-center">
+                      {fake.profit.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    </td>
+
+                    <td
+                      className="px-4 py-3 text-right"
+                      onClick={(e) => e.stopPropagation()} // evitar abrir modal ao clicar no botão
                     >
-                      <Calculator size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      <button
+                        onClick={() => { setVendaSelecionada(sale); setOpenDrawer(true); }}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b] transition"
+                        aria-label="Abrir simulador"
+                      >
+                        <Calculator size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -304,9 +460,10 @@ export function VendasTable() {
           <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
             <div className="flex gap-2">
               <button
-                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"
+                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
+                aria-label="Página anterior"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -314,17 +471,21 @@ export function VendasTable() {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
-                  className={`p-2 rounded-md text-sm font-semibold ${page === currentPage ? "bg-primary text-white" : "ring-1 ring-border-dark hover:bg-background"}`}
+                  className={`p-2 rounded-md text-sm font-semibold ${
+                    page === currentPage ? "bg-primary text-white" : "ring-1 ring-border-dark hover:bg-background"
+                  }`}
                   onClick={() => setCurrentPage(page)}
+                  aria-current={page === currentPage ? "page" : undefined}
                 >
                   {page}
                 </button>
               ))}
 
               <button
-                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background"
+                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
+                aria-label="Próxima página"
               >
                 <ChevronRight size={16} />
               </button>
@@ -333,11 +494,11 @@ export function VendasTable() {
         </div>
       )}
 
-      {/* Drawer da calculadora (já existia) */}
+      {/* Drawer calculadora */}
       <Drawer
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
-        title={vendaSelecionada ? `Simulador - ${vendaSelecionada.items?.[0]?.productName ?? ""}` : "Simulador de preços"}
+        title={vendaSelecionada ? `Simulador - ${vendaSelecionada?.items?.[0]?.productName ?? ""}` : "Simulador de preços"}
       >
         <CalculadoraMargem
           initialPreco={vendaSelecionada?.totalAmount ?? 0}
@@ -346,7 +507,7 @@ export function VendasTable() {
         />
       </Drawer>
 
-      {/* 👉 Modal de informações da venda */}
+      {/* Modal de informações da venda */}
       {infoData && (
         <VendasInfo
           open={openInfo}
