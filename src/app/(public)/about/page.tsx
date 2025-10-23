@@ -6,6 +6,7 @@ import {
   Zap,
   TrendingUp,
 } from "lucide-react";
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const Hero = () => {
   return (
@@ -141,7 +142,11 @@ const Features = () => {
   );
 };
 
-export default function LandingPage() {
+// Marcar a função como async para usar await
+export default async function LandingPage() {
+  // Adicionar o delay aqui (REMOVA EM PRODUÇÃO)
+  await sleep(7000); // Atraso de 2 segundos
+
   return (
     <main className="flex-1">
       <Hero />
