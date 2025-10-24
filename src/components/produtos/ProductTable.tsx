@@ -10,7 +10,7 @@ import { useProductStore } from "@/store/useProductStore";
 import { ProductHealthIcons } from "./ProductHealthIcons";
 
 const RechartsSparkline = dynamic(
-  () => import("./Charts").then((mod) => mod.RechartsSparkline),
+  () => import("../produtos/Charts").then((mod) => mod.RechartsSparkline),
   {
     ssr: false,
     loading: () => (
@@ -120,13 +120,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     { key: "price", label: "Faturamento" },
     { key: "margin", label: "Margem" },
     { key: "totalProfit", label: "Lucro total" },
-    { key: "workingCapital", label: "Cap. de giro" },
   ];
 
   return (
     <div className="bg-card p-4 sm:p-6 rounded-lg shadow-md mt-6 border border-border-dark w-full">
       <div className="flex justify-between items-center mb-2">
-        <label className="text-sm text-text-secondary flex items-center gap-2">
+        <label className="text-xs font-bold text-text-secondary flex items-center gap-2">
           Mostrar
           <select
             value={rowsPerPage}
@@ -134,7 +133,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               setRowsPerPage(Number(e.target.value));
               setCurrentPage(1);
             }}
-            className="border border-border-dark rounded px-2 py-1 ml-2"
+            className="border border-border-dark text-xs rounded px-1 py-1 ml-2"
           >
             {[5, 10, 20, 50].map((n) => (
               <option key={n} value={n}>
@@ -145,7 +144,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           itens
         </label>
 
-        <p className="text-sm text-text-secondary hidden sm:block">
+        <p className="text-xs text-text-secondary hidden sm:block">
           Mostrando{" "}
           <span className="font-medium">
             {(currentPage - 1) * rowsPerPage + 1}
@@ -163,7 +162,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         <table className="min-w-full divide-y divide-border-dark">
           <thead className="bg-background">
             <tr>
-              <th className="px-4 py-3">
+              <th className="px-3 py-3">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -177,7 +176,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   onClick={() =>
                     key !== "alerts" && handleSort(key as keyof Product)
                   }
-                  className={`px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider ${
+                  className={`px-3 py-3 text-left text-[0.6rem] font-medium text-text-secondary uppercase tracking-wider ${
                     key !== "alerts"
                       ? "cursor-pointer select-none"
                       : "text-center"
@@ -226,7 +225,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 onClick={() => onRowClick(product)}
                 className="hover:bg-background transition-colors cursor-pointer"
               >
-                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                <td className="px-2 py-2" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={selected.includes(product.id)}
@@ -234,8 +233,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
                   />
                 </td>
-                <td className="px-4 py-3 text-sm font-medium text-text flex items-center gap-2">
-                  <div className="w-10 h-10 flex-shrink-0 relative">
+                <td className="py-3 text-xs font-medium text-text flex items-center gap-2">
+                  <div className="w-9 h-9 flex-shrink-0 relative">
                     {product.image ? (
                       <Image
                         src={product.image}
@@ -252,9 +251,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   <span>{product.name}</span>
                 </td>
 
-                <td className="px-4 py-3 text-sm">
+                <td className="px-2 py-1.5 text-xs">
                   <span
-                    className={`px-2 py-0.5 inline-flex text-xs font-semibold rounded-full ${
+                    className={`px-1.5 py-0.5 inline-flex text-xs font-semibold rounded-full ${
                       product.status === "Precificado"
                         ? "bg-primary-dark text-white"
                         : product.status === "Pendente"
@@ -266,15 +265,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   </span>
                 </td>
 
-                <td className="px-4 py-3 text-sm">
+                <td className="px-3 py-3">
                   <ProductHealthIcons product={product} />
                 </td>
 
-                {/* Gráfico de linha pequeno (somente linha, centralizado) */}
-                <td className="px-4 py-3 text-sm text-text-secondary">
+                <td className="px-3 py-3 text-xs text-text-secondary">
                   <div className="flex items-center justify-between">
                     <span>{product.sales}</span>
-                    <div className="flex items-center justify-center w-[80px]">
+                    <div className="flex items-center justify-center w-[3.8rem]">
                       <RechartsSparkline
                         data={(product.salesHistory || []).map((value) => ({
                           value,
@@ -285,17 +283,17 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   </div>
                 </td>
 
-                <td className="px-4 py-3 text-sm text-text">
+                <td className="px-3 py-3 text-xs text-text">
                   {product.price.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </td>
-                <td className="px-4 py-3 text-sm text-text">
+                <td className="px-4 py-3 text-xs text-text">
                   {product.margin.toFixed(2)}%
                 </td>
 
-                <td className="px-4 py-3 text-sm">
+                <td className="px-3 py-3 text-xs">
                   <div className="flex items-center justify-between">
                     <span
                       className={`whitespace-nowrap ${
@@ -307,7 +305,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         currency: "BRL",
                       })}
                     </span>
-                    <div className="flex items-center justify-center w-[80px]">
+                    <div className="flex items-center justify-center w-[3.8rem]">
                       <RechartsSparkline
                         data={(product.profitHistory || []).map((value) => ({
                           value,
@@ -320,19 +318,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                       />
                     </div>
                   </div>
-                </td>
-
-                <td className="px-4 py-3 text-sm">
-                  <span
-                    className={
-                      product.workingCapital < 0 ? "text-error" : "text-primary"
-                    }
-                  >
-                    {product.workingCapital.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
                 </td>
               </tr>
             ))}
@@ -351,7 +336,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </table>
       </div>
 
-      {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
         <div className="flex gap-2">
           <button
@@ -364,7 +348,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
-              className={`p-2 rounded-md text-sm font-semibold ${
+              className={`p-2 rounded-md text-xs font-semibold ${
                 page === currentPage
                   ? "bg-primary text-white"
                   : "ring-1 ring-border-dark hover:bg-background"

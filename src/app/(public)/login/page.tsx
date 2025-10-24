@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { LogIn } from 'lucide-react'; // Ícone para o botão
+import React, { useState } from "react";
+import Link from "next/link";
+import { LogIn } from "lucide-react"; // Ícone para o botão
 
 // Componentes simulados de UI (em um projeto real, importe de /components/ui)
-const Card = ({ className, children }: { className?: string, children: React.ReactNode }) => (
-  <div className={`bg-card rounded-lg border border-border-dark shadow-md ${className}`}>
+const Card = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => (
+  <div
+    className={`bg-card rounded-lg border border-border-dark shadow-md ${className}`}
+  >
     {children}
   </div>
 );
@@ -25,11 +33,14 @@ Input.displayName = "Input";
 
 const Button = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" }
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: "primary" | "secondary";
+  }
 >(({ className, variant = "primary", ...props }, ref) => {
-  const variantClasses = variant === 'primary'
-    ? 'bg-primary text-white hover:bg-primary-dark'
-    : 'bg-background text-text-secondary hover:bg-opacity-80';
+  const variantClasses =
+    variant === "primary"
+      ? "bg-primary text-white hover:bg-primary-dark"
+      : "bg-background text-text-secondary hover:bg-opacity-80";
   return (
     <button
       ref={ref}
@@ -42,8 +53,8 @@ Button.displayName = "Button";
 
 // --- Página de Login ---
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,27 +64,31 @@ export default function LoginPage() {
     setError(null);
 
     // --- Lógica de Autenticação (Substitua pelo seu método real) ---
-    console.log('Tentando logar com:', { email, password });
+    console.log("Tentando logar com:", { email, password });
     // Exemplo: Chamar sua API de login aqui
     // Exemplo de erro:
     // setTimeout(() => {
     //   setError('Email ou senha inválidos.');
     //   setLoading(false);
     // }, 1000);
-     setTimeout(() => {
+    setTimeout(() => {
       // Simula sucesso (em um caso real, você receberia um token e redirecionaria)
-       console.log('Login bem-sucedido (simulado)');
+      console.log("Login bem-sucedido (simulado)");
       // Ex: document.cookie = 'token=seu_jwt_token; path=/';
       // Ex: window.location.href = '/dashboard'; // Ou use router.push('/dashboard')
       setLoading(false);
-     }, 1000); // Simula um delay da API
+    }, 1000); // Simula um delay da API
   };
 
   return (
     <div className="flex min-h-[calc(100vh-100px)] items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md p-8 shadow-xl">
-        <h1 className="text-3xl font-bold text-center text-text mb-2">Bem-vindo de volta!</h1>
-        <p className="text-center text-text-secondary mb-6 text-sm">Faça login para acessar seu painel.</p>
+        <h1 className="text-3xl font-bold text-center text-text mb-2">
+          Bem-vindo de volta!
+        </h1>
+        <p className="text-center text-text-secondary mb-6 text-sm">
+          Faça login para acessar seu painel.
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -124,16 +139,30 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-error text-center">{error}</p>
-          )}
+          {error && <p className="text-sm text-error text-center">{error}</p>}
 
           <div>
             <Button type="submit" disabled={loading} className="mt-2">
               {loading ? (
-                <svg className="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 text-white mx-auto"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
               ) : (
                 <>
@@ -145,12 +174,12 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-sm text-text-secondary">
-          Não tem uma conta?{' '}
+          Não tem uma conta?{" "}
           <Link
-            href="/register" // Link para sua página de registro
+            href="/e-mail"
             className="font-medium text-primary hover:text-primary-dark"
           >
-            Cadastre-se
+            Entre em contato
           </Link>
         </p>
       </Card>
