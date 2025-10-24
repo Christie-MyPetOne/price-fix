@@ -40,7 +40,7 @@ export function Navbar() {
               : "text-text-secondary hover:bg-card hover:text-text"
           }`}
       >
-        {Icon && <Icon className="w-5 h-5 mr-1" />}
+        {Icon && <Icon className="w-5 h-4 mr-1" />}
         {children}
       </Link>
     );
@@ -63,9 +63,9 @@ export function Navbar() {
         aria-label="Alternar tema"
       >
         {theme === "dark" ? (
-          <Sun className="w-5 h-5" />
+          <Sun className="w-4 h-4" />
         ) : (
-          <Moon className="w-5 h-5" />
+          <Moon className="w-4 h-4" />
         )}
       </button>
     );
@@ -89,18 +89,18 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-card p-4 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
+    <nav className="bg-card p-3 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
       <div className="flex items-center space-x-6">
         <Link
           href="/"
           className="flex items-center text-2xl font-bold text-primary"
         >
-          <IconsBrand className="h-8 w-auto mr-2" />
+          <IconsBrand className="ml-5 h-8 w-auto mr-1" />
         </Link>
 
         {/* Links de Navegação */}
-        <div className="hidden md:flex items-center space-x-2">
-          <NavLink href="/" icon={Home}>
+        <div className="hidden text-sm md:flex items-center space-x-2">
+          <NavLink href="/" icon={Home }>
             Dashboard
           </NavLink>
           <div className="relative">
@@ -149,7 +149,7 @@ export function Navbar() {
           <NavLink href="/relatorios" icon={BarChart}>
             Relatórios
           </NavLink>
-          <NavLink href="#" icon={null}>
+          <NavLink href="/otimizar" icon={null}>
             Otimizar
           </NavLink>
           <NavLink href="#" icon={null}>
@@ -162,23 +162,23 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <span className="text-text-secondary text-sm hidden lg:inline">
+        <span className="text-text-secondary text-xs hidden lg:inline">
           Última sincronização: 17/10/2025 13:52
         </span>
         <ThemeToggleButton />
         <button className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
-          <HelpCircle className="w-5 h-5" />
+          <HelpCircle className="w-4 h-4" />
         </button>
         <button className="relative text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
-          <Bell className="w-5 h-5" />
+          <Bell className="w-4 h-4" />
           <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-error rounded-full">
             3
           </span>
         </button>
         <div className="relative group">
           <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
-            <User className="w-5 h-5 mr-1" />
-            <span className="hidden md:inline text-text-secondary">
+            <User className="w-4 h-4 mr-1" />
+            <span className="hidden md:inline text-sm text-text-secondary">
               gustavo@mypeto...
             </span>
             <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
