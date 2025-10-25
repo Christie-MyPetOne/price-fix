@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+import { DashFilter } from "@/components/dashboard/DashFilter";
+
+
+
 import {
   BarChart,
   Bar,
@@ -103,6 +107,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, value, change, sparklineData, 
   const ChangeIcon = isPositive ? ArrowUpRight : ArrowDownRight;
 
   return (
+    
     <Card className="p-6 flex flex-col justify-between">
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
@@ -171,7 +176,9 @@ const TopMarketplacesTable: React.FC = () => {
 
 export default function DashboardPage() {
   return (
+    
     <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8">
+      <DashFilter/>
       {/* Cards de Indicadores (KPIs) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {kpiData.map((kpi) => (

@@ -169,7 +169,7 @@ interface Props { open: boolean; onClose: () => void; data: VendasInfoData; }
 
 export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
   const K = useMemo(() => calcPedido(data), [data]);
-  const [openAll, setOpenAll] = useState<boolean | null>(true); // controla expandir/minimizar todos
+  const [openAll, setOpenAll] = useState<boolean | null>(false); // controla expandir/minimizar todos
 
   if (!open) return null;
 
