@@ -100,7 +100,7 @@ export function Navbar() {
 
         {/* Links de Navegação */}
         <div className="hidden text-sm md:flex items-center space-x-2">
-          <NavLink href="/" icon={Home }>
+          <NavLink href="/" icon={Home}>
             Dashboard
           </NavLink>
           <div className="relative">
@@ -149,8 +149,8 @@ export function Navbar() {
           <NavLink href="/relatorios" icon={BarChart}>
             Relatórios
           </NavLink>
-          <NavLink href="/otimizar" icon={null}>
-            Otimizar
+          <NavLink href="/comprar" icon={null}>
+            Comprar
           </NavLink>
           <NavLink href="#" icon={null}>
             Histórico

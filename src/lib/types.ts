@@ -107,3 +107,11 @@ export interface DropdownLinkProps {
   icon?: React.ElementType | null;
   onClick: () => void;
 }
+
+export interface PurchaseFiltersProps {
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  stockHealthFilter: string;
+  setStockHealthFilter: React.Dispatch<React.SetStateAction<string>>;
+  onFilter: () => void;
+}
