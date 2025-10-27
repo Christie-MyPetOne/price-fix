@@ -112,7 +112,7 @@ export default function VendasPage() {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-full">
+    <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
       <div className="flex-1">
         <h1 className="text-3xl font-bold mb-4 text-color-text">Vendas</h1>
 
