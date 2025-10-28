@@ -5,6 +5,7 @@ import { DashFilter } from "@/components/dashboard/DashFilter";
 import KpiCard from "@/components/dashboard/kpiCard";
 import GraficoBar from "@/components/dashboard/GraficoBar";
 import GraficoPeR from "@/components/dashboard/GraficoPeR";
+import GraficoMargen from "@/components/dashboard/GraficoMargen";
 
 import {
   BarChart,
@@ -27,6 +28,7 @@ import {
   TrendingUp,
   Activity,
 } from "lucide-react";
+import GraficoMargem from "@/components/dashboard/GraficoMargen";
 
 
 // --- DADOS SIMULADOS (Substitua pela sua chamada de API) ---
@@ -170,6 +172,12 @@ const datas = [
   { mes: "Jun", pedidos: 170, receita: 4200 },
 ];
 
+const dataMargem = [
+  { date: "13/10/25", margem: 32 },
+  { date: "14/10/25", margem: 28 },
+  { date: "15/10/25", margem: 30 },
+  { date: "16/10/25", margem: 27 },
+];
 
 
 export default function DashboardPage() {
@@ -232,16 +240,26 @@ export default function DashboardPage() {
                 { key: "base", label: "Base", color: "#2563eb" },
               ]}
             />
-            <GraficoPeR
-              title="Pedidos x Receita"
-              data={datas}
-              xKey="mes"
-              series={[
-                { key: "pedidos", label: "Pedidos", color: "#413ea0" },
-                // se tiver mais barras (ex.: por canal), é só adicionar aqui
-              ]}
-              line={{ key: "receita", label: "Receita (R$)", color: "#ff7300", dot: true }}
-            />
+            <div className="flex gap-4">
+            <div className="flex">
+              <GraficoPeR
+                title="Pedidos x Receita"
+                data={datas}
+                xKey="mes"
+                series={[
+                  { key: "pedidos", label: "Pedidos", color: "#413ea0" },
+                ]}
+                line={{ key: "receita", label: "Receita (R$)", color: "#ff7300", dot: true }}
+              />
+            </div>
+            <div className="flex-1">
+              <GraficoMargem
+                title="Margem Bruta (%)" 
+                data={dataMargem} 
+                xKey="date" 
+              />
+            </div>
+          </div>
           </div>  
 
 
