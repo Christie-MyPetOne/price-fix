@@ -46,7 +46,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row gap-6 h-full w-full px-3 sm:px-4 md:px-6 pb-6">
+      <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full  px-3 sm:px-4 md:px-6 pb-6">
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-2xl font-bold mb-4 text-text">
             Meus produtos

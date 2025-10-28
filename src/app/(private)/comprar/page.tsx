@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { ShoppingCart, CalendarDays, Settings2 } from "lucide-react";
+import { ShoppingCart, CalendarDays } from "lucide-react";
 import { useProductStore } from "@/store/useProductStore";
 import { PurchaseConfigModal } from "@/components/comprar/PurchaseConfigModal";
 import { PurchaseTable } from "@/components/comprar/PurchaseTable";
 import { PurchaseFilters } from "@/components/comprar/PurchaseFilters";
-import { Product } from "@/lib/types";
+import { Product, StockConfig } from "@/lib/types";
 import { PurchaseStatusCard } from "@/components/comprar/PurchaseStatusCard";
+import { PurchaseHealthCard } from "@/components/comprar/PurchaseHealthCard"; // ✅ import correto
 
+// ✅ Botão local
 const Button = ({
   children,
   variant = "primary",
@@ -48,6 +50,17 @@ export default function OtimizarComprasPage() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isStockConfigModalOpen, setIsStockConfigModalOpen] = useState(false);
 
+  // ✅ Configuração padrão da saúde de estoque
+  const [stockConfig, setStockConfig] = useState<StockConfig>({
+    useDefault: true, // 👈 campo obrigatório
+    purchaseForDays: 30,
+    deliveryEstimateDays: 7,
+    healthLevels: {
+      good: 40,
+      ruim: 60,
+      frozen: 80,
+    },
+  });
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
@@ -102,7 +115,7 @@ export default function OtimizarComprasPage() {
   };
 
   // Regras
-  const getPurchaseStatus = (product: Product) => {
+  const getPurchaseStatus = (product: Product): string => {
     const salesHistory = product.salesHistory ?? [];
     const totalSales = salesHistory.reduce((a, b) => a + b, 0);
     const salesPerDay = totalSales / (salesHistory.length || 1);
@@ -110,6 +123,7 @@ export default function OtimizarComprasPage() {
       product.stockLevel && salesPerDay > 0
         ? product.stockLevel / salesPerDay
         : Infinity;
+
     if ((product.stockLevel ?? 0) <= 0 && salesPerDay > 0) return "Sem Estoque";
     if (daysLeft < 40) return "Comprar";
     return "Ok";
@@ -140,22 +154,26 @@ export default function OtimizarComprasPage() {
             <Button variant="outline" className="flex items-center gap-2">
               <CalendarDays size={18} /> Jul 2025 - Out 2025
             </Button>
-            <Button
-              variant="secondary"
-              className="flex items-center gap-2"
-              onClick={() => setIsStockConfigModalOpen(true)}
-            >
-              <Settings2 size={18} /> Configurar Saúde de Estoque
-            </Button>
           </div>
         </div>
 
-        <PurchaseStatusCard
-          products={filteredProducts}
-          getPurchaseStatus={getPurchaseStatus}
-        />
+        {/* 🔹 Cards lado a lado */}
+        <div className="grid grid-cols-3 gap-6">
+          <div className="md:col-span-2 col-span-3">
+            <PurchaseStatusCard
+              products={filteredProducts}
+              getPurchaseStatus={getPurchaseStatus}
+            />
+          </div>
+          <div className="md:col-span-1 col-span-3">
+            <PurchaseHealthCard
+              stockConfig={stockConfig}
+              onConfigClick={() => setIsStockConfigModalOpen(true)}
+            />
+          </div>
+        </div>
 
-        {/* Filtros extraídos */}
+        {/* Filtros */}
         <PurchaseFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -182,6 +200,7 @@ export default function OtimizarComprasPage() {
         />
       </div>
 
+      {/* Modal de configuração */}
       <PurchaseConfigModal
         open={isStockConfigModalOpen}
         onClose={() => setIsStockConfigModalOpen(false)}

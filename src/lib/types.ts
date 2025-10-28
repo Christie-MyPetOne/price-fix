@@ -115,3 +115,30 @@ export interface PurchaseFiltersProps {
   setStockHealthFilter: React.Dispatch<React.SetStateAction<string>>;
   onFilter: () => void;
 }
+
+export interface PurchaseTableProps {
+  loading: boolean;
+  displayedProducts: Product[];
+  filteredProducts: Product[];
+  selectedItems: string[];
+  handleSelectAll: () => void;
+  handleSelectItem: (id: string) => void;
+  totalProducts: number;
+  searchTerm: string;
+  getPurchaseStatus: (product: Product) => string;
+  getStockHealth: (product: Product) => string;
+  currentPage: number;
+  totalPages: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export interface StockConfig {
+  useDefault: boolean;
+  purchaseForDays: number;
+  deliveryEstimateDays: number;
+  healthLevels: {
+    good: number;
+    ruim: number; // O limite para "Ruim" (Média fica entre good e ruim)
+    frozen: number; // O limite para "Congelado"
+  };
+}

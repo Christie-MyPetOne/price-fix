@@ -1,34 +1,40 @@
 "use client";
+
 import React, { useState } from "react";
 
 interface ToggleButtonProps {
-  defaultActive?: boolean;
+  initialActive?: boolean; // Prop para o estado inicial
   onToggle?: (active: boolean) => void;
-}
+} // <-- 1. A INTERFACE TERMINA AQUI
 
+/**
+ * Componente ToggleButton que gerencia seu próprio estado (não-controlado).
+ * Ele usa 'initialActive' para seu estado inicial.
+ */
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
-  defaultActive = false,
+  initialActive = false, // 2. Usa initialActive, e o padrão é 'false'
   onToggle,
 }) => {
-  const [active, setActive] = useState(defaultActive);
+  const [isActive, setIsActive] = useState(initialActive); // 3. Usa initialActive no estado
 
-  const handleToggle = () => {
-    const newValue = !active;
-    setActive(newValue);
+  const handleClick = () => {
+    const newValue = !isActive;
+    setIsActive(newValue);
     onToggle?.(newValue);
   };
 
   return (
     <button
       type="button"
-      onClick={handleToggle}
+      onClick={handleClick}
       className={`${
-        active ? "bg-primary" : "bg-gray-600"
-      } relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+        // 4. CORRIGIDO: Usa 'bg-primary' para ativo e 'bg-gray-600' para inativo
+        isActive ? "bg-primary" : "bg-gray-600"
+      } relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
     >
       <span
         className={`${
-          active ? "translate-x-4" : "translate-x-0"
+          isActive ? "translate-x-5" : "translate-x-0"
         } inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
       />
     </button>

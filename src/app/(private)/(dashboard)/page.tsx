@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DashFilter } from "@/components/dashboard/DashFilter";
+import KpiCard from "@/components/dashboard/kpiCard";
 
 
 
@@ -26,6 +27,7 @@ import {
   TrendingUp,
   Activity,
 } from "lucide-react";
+
 
 // --- DADOS SIMULADOS (Substitua pela sua chamada de API) ---
 
@@ -102,45 +104,6 @@ interface KpiCardProps {
   icon: React.ElementType;
 }
 
-const KpiCard: React.FC<KpiCardProps> = ({ title, value, change, sparklineData, icon: Icon }) => {
-  const isPositive = change >= 0;
-  const ChangeIcon = isPositive ? ArrowUpRight : ArrowDownRight;
-
-  return (
-    
-    <Card className="p-6 flex flex-col justify-between">
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col">
-          <p className="text-sm text-text-secondary">{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
-        </div>
-        <div className="p-2 bg-background rounded-lg">
-          <Icon className="w-5 h-5 text-text-secondary" />
-        </div>
-      </div>
-      <div className="flex items-end justify-between mt-4">
-        <div className={`flex items-center text-sm font-semibold ${isPositive ? "text-primary" : "text-error"}`}>
-          <ChangeIcon size={16} className="mr-1" />
-          {Math.abs(change)}%
-        </div>
-        <div className="w-24 h-10">
-          <ResponsiveContainer>
-            <LineChart data={sparklineData}>
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={isPositive ? "var(--color-primary)" : "var(--color-error)"}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
 
 const TopMarketplacesTable: React.FC = () => {
     return (
@@ -177,13 +140,45 @@ const TopMarketplacesTable: React.FC = () => {
 export default function DashboardPage() {
   return (
     
-    <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-8">
-      <DashFilter/>
-      {/* Cards de Indicadores (KPIs) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {kpiData.map((kpi) => (
-          <KpiCard key={kpi.title} {...kpi} />
-        ))}
+    <div className="-mt-8 max-w-7xl mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
+      <div>
+        <DashFilter />
+        {/* Cards de Indicadores (KPIs) */}
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <KpiCard
+            title="Receita total"
+            value="R$ 489.7K"
+            change={-15}
+            sparklineData={[
+              { value: 10 }, { value: 15 }, { value: 12 }, { value: 18 },
+              { value: 20 }, { value: 25 }, { value: 23 },
+            ]}
+            comparedLabel="vs. Semana passada"
+            comparedValue="R$ 435.2K"
+          />
+            <KpiCard
+            title="Ticket médio"
+            value="R$ 489.7K"
+            change={12.5}
+            sparklineData={[
+              { value: 10 }, { value: 15 }, { value: 12 }, { value: 18 },
+              { value: 20 }, { value: 25 }, { value: 23 },
+            ]}
+            comparedLabel="vs. Semana passada"
+            comparedValue="R$ 435.2K"
+          />
+        <KpiCard
+            title="Pedidos de venda"
+            value="R$ 489.7K"
+            change={12.5}
+            sparklineData={[
+              { value: 10 }, { value: 15 }, { value: 12 }, { value: 18 },
+              { value: 20 }, { value: 25 }, { value: 23 },
+            ]}
+            comparedLabel="vs. Semana passada"
+            comparedValue="R$ 435.2K"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -228,7 +223,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabela de Top Marketplaces */}
-      <Card className="p-6">
+      <Card className="p-5">
         <h2 className="text-xl font-semibold mb-4 text-text">
           Top Marketplaces
         </h2>

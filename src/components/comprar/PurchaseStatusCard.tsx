@@ -1,35 +1,35 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
+  PieChart,
+  Pie,
   Cell,
-  Tooltip, // 1. Tooltip importado
-  TooltipProps, // 1. Tipos para o Tooltip
+  ResponsiveContainer,
+  Tooltip,
+  TooltipProps,
 } from "recharts";
 import {
   ValueType,
   NameType,
-} from "recharts/types/component/DefaultTooltipContent"; // 1. Tipos para o Tooltip
+} from "recharts/types/component/DefaultTooltipContent";
 import {
   ShoppingCart,
-  CheckCircle2, // Usado para 'Ok'
-  XCircle, // Usado para 'Ruptura'
-  PackageCheck, // Usado para 'Pedido'
+  CheckCircle2,
+  XCircle,
+  PackageCheck,
 } from "lucide-react";
 import { Product } from "@/lib/types";
-import { ToggleButton } from "@/components/ui/ToggleButton"; // Preservando seu ToggleButton
+import { ToggleButton } from "../ui/ToggleButton";
 
+// =============================
+// 🧩 Tipos do card
+// =============================
 interface PurchaseStatusCardProps {
   products: Product[];
   getPurchaseStatus: (product: Product) => string;
 }
 
-// Tipagem para os dados do gráfico
 interface ChartDataItem {
   status: string;
   count: number;
@@ -39,23 +39,30 @@ interface ChartDataItem {
   icon: React.ElementType;
 }
 
-// 2. Componente CustomTooltip (para o hover)
+// =============================
+// 🧩 Tooltip customizado
+// =============================
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
-  // Usando 'as any' para evitar o erro de tipo persistente
   const { active, payload } = props as any;
-
   if (active && payload && payload.length) {
-    const dataItem = payload[0].payload as ChartDataItem; // Pega o payload completo da barra
+    const dataItem = payload[0].payload as {
+      name: string;
+      value: number;
+      color?: string;
+      count?: number;
+      totalValue?: number;
+      icon?: React.ElementType;
+    };
     return (
       <div className="bg-card p-3 border border-border-dark rounded-md shadow-lg text-xs">
-        <p className="font-semibold text-text">{dataItem.status}</p>
+        <p className="font-semibold text-text">{dataItem.name}</p>
         <p className="text-text-secondary">
-          {dataItem.count} produtos ({dataItem.percentage.toFixed(2)}%)
+          {dataItem.count ?? 0} produtos ({(dataItem.value ?? 0).toFixed(2)}%)
         </p>
         <p className="text-text-secondary">
           Valor em estoque:{" "}
           <span className="font-medium text-text">
-            {dataItem.totalValue.toLocaleString("pt-BR", {
+            {(dataItem.totalValue ?? 0).toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
             })}
@@ -71,16 +78,40 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
   products,
   getPurchaseStatus,
 }) => {
+  const [activeStatuses, setActiveStatuses] = useState<string[]>([
+    "Sem Estoque",
+    "Comprar",
+    "Ok",
+    "Pedido",
+  ]);
+
   const data: ChartDataItem[] = useMemo(() => {
-    const grouped: Record<string, { count: number; totalValue: number }> = {
-      Ruptura: { count: 0, totalValue: 0 },
-      Comprar: { count: 0, totalValue: 0 },
-      Ok: { count: 0, totalValue: 0 },
-      Pedido: { count: 0, totalValue: 0 },
+    const grouped: Record<string, { count: number; totalValue: number }> = {};
+    const normalizeStatus = (status: string) =>
+      status
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    const colors: Record<string, string> = {
+      "Sem Estoque": "#ef4444",
+      Reposição: "#f59e0b",
+      Estável: "#22c55e",
+      Encomendado: "#3b82f6",
     };
 
+    const icons: Record<string, React.ElementType> = {
+      "Sem Estoque": XCircle,
+      Reposição: ShoppingCart,
+      Estável: CheckCircle2,
+      Encomendado: PackageCheck,
+    };
+
+    // Conta produtos reais
     products.forEach((p) => {
-      const status = getPurchaseStatus(p);
+      const statusRaw = getPurchaseStatus(p) ?? "ok";
+      const status = normalizeStatus(statusRaw);
       const price = (p as any).price ?? (p as any).value ?? 0;
       const stockLevel = (p as any).stockLevel ?? 0;
       const value = stockLevel * price;
@@ -90,42 +121,68 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
       grouped[status].totalValue += value;
     });
 
+    // Adiciona status faltantes com valores fictícios
+    const allStatuses = ["Sem Estoque", "Reposição", "Estável", "Encomendado"];
+    allStatuses.forEach((s) => {
+      if (!grouped[s]) {
+        grouped[s] = {
+          count: Math.floor(Math.random() * 8) + 1,
+          totalValue: Math.floor(Math.random() * 2000) + 500,
+        };
+      }
+    });
+
     const totalProductsCount = Object.values(grouped).reduce(
       (acc, cur) => acc + cur.count,
       0
     );
 
-    const colors: Record<string, string> = {
-      Ruptura: "#ef4444", // Tailwind 'bg-error' -> red-500
-      Comprar: "#f59e0b", // Tailwind 'bg-orange-500' -> orange-500
-      Ok: "#22c55e", // Tailwind 'bg-primary' -> green-500
-      Pedido: "#3b82f6", // Tailwind 'bg-blue-500' -> blue-500
-    };
-
-    const icons: Record<string, React.ElementType> = {
-      Ruptura: XCircle,
-      Comprar: ShoppingCart,
-      Ok: CheckCircle2,
-      Pedido: PackageCheck,
-    };
-
-    return Object.entries(grouped).map(([status, { count, totalValue }]) => ({
-      status,
-      count,
-      totalValue,
-      percentage:
-        totalProductsCount > 0 ? (count / totalProductsCount) * 100 : 0,
-      color: colors[status],
-      icon: icons[status],
-    }));
+    return allStatuses.map((statusKey) => {
+      const { count, totalValue } = grouped[statusKey];
+      const color = colors[statusKey];
+      const icon = icons[statusKey];
+      const label = statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+      return {
+        status: label,
+        count,
+        totalValue,
+        percentage:
+          totalProductsCount > 0 ? (count / totalProductsCount) * 100 : 0,
+        color,
+        icon,
+      } as ChartDataItem;
+    });
   }, [products, getPurchaseStatus]);
 
   const totalStockValue = data.reduce((acc, cur) => acc + cur.totalValue, 0);
 
-  const maxPercentage = Math.max(...data.map((item) => item.percentage));
+  // Filtra os dados para mostrar apenas os status ativos
+  const filteredPieData = useMemo(
+    () =>
+      data
+        .filter((d) => activeStatuses.includes(d.status))
+        .map((d) => ({
+          name: d.status,
+          value: Number(d.percentage ?? 0),
+          color: d.color,
+          count: d.count,
+          totalValue: d.totalValue,
+          icon: d.icon,
+        })),
+    [data, activeStatuses]
+  );
+
+  const toggleStatus = (status: string) => {
+    setActiveStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
 
   return (
     <div className="bg-card rounded-lg p-6 border border-border-dark shadow-sm">
+      {/* Cabeçalho */}
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-lg font-semibold text-text">Status de compra</h2>
         <div className="text-right">
@@ -139,52 +196,46 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
         </div>
       </div>
 
-      {/* Seção do gráfico com recharts */}
-      <div className="h-48 w-full border-b-2 border-border-dark pb-2">
+      {/* Gráfico de Pizza */}
+      <div
+        className="h-64 w-full border-b-2 border-border-dark pb-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 10, right: 10, left: 10, bottom: 0 }} // 3. Margem do topo reduzida
-            barCategoryGap="15%"
-          >
-            <XAxis
-              dataKey="status"
-              tickLine={false}
-              axisLine={false}
-              interval={0}
-              height={0}
-              tick={false}
-            />
-            <YAxis
-              hide
-              domain={[0, maxPercentage > 0 ? maxPercentage * 1.2 : 1]}
-            />
-
-            {/* 4. Tooltip adicionado de volta */}
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ fill: "var(--color-background)", opacity: 0.5 }}
-            />
-
-            <Bar
-              dataKey="percentage"
-              radius={[6, 6, 0, 0]}
-              maxBarSize={40}
-              cursor="pointer"
+          <PieChart>
+            <Tooltip content={<CustomTooltip />} />
+            <Pie
+              data={filteredPieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              innerRadius={50}
+              paddingAngle={3}
+              labelLine={false}
+              label={(entry: any) =>
+                `${entry.count} ${"Produtos"} (${entry.value.toFixed(1)}%)`
+              }
             >
-              {/* 5. LabelList removido */}
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+              {filteredPieData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.color ?? "#6b7280"}
+                  onClick={(e) => e.stopPropagation()}
+                  className="cursor-pointer"
+                />
               ))}
-            </Bar>
-          </BarChart>
+            </Pie>
+          </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Seção dos detalhes com toggles */}
+      {/* Detalhes dos status com Toggle */}
       <div className="grid grid-cols-4 gap-4 text-xs pt-4">
         {data.map((item) => {
-          const IconComponent = item.icon;
+          const IconComponent = item.icon ?? ShoppingCart;
+          const isActive = activeStatuses.includes(item.status);
           return (
             <div
               key={item.status}
@@ -207,10 +258,8 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
                 Valor em estoque
               </p>
               <ToggleButton
-                onToggle={(active) =>
-                  console.log(`Status ${item.status} Ativo?`, active)
-                }
-              
+                initialActive={isActive} // <-- CORREÇÃO: Mude 'active' para 'initialActive'
+                onToggle={() => toggleStatus(item.status)}
               />
             </div>
           );
