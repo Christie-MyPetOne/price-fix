@@ -92,7 +92,7 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
           dataKey={s.key}
           stackId="stack"
           fill={s.color}
-          radius={[4, 4, 0, 0]}
+          radius={[2, 2, 0, 0]}
           hide={!visible.has(s.key)}
         />
       )),
@@ -215,10 +215,9 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
           </BarChart>
         </ResponsiveContainer>
       </div>
-      
+z
       {/* Rodapé: contador selecionados */}
       <div className="text-center text-xs text-text-secondary mt-2">
-        
         <span className="font-semibold">{visibleCount}</span> de {totalCount} selecionados
       </div>
     </div>
