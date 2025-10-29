@@ -3,8 +3,8 @@
 import React from "react";
 import { DashFilter } from "@/components/dashboard/DashFilter";
 import KpiCard from "@/components/dashboard/kpiCard";
-
-
+import GraficoBar from "@/components/dashboard/GraficoBar";
+import GraficoPeR from "@/components/dashboard/GraficoPeR";
 
 import {
   BarChart,
@@ -134,13 +134,48 @@ const TopMarketplacesTable: React.FC = () => {
     );
 };
 
+const data = [
+  { date: "13/10/25", base: 80_000, one: 70_000, shopee: 85_000, store: 45_000, mypet: 30_000, amazon: 0, full: 0 },
+  { date: "14/10/25", base: 65_000, one: 55_000, shopee: 60_000, store: 35_000, mypet: 40_000, amazon: 0, full: 0 },
+  { date: "15/10/25", base: 60_000, one: 50_000, shopee: 58_000, store: 32_000, mypet: 38_000, amazon: 0, full: 0 },
+  { date: "16/10/25", base: 70_000, one: 62_000, shopee: 65_000, store: 40_000, mypet: 35_000, amazon: 0, full: 0 },
+  { date: "17/10/25", base: 75_000, one: 68_000, shopee: 70_000, store: 42_000, mypet: 36_000, amazon: 0, full: 0 },
+  { date: "18/10/25", base: 68_000, one: 58_000, shopee: 63_000, store: 38_000, mypet: 34_000, amazon: 0, full: 0 },
+  { date: "19/10/25", base: 72_000, one: 61_000, shopee: 67_000, store: 39_000, mypet: 37_000, amazon: 0, full: 0 },
+  { date: "20/10/25", base: 77_000, one: 66_000, shopee: 73_000, store: 43_000, mypet: 35_000, amazon: 0, full: 0 },
+  { date: "21/10/25", base: 74_000, one: 63_000, shopee: 69_000, store: 41_000, mypet: 33_000, amazon: 0, full: 0 },
+  { date: "22/10/25", base: 79_000, one: 70_000, shopee: 76_000, store: 44_000, mypet: 36_000, amazon: 0, full: 0 },
+  { date: "23/10/25", base: 71_000, one: 59_000, shopee: 64_000, store: 37_000, mypet: 32_000, amazon: 0, full: 0 },
+  { date: "24/10/25", base: 66_000, one: 56_000, shopee: 61_000, store: 36_000, mypet: 31_000, amazon: 0, full: 0 },
+];
 
+
+const series = [
+  { key: "base",   label: "Base",                 color: "#3B82F6", total: 11513 },
+  { key: "one",    label: "MYPET ONE",            color: "#22C55E", total: 8267 },
+  { key: "shopee", label: "Shopee",               color: "#F59E0B", total: 9566 },
+  { key: "store",  label: "MYPETONE STORE",       color: "#EF4444", total: 8268 },
+  { key: "mypet",  label: "MY.PET.ONE",           color: "#60A5FA", total: 7706 },
+  { key: "amazon", label: "Amazon",               color: "#D1D5DB", total: 9804 },
+  { key: "full",   label: "MY.PET.ONE - FULL",    color: "#E5E7EB", total: 8544 },
+];
 // --- PÁGINA PRINCIPAL DO DASHBOARD ---
+
+const datas = [
+  { mes: "Jan", pedidos: 120, receita: 2500 },
+  { mes: "Fev", pedidos: 150, receita: 10000 },
+  { mes: "Mar", pedidos: 180, receita: 4000 },
+  { mes: "Abr", pedidos: 100, receita: 2200 },
+  { mes: "Mai", pedidos: 200, receita: 5000 },
+  { mes: "Jun", pedidos: 170, receita: 4200 },
+];
+
+
 
 export default function DashboardPage() {
   return (
     
-    <div className="-mt-8 max-w-7xl mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
+    <div className="-mt-11 max-w-7xl mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
       <div>
         <DashFilter />
         {/* Cards de Indicadores (KPIs) */}
@@ -179,48 +214,36 @@ export default function DashboardPage() {
             comparedValue="R$ 435.2K"
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico de Faturamento por Marketplace */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4 text-text">
-            Faturamento por Marketplace
-          </h2>
-          <div className="w-full h-[300px]">
-            <ResponsiveContainer>
-              <BarChart data={revenueByMarketplaceData} margin={{ left: 10, right: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-dark)" />
-                <XAxis dataKey="name" stroke="var(--color-text-secondary)" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--color-text-secondary)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `R$${Number(value) / 1000}k`} />
-                <Tooltip
-                  cursor={{ fill: 'var(--color-background)' }}
-                  contentStyle={{
-                    background: 'var(--color-card)',
-                    borderColor: 'var(--color-border-dark)',
-                    borderRadius: '0.5rem',
-                  }}
-                />
-                <Bar dataKey="Faturamento" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Placeholder para outro gráfico */}
-        <Card className="p-6 flex flex-col">
-           <h2 className="text-xl font-semibold mb-4 text-text">
-            Análise de Produtos
-          </h2>
-          <div className="flex-grow flex items-center justify-center text-center bg-background rounded-lg">
-            <div className="text-text-secondary">
-                <Activity size={48} className="mx-auto mb-4 opacity-50"/>
-                <p className="font-semibold">Em breve</p>
-                <p className="text-sm">Um gráfico analisando os produtos mais e menos lucrativos.</p>
-            </div>
-          </div>
-        </Card>
       </div>
+          <div className="flex flex-col gap-5">
+
+            <GraficoBar
+              title="Receita por canal"
+              data={data}
+              xKey="date"   // ✅ agora bate com a chave "date"
+              series={[
+                { key: "shopee", label: "Shopee", color: "#f97316" },
+                { key: "one", label: "One", color: "#9333ea" },
+                { key: "store", label: "Store", color: "#22c55e" },
+                { key: "mypet", label: "MyPet", color: "#eab308" },
+                { key: "amazon", label: "Amazon", color: "#111827" },
+                { key: "full", label: "Full", color: "#06b6d4" },
+                { key: "base", label: "Base", color: "#2563eb" },
+              ]}
+            />
+            <GraficoPeR
+              title="Pedidos x Receita"
+              data={datas}
+              xKey="mes"
+              series={[
+                { key: "pedidos", label: "Pedidos", color: "#413ea0" },
+                // se tiver mais barras (ex.: por canal), é só adicionar aqui
+              ]}
+              line={{ key: "receita", label: "Receita (R$)", color: "#ff7300", dot: true }}
+            />
+          </div>  
+
 
       {/* Tabela de Top Marketplaces */}
       <Card className="p-5">
@@ -229,6 +252,10 @@ export default function DashboardPage() {
         </h2>
         <TopMarketplacesTable />
       </Card>
+
     </div>
   );
 }
+
+
+

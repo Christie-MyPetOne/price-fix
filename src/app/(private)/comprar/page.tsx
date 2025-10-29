@@ -144,11 +144,11 @@ export default function OtimizarComprasPage() {
 
   return (
     <>
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-6 space-y-6 max-w-4xl ">
         {/* Cabeçalho */}
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <h1 className="text-3xl font-bold text-text flex items-center gap-2">
-            <ShoppingCart className="w-7 h-7" /> Comprar
+          <h1 className="text-2xl font-bold text-text flex items-center gap-2">
+            <ShoppingCart className="w-6 h-6" /> Comprar
           </h1>
           <div className="flex items-center gap-4">
             <Button variant="outline" className="flex items-center gap-2">

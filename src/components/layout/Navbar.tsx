@@ -89,7 +89,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-card p-3 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
+    <nav className="bg-card py-2 shadow-lg flex justify-between items-center z-10 border-b border-border-dark">
       <div className="flex items-center space-x-6">
         <Link
           href="/"
@@ -162,9 +162,7 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-        <span className="text-text-secondary text-xs hidden lg:inline">
-          Última sincronização: 17/10/2025 13:52
-        </span>
+      
         <ThemeToggleButton />
         <button className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
           <HelpCircle className="w-4 h-4" />
