@@ -285,11 +285,6 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-
-      {/* Rodapé: contador selecionados */}
-      <div className="text-center text-xs text-text-secondary mt-2">
-        <span className="font-semibold">{visibleCount}</span> de {totalCount} selecionados
-      </div>
     </div>
   );
 };

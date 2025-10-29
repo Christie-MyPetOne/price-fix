@@ -162,7 +162,6 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center space-x-4">
-      
         <ThemeToggleButton />
         <button className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
           <HelpCircle className="w-4 h-4" />
