@@ -26,7 +26,7 @@ export interface KpiCardProps {
   sparklineData: { value: number }[];
   comparedLabel?: string;
   comparedValue?: string | number;
-  className?: string;
+  className?: string; 
 }
 
 /* --- Componente KPI Card --- */
