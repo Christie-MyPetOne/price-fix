@@ -4,55 +4,43 @@ import React, { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import {
   RefreshCcw,
-  Eye,
-  ShoppingCart,
-  CheckCircle2,
-  XCircle,
-  PackageCheck,
+  ShoppingCartIcon,
+  CheckCircle2Icon,
+  XCircleIcon,
+  PackageCheckIcon,
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
   Pencil,
+  ArrowDown,
 } from "lucide-react";
 import { PurchaseTableProps } from "@/lib/types";
 import { toggleSelectAll, toggleSelection, sortData } from "@/lib/utils";
-import { ProductHealthIcons } from "../produtos/ProductHealthIcons";
 import { PurchaseConfigModal } from "../comprar/PurchaseConfigModal";
 
 const StatusBadge = ({ status }: { status?: string }) => {
-  let bgColor = "bg-gray-500";
-  let Icon = CheckCircle2;
+  const statusConfig: Record<
+    string,
+    { color: string; icon: React.ElementType }
+  > = {
+    "Sem Estoque": { color: "#ef4444", icon: XCircleIcon },
+    Reposição: { color: "#f59e0b", icon: ShoppingCartIcon },
+    Estável: { color: "#22c55e", icon: CheckCircle2Icon },
+    Encomendado: { color: "#3b82f6", icon: PackageCheckIcon },
+  };
 
-  switch (status) {
-    case "Sem Estoque":
-      bgColor = "bg-red-500";
-      Icon = XCircle;
-      break;
-    case "Reposição":
-      bgColor = "bg-orange-500";
-      Icon = ShoppingCart;
-      break;
-    case "Estável":
-      bgColor = "bg-green-600";
-      Icon = CheckCircle2;
-      break;
-    case "Encomendado":
-      bgColor = "bg-blue-500";
-      Icon = PackageCheck;
-      break;
-  }
+  const config = statusConfig[status || ""];
 
-  if (
-    !["Sem Estoque", "Reposição", "Estável", "Encomendado"].includes(
-      status || ""
-    )
-  ) {
+  if (!config) {
     return <span className="text-xs text-text-secondary">-</span>;
   }
 
+  const { color, icon: Icon } = config;
+
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-white ${bgColor}`}
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-white"
+      style={{ backgroundColor: color }}
     >
       <Icon size={12} /> {status}
     </span>
@@ -85,6 +73,40 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
     key: keyof (typeof displayedProducts)[0] | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
+
+  const [config, setConfig] = useState({
+    comprarPara: 40,
+    entregaEstimada: 5,
+    excelente: 30,
+    moderado: 40,
+    risco: 50,
+    parado: 60,
+  });
+
+  const healthLevels = [
+    { label: "Excelente", key: "excelente", color: "bg-green-500" },
+    { label: "Moderado", key: "moderado", color: "bg-yellow-400" },
+    { label: "Risco", key: "risco", color: "bg-red-500" },
+    { label: "Parado", key: "parado", color: "bg-blue-400" },
+  ];
+
+  const getStockHealthInfo = (
+    daysLeft: number
+  ): { label: string; color: string } => {
+    if (!isFinite(daysLeft)) {
+      return healthLevels.find((l) => l.key === "parado")!;
+    }
+    if (daysLeft <= config.excelente) {
+      return healthLevels.find((l) => l.key === "excelente")!;
+    }
+    if (daysLeft <= config.moderado) {
+      return healthLevels.find((l) => l.key === "moderado")!;
+    }
+    if (daysLeft <= config.risco) {
+      return healthLevels.find((l) => l.key === "risco")!;
+    }
+    return healthLevels.find((l) => l.key === "parado")!;
+  };
 
   useEffect(() => {
     const ids = cartItems.map((item) => item.id);
@@ -176,7 +198,6 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
 
   return (
     <div className="bg-card rounded-lg border border-border-dark shadow-sm p-4 w-full">
-      {/* Header */}
       <div className="flex justify-between items-center mb-2">
         <label className="text-xs font-bold text-text-secondary flex items-center gap-2">
           Mostrar
@@ -211,10 +232,9 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
         </p>
       </div>
 
-      {/* Tabela */}
-      <div className="overflow-x-auto w-full">
-        <table className="min-w-full divide-y divide-border-dark text-sm">
-          <thead className="bg-background">
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right divide-border-dark ">
+          <thead className="bg-background text-xs text-text uppercase ">
             <tr>
               <th className="px-3 py-3 w-10 text-center">
                 <input
@@ -230,16 +250,18 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
               {[
                 { key: "name", label: "Produto" },
                 { key: "stockLevel", label: "Estoque Atual" },
-                { key: "sales", label: "Vendas/dia" },
-                { key: "daysLeft", label: "Vai durar /dias" },
+                { key: "sales", label: "Vendas" },
+                { key: "daysLeft", label: "Vai durar" },
+                { key: "purchaseSuggestion", label: "Comprar para" },
                 { key: "purchaseSuggestionUnits", label: "Comprar" },
+                { key: "saude", label: "Saúde" },
               ].map(({ key, label }) => (
                 <th
                   key={key}
                   onClick={() =>
                     handleSort(key as keyof (typeof displayedProducts)[0])
                   }
-                  className="px-3 py-3 text-left font-medium text-text-secondary cursor-pointer select-none"
+                  className="px-3 py-3 text-left font-medium text-text-secondary cursor-pointer select-none "
                 >
                   <div className="flex items-center gap-1">
                     {label}
@@ -258,12 +280,10 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
                   </div>
                 </th>
               ))}
-              <th className="px-3 py-3 text-center font-medium text-text-secondary">
-                Saúde
-              </th>
-              <th className="px-3 py-3 text-center font-medium text-text-secondary">
-                Ações
-              </th>
+              <th
+                scope="col"
+                className="px-3 py-3 text-center font-medium text-text-secondary uppercase sr-only"
+              ></th>
             </tr>
           </thead>
 
@@ -342,16 +362,29 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
                     <td className="px-3 py-2 text-right text-xs">
                       {isFinite(daysLeft) ? daysLeft.toFixed(0) : "∞"}
                     </td>
+
                     <td className="px-3 py-2 text-right text-xs">
                       <p className="font-semibold">{purchaseSuggestionUnits}</p>
+                    </td>
+
+                    <td className="px-3 py-2 text-left text-xs">
                       <StatusBadge status={purchaseStatus} />
                     </td>
 
                     <td className="px-3 py-2 text-center">
-                      <ProductHealthIcons product={product} />
+                      {(() => {
+                        const healthInfo = getStockHealthInfo(daysLeft);
+                        return (
+                          <span className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-text">
+                            <div
+                              className={`w-2.5 h-2.5 rounded-full ${healthInfo.color}`}
+                            />
+                            {healthInfo.label}
+                          </span>
+                        );
+                      })()}
                     </td>
 
-                    {/* Ícones de ação */}
                     <td className="px-3 py-2 flex items-center justify-center gap-2">
                       <button
                         className={`p-1 border-none rounded transition ${
@@ -364,7 +397,7 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
                         }
                         onClick={() => handleToggleCart(product)}
                       >
-                        <ShoppingCart size={16} />
+                        <ShoppingCartIcon size={16} />
                       </button>
                       <button
                         className="p-1 border-none hover:bg-background rounded transition"
@@ -378,7 +411,7 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
                         title="Ver detalhes"
                         onClick={() => toggleExpand(product.id)}
                       >
-                        <Eye size={16} />
+                        <ArrowDown size={16} />
                       </button>
                     </td>
                   </tr>
@@ -463,15 +496,14 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
         </table>
       </div>
 
-      {/* Modal individual */}
       {selectedProduct && (
         <PurchaseConfigModal
           open={!!selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          products={[selectedProduct]}
         />
       )}
 
-      {/* Paginação */}
       <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
         <div className="flex gap-2">
           <button

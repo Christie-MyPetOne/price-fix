@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  X,
-  Trash2,
-  Image as ImageIcon,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { X, Trash2, ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { CartItem } from "@/lib/types";
 

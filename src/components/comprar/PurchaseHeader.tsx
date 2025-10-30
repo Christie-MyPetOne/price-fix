@@ -2,19 +2,10 @@
 
 import React from "react";
 import { CalendarDays, ShoppingCart } from "lucide-react";
-import { CartItem, Product } from "@/lib/types";
-
-interface PurchaseHeaderProps {
-  cartItems: CartItem[];
-  onRemove?: (id: string) => void;
-  onAddToCart?: (product: Product) => void;
-  onOpenCart?: () => void;
-}
+import { PurchaseHeaderProps } from "@/lib/types";
 
 export const PurchaseHeader: React.FC<PurchaseHeaderProps> = ({
   cartItems,
-  onRemove,
-  onAddToCart,
   onOpenCart,
 }) => {
   const totalItems =

@@ -22,14 +22,10 @@ import {
 import { Product } from "@/lib/types";
 import { ToggleButton } from "../ui/ToggleButton";
 
-// =============================
-// 🧩 Tipos do card
-// =============================
 interface PurchaseStatusCardProps {
   products: Product[];
   getPurchaseStatus: (product: Product) => string;
 }
-
 interface ChartDataItem {
   status: string;
   count: number;
@@ -39,9 +35,6 @@ interface ChartDataItem {
   icon: React.ElementType;
 }
 
-// =============================
-// 🧩 Tooltip customizado
-// =============================
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;
   if (active && payload && payload.length) {
@@ -85,7 +78,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
     "Encomendado",
   ]);
 
-  // Dados do gráfico, inicializados no cliente
   const [data, setData] = useState<ChartDataItem[]>([]);
 
   useEffect(() => {
@@ -111,7 +103,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
       Encomendado: PackageCheck,
     };
 
-    // Conta produtos reais
     products.forEach((p) => {
       const statusRaw = getPurchaseStatus(p) ?? "ok";
       const status = normalizeStatus(statusRaw);
@@ -124,7 +115,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
       grouped[status].totalValue += value;
     });
 
-    // Adiciona status faltantes com valores fictícios (somente no cliente)
     const allStatuses = ["Sem Estoque", "Reposição", "Estável", "Encomendado"];
     allStatuses.forEach((s) => {
       if (!grouped[s]) {
@@ -164,7 +154,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
     [data]
   );
 
-  // Filtra os dados para mostrar apenas os status ativos
   const filteredPieData = useMemo(
     () =>
       data
@@ -190,7 +179,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
 
   return (
     <div className="bg-card rounded-lg p-6 border border-border-dark shadow-sm">
-      {/* Cabeçalho */}
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-lg font-semibold text-text">Status de compra</h2>
         <div className="text-right">
@@ -204,7 +192,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
         </div>
       </div>
 
-      {/* Gráfico de Pizza */}
       <div
         className="h-64 w-full border-b-2 border-border-dark pb-2"
         onClick={(e) => e.stopPropagation()}
@@ -238,7 +225,6 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
         </ResponsiveContainer>
       </div>
 
-      {/* Detalhes dos status com Toggle */}
       <div className="grid grid-cols-4 gap-4 text-xs pt-4">
         {data.map((item) => {
           const IconComponent = item.icon ?? ShoppingCart;

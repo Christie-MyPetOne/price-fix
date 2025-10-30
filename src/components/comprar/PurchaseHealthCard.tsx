@@ -4,20 +4,7 @@ import React from "react";
 import { Settings2, ChevronLeft, ChevronRight } from "lucide-react";
 import { StockConfig } from "@/lib/types";
 import { Button } from "../ui/Button";
-
-const Card = ({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => (
-  <div
-    className={`bg-card rounded-lg border border-border-dark shadow-sm ${className}`}
-  >
-    {children}
-  </div>
-);
+import { Card } from "../ui/Card";
 
 interface PurchaseHealthCard {
   stockConfig: StockConfig;
@@ -51,7 +38,7 @@ export const PurchaseHealthCard: React.FC<PurchaseHealthCard> = ({
           <div className="flex justify-between items-center text-primary">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-primary block"></span>
-              <span>Bom</span>
+              <span>Excelente</span>
             </div>
             <span className="flex items-center gap-1 text-text-secondary">
               <ChevronLeft size={12} /> {stockConfig.healthLevels.good}

@@ -139,7 +139,7 @@ export default function OtimizarComprasPage() {
 
   return (
     <>
-      <div className="container mx-auto p-6 space-y-6 max-w-5xl">
+      <div className="container mx-auto p-6 space-y-6 max-w-6xl">
         <div className="flex flex-wrap justify-between items-center gap-4">
           <PurchaseHeader
             cartItems={cartItems}

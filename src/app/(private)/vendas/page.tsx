@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { VendasFilters } from "@/components/vendas/VendasFilters";
 import { VendasTable } from "@/components/vendas/VendasTable";
 import { Card } from "@/components/ui/Card";
-import CardVendas from "@/components/ui/CardVendas";
 import MargensChart from "@/components/vendas/MargensChart";
 import { useSalesStore } from "@/store/useSalesStore";
 
@@ -17,8 +16,6 @@ type FiltersState = {
 
 export default function VendasPage() {
   const { filterSales, clearFilters } = useSalesStore();
-
-  // estado local dos filtros do TOPO
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<FiltersState>({
     date: "",
@@ -27,7 +24,6 @@ export default function VendasPage() {
     produto: "",
   });
 
-  // handlers do VendasFilters (TOPO)
   const handleSearch = (term: string) => setSearchTerm(term);
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -57,11 +53,9 @@ export default function VendasPage() {
   };
 
   const handleSelectAll = (checked: boolean) => {
-    // opcional: sincronizar com a tabela via store/contexto
     console.log("Selecionar todos (topo):", checked);
   };
 
-  // Dados do gráfico (exemplo)
   const buckets = [
     {
       id: "alta",
@@ -116,27 +110,27 @@ export default function VendasPage() {
       <div className="flex-1">
         <h1 className="text-3xl font-bold mb-4 text-color-text">Vendas</h1>
 
-        {/* FILTROS DO TOPO — únicos */}
         <VendasFilters
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
           onSelectAll={handleSelectAll}
         />
 
-        {/* Cards de resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <Card>
-            <CardVendas Nome="Faturamento" Valor="R$ 150,00" />
+            <h1 className="font-bold text-2xl">Faturamento</h1>
+            <p className="mt-4 text-xl">R$ 150,00</p>
           </Card>
           <Card>
-            <CardVendas Nome="Margem" Valor="15%" />
+            <h1 className="font-bold text-2xl">Margem</h1>
+            <p className="mt-4 text-xl">15%</p>
           </Card>
           <Card>
-            <CardVendas Nome="Pedidos Realizados" Valor="75000" />
+            <h1 className="font-bold text-2xl">Pedidos Realizados</h1>
+            <p className="mt-4 text-xl">75.000</p>
           </Card>
         </div>
 
-        {/* Gráfico de Margens (mantido) */}
         <div className="mt-8">
           <MargensChart
             buckets={buckets}
@@ -146,7 +140,6 @@ export default function VendasPage() {
           />
         </div>
 
-        {/* Tabela (sem filtros próprios) */}
         <VendasTable />
       </div>
     </div>

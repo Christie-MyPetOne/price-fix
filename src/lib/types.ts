@@ -1,26 +1,20 @@
 export interface Product {
   id: string;
   name: string;
-  sales: number;
-  status: "Precificado" | "Pendente" | "Erro";
   price: number;
+  cost?: number;
   margin: number;
   totalProfit: number;
   workingCapital: number;
-  line?: string;
+  sales: number;
+  status: "Precificado" | "Pendente" | "Erro";
   origin?: string;
-  salesChannel?: string;
-  supplier?: string;
-  problems?: string[];
-  image: string;
-  cost?: number;
+  image?: string;
+  stockLevel?: number;
   salesHistory?: number[];
   profitHistory?: number[];
-  stockLevel?: number;
-  description?: string;
-  sku?: string;
-  imageUrl?: string;
-  coverage?: number;
+  supplier?: string;
+  stockHealthStatus?: "Bom" | "Moderado" | "Risco" | "Parado";
 }
 export interface Venda {
   id: string;
@@ -78,10 +72,7 @@ export interface DrawerProps {
   children: React.ReactNode;
   side?: "right" | "left";
 }
-export interface CardVendasProps {
-  Nome: string;
-  Valor: string | number;
-}
+
 export interface FakeProduct {
   id: number;
   title: string;
@@ -165,4 +156,16 @@ export interface CartItem {
   coverageDays?: number;
   image?: string; // <- Adicione isso
   coverage?: number; // ✅ Adiciona isso
+}
+
+export interface PurchaseHeaderProps {
+  cartItems: CartItem[];
+  onRemove?: (id: string) => void;
+  onAddToCart?: (product: Product) => void;
+  onOpenCart?: () => void;
+}
+
+export interface PurchaseHealthCard {
+  stockConfig: StockConfig;
+  onConfigClick: () => void;
 }
