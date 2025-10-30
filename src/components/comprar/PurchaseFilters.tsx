@@ -3,20 +3,7 @@
 import React from "react";
 import { Filter } from "lucide-react";
 import { PurchaseFiltersProps } from "@/lib/types";
-
-const Card = ({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => (
-  <div
-    className={`bg-card rounded-lg border border-border-dark shadow-sm ${className}`}
-  >
-    {children}
-  </div>
-);
+import { Card } from "../ui/Card";
 
 const Button = ({
   children,
@@ -77,6 +64,8 @@ export const PurchaseFilters: React.FC<PurchaseFiltersProps> = ({
   stockHealthFilter,
   setStockHealthFilter,
   onFilter,
+  onOpenConfigModal,
+  selectedProducts,
 }) => {
   return (
     <Card className="p-4">
@@ -87,9 +76,30 @@ export const PurchaseFilters: React.FC<PurchaseFiltersProps> = ({
             placeholder="Buscar Produto ou SKU"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-8"
           />
         </div>
+        <select
+          value={stockHealthFilter}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === "config") {
+              onOpenConfigModal(selectedProducts);
+              setStockHealthFilter("");
+            } else {
+              setStockHealthFilter(value);
+            }
+          }}
+          className="border border-gray-300 rounded-md p-2 text-sm"
+        >
+          <option value="" disabled hidden>
+            Ações
+          </option>
+          <option value="config">Configuração</option>
+          <option value="export">Exportar</option>
+          <option value="lista">Lista de compras</option>
+        </select>
+
         <Select
           value={stockHealthFilter}
           onChange={(e) => setStockHealthFilter(e.target.value)}
@@ -100,7 +110,12 @@ export const PurchaseFilters: React.FC<PurchaseFiltersProps> = ({
           <option value="Ruim">Ruim</option>
           <option value="Congelado">Congelado</option>
         </Select>
-        <Button variant="primary" className="flex items-center gap-1" onClick={onFilter}>
+
+        <Button
+          variant="primary"
+          className="flex items-center gap-1"
+          onClick={onFilter}
+        >
           <Filter size={16} /> Filtrar
         </Button>
       </div>

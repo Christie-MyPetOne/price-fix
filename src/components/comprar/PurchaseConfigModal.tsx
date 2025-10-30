@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { Product } from "@/lib/types";
 
 interface PurchaseConfigModalProps {
   open: boolean;
   onClose: () => void;
+  products?: Product[]; // agora pode vir vários produtos selecionados
 }
 
 export const PurchaseConfigModal = ({
   open,
   onClose,
+  products = [],
 }: PurchaseConfigModalProps) => {
   const [config, setConfig] = useState({
     comprarPara: 40,
@@ -34,7 +37,11 @@ export const PurchaseConfigModal = ({
       >
         {/* Cabeçalho */}
         <div className="flex justify-between items-center p-4 border-b border-border-dark">
-          <h2 className="text-lg font-semibold">Saúde do Estoque</h2>
+          <h2 className="text-lg font-semibold">
+            {products.length > 0
+              ? `Configurar Saúde de Estoque (${products.length})`
+              : "Saúde de Estoque Padrão"}
+          </h2>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-background"
@@ -45,10 +52,28 @@ export const PurchaseConfigModal = ({
 
         {/* Conteúdo */}
         <div className="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
-          <p className="text-sm text-text-secondary">
-            As definições padrão de estoque serão utilizadas para todos os
-            produtos que não tiverem uma configuração personalizada.
-          </p>
+          {products.length === 0 ? (
+            <p className="text-sm text-text-secondary">
+              As definições padrão de estoque serão utilizadas para todos os
+              produtos que não tiverem uma configuração personalizada.
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-text-secondary">
+                Você está configurando {products.length} produto
+                {products.length > 1 && "s"} selecionado
+                {products.length > 1 && "s"}.
+              </p>
+
+              <ul className="text-xs text-text-secondary border border-border-dark rounded-md p-2 max-h-[100px] overflow-y-auto">
+                {products.map((p) => (
+                  <li key={p.id} className="truncate">
+                    {p.name} — Estoque: {p.stockLevel ?? "-"}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
           {/* Campos principais */}
           <div className="grid grid-cols-2 gap-4">
@@ -87,8 +112,7 @@ export const PurchaseConfigModal = ({
             </h3>
             <p className="text-sm text-text-secondary mb-5">
               Avaliação do produto em estoque com base no tempo médio de
-              renovação. Exemplo: para ser classificado como bom, o estoque deve
-              ter um giro máximo de 30 dias.
+              renovação.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

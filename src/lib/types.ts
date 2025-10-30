@@ -17,6 +17,10 @@ export interface Product {
   salesHistory?: number[];
   profitHistory?: number[];
   stockLevel?: number;
+  description?: string;
+  sku?: string;
+  imageUrl?: string;
+  coverage?: number;
 }
 export interface Venda {
   id: string;
@@ -114,6 +118,8 @@ export interface PurchaseFiltersProps {
   stockHealthFilter: string;
   setStockHealthFilter: React.Dispatch<React.SetStateAction<string>>;
   onFilter: () => void;
+  onOpenConfigModal: (selectedProducts: Product[]) => void; // ✅ passa produtos
+  selectedProducts: Product[]; // ✅ lista dos produtos selecionados
 }
 
 export interface PurchaseTableProps {
@@ -121,8 +127,7 @@ export interface PurchaseTableProps {
   displayedProducts: Product[];
   filteredProducts: Product[];
   selectedItems: string[];
-  handleSelectAll: () => void;
-  handleSelectItem: (id: string) => void;
+  setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
   totalProducts: number;
   searchTerm: string;
   getPurchaseStatus: (product: Product) => string;
@@ -130,8 +135,10 @@ export interface PurchaseTableProps {
   currentPage: number;
   totalPages: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  onAddToCart?: (product: Product) => void;
+  cartItems: CartItem[];
+  onRemove: (id: string) => void;
 }
-
 export interface StockConfig {
   useDefault: boolean;
   purchaseForDays: number;
@@ -141,4 +148,21 @@ export interface StockConfig {
     ruim: number; // O limite para "Ruim" (Média fica entre good e ruim)
     frozen: number; // O limite para "Congelado"
   };
+}
+
+export interface CartItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  cost: number;
+  estimatedRevenue: number;
+  estimatedProfit: number;
+  supplier: string;
+  description?: string;
+  sku?: string;
+  imageUrl?: string;
+  coverageDays?: number;
+  image?: string; // <- Adicione isso
+  coverage?: number; // ✅ Adiciona isso
 }

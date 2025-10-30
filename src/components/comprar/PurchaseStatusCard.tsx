@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -80,12 +80,15 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
 }) => {
   const [activeStatuses, setActiveStatuses] = useState<string[]>([
     "Sem Estoque",
-    "Comprar",
-    "Ok",
-    "Pedido",
+    "Reposição",
+    "Estável",
+    "Encomendado",
   ]);
 
-  const data: ChartDataItem[] = useMemo(() => {
+  // Dados do gráfico, inicializados no cliente
+  const [data, setData] = useState<ChartDataItem[]>([]);
+
+  useEffect(() => {
     const grouped: Record<string, { count: number; totalValue: number }> = {};
     const normalizeStatus = (status: string) =>
       status
@@ -121,7 +124,7 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
       grouped[status].totalValue += value;
     });
 
-    // Adiciona status faltantes com valores fictícios
+    // Adiciona status faltantes com valores fictícios (somente no cliente)
     const allStatuses = ["Sem Estoque", "Reposição", "Estável", "Encomendado"];
     allStatuses.forEach((s) => {
       if (!grouped[s]) {
@@ -137,7 +140,7 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
       0
     );
 
-    return allStatuses.map((statusKey) => {
+    const chartData: ChartDataItem[] = allStatuses.map((statusKey) => {
       const { count, totalValue } = grouped[statusKey];
       const color = colors[statusKey];
       const icon = icons[statusKey];
@@ -150,11 +153,16 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
           totalProductsCount > 0 ? (count / totalProductsCount) * 100 : 0,
         color,
         icon,
-      } as ChartDataItem;
+      };
     });
+
+    setData(chartData);
   }, [products, getPurchaseStatus]);
 
-  const totalStockValue = data.reduce((acc, cur) => acc + cur.totalValue, 0);
+  const totalStockValue = useMemo(
+    () => data.reduce((acc, cur) => acc + cur.totalValue, 0),
+    [data]
+  );
 
   // Filtra os dados para mostrar apenas os status ativos
   const filteredPieData = useMemo(
@@ -215,14 +223,13 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
               paddingAngle={3}
               labelLine={false}
               label={(entry: any) =>
-                `${entry.count} ${"Produtos"} (${entry.value.toFixed(1)}%)`
+                `${entry.count} Produtos (${entry.value.toFixed(1)}%)`
               }
             >
               {filteredPieData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.color ?? "#6b7280"}
-                  onClick={(e) => e.stopPropagation()}
                   className="cursor-pointer"
                 />
               ))}
@@ -258,7 +265,7 @@ export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
                 Valor em estoque
               </p>
               <ToggleButton
-                initialActive={isActive} // <-- CORREÇÃO: Mude 'active' para 'initialActive'
+                initialActive={isActive}
                 onToggle={() => toggleStatus(item.status)}
               />
             </div>
