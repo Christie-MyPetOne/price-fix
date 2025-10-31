@@ -14,9 +14,9 @@ import {
   Pencil,
   ArrowDown,
 } from "lucide-react";
-import { PurchaseTableProps } from "@/lib/types";
+import { StockTableProps } from "@/lib/types";
 import { toggleSelectAll, toggleSelection, sortData } from "@/lib/utils";
-import { PurchaseConfigModal } from "../comprar/PurchaseConfigModal";
+import { StockConfigModal } from "./StockConfigModal";
 
 const StatusBadge = ({ status }: { status?: string }) => {
   const statusConfig: Record<
@@ -47,7 +47,7 @@ const StatusBadge = ({ status }: { status?: string }) => {
   );
 };
 
-export const PurchaseTable: React.FC<PurchaseTableProps> = ({
+export const StockTable: React.FC<StockTableProps> = ({
   loading,
   displayedProducts,
   selectedItems,
@@ -497,7 +497,7 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
       </div>
 
       {selectedProduct && (
-        <PurchaseConfigModal
+        <StockConfigModal
           open={!!selectedProduct}
           onClose={() => setSelectedProduct(null)}
           products={[selectedProduct]}

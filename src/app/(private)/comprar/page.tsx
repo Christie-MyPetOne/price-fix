@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useProductStore } from "@/store/useProductStore";
-import { PurchaseConfigModal } from "@/components/comprar/PurchaseConfigModal";
-import { PurchaseTable } from "@/components/comprar/PurchaseTable";
-import { PurchaseFilters } from "@/components/comprar/PurchaseFilters";
+import { StockConfigModal } from "@/components/comprar/StockConfigModal";
+import { StockTable } from "@/components/comprar/StockTable";
+import { StockFilters } from "@/components/comprar/StockFilters";
 import { Product, StockConfig, CartItem } from "@/lib/types";
-import { PurchaseStatusCard } from "@/components/comprar/PurchaseStatusCard";
-import { PurchaseHealthCard } from "@/components/comprar/PurchaseHealthCard";
-import { PurchaseHeader } from "@/components/comprar/PurchaseHeader";
+import { StockStatusCard } from "@/components/comprar/StockStatusCard";
+import { StockHealthCard } from "@/components/comprar/StockHealthCard";
+import { StockHeader } from "@/components/comprar/StockHeader";
 import { ShoppingCartModal } from "@/components/comprar/ShoppingCartModal";
 
 export default function OtimizarComprasPage() {
@@ -141,7 +141,7 @@ export default function OtimizarComprasPage() {
     <>
       <div className="container mx-auto p-6 space-y-6 max-w-6xl">
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <PurchaseHeader
+          <StockHeader
             cartItems={cartItems}
             onRemove={handleRemoveFromCart}
             onAddToCart={handleAddToCart}
@@ -151,20 +151,20 @@ export default function OtimizarComprasPage() {
 
         <div className="grid grid-cols-3 gap-6">
           <div className="md:col-span-2 col-span-3">
-            <PurchaseStatusCard
+            <StockStatusCard
               products={filteredProducts}
               getPurchaseStatus={getPurchaseStatus}
             />
           </div>
           <div className="md:col-span-1 col-span-3">
-            <PurchaseHealthCard
+            <StockHealthCard
               stockConfig={stockConfig}
               onConfigClick={() => setIsStockConfigModalOpen(true)}
             />
           </div>
         </div>
 
-        <PurchaseFilters
+        <StockFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           stockHealthFilter={stockHealthFilter}
@@ -174,7 +174,7 @@ export default function OtimizarComprasPage() {
           onOpenConfigModal={handleOpenConfigModal}
         />
 
-        <PurchaseTable
+        <StockTable
           loading={loading}
           displayedProducts={displayedProducts}
           filteredProducts={filteredProducts}
@@ -193,7 +193,7 @@ export default function OtimizarComprasPage() {
         />
       </div>
 
-      <PurchaseConfigModal
+      <StockConfigModal
         open={isStockConfigModalOpen}
         onClose={handleCloseConfigModal} // ✅ agora desmarca ao fechar
         products={selectedProducts}

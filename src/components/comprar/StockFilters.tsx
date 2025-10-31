@@ -2,13 +2,13 @@
 
 import React from "react";
 import { Filter } from "lucide-react";
-import { PurchaseFiltersProps } from "@/lib/types";
+import { StockFiltersProps } from "@/lib/types";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { Input } from "../ui/Input";
 
-export const PurchaseFilters: React.FC<PurchaseFiltersProps> = ({
+export const StockFilters: React.FC<StockFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   stockHealthFilter,

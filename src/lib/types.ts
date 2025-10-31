@@ -103,7 +103,7 @@ export interface DropdownLinkProps {
   onClick: () => void;
 }
 
-export interface PurchaseFiltersProps {
+export interface StockFiltersProps {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   stockHealthFilter: string;
@@ -113,7 +113,7 @@ export interface PurchaseFiltersProps {
   selectedProducts: Product[]; // ✅ lista dos produtos selecionados
 }
 
-export interface PurchaseTableProps {
+export interface StockTableProps {
   loading: boolean;
   displayedProducts: Product[];
   filteredProducts: Product[];
@@ -158,14 +158,9 @@ export interface CartItem {
   coverage?: number; // ✅ Adiciona isso
 }
 
-export interface PurchaseHeaderProps {
+export interface StockHeaderProps {
   cartItems: CartItem[];
   onRemove?: (id: string) => void;
   onAddToCart?: (product: Product) => void;
   onOpenCart?: () => void;
-}
-
-export interface PurchaseHealthCard {
-  stockConfig: StockConfig;
-  onConfigClick: () => void;
 }

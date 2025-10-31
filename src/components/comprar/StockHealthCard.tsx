@@ -6,12 +6,12 @@ import { StockConfig } from "@/lib/types";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 
-interface PurchaseHealthCard {
+interface StockHealthCard {
   stockConfig: StockConfig;
   onConfigClick: () => void;
 }
 
-export const PurchaseHealthCard: React.FC<PurchaseHealthCard> = ({
+export const StockHealthCard: React.FC<StockHealthCard> = ({
   stockConfig,
   onConfigClick,
 }) => {

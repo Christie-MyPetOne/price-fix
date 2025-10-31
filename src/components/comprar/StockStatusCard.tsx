@@ -22,7 +22,7 @@ import {
 import { Product } from "@/lib/types";
 import { ToggleButton } from "../ui/ToggleButton";
 
-interface PurchaseStatusCardProps {
+interface StockStatusCardProps {
   products: Product[];
   getPurchaseStatus: (product: Product) => string;
 }
@@ -67,7 +67,7 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   return null;
 };
 
-export const PurchaseStatusCard: React.FC<PurchaseStatusCardProps> = ({
+export const StockStatusCard: React.FC<StockStatusCardProps> = ({
   products,
   getPurchaseStatus,
 }) => {

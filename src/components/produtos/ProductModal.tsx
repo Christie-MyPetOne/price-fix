@@ -59,31 +59,35 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4"
+      className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-card text-text rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col relative"
+        className="bg-card text-text rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center p-4 border-b border-border-dark">
-          <div>
-            <h2 className="text-xl font-bold">
+        {/* HEADER */}
+        <div className="flex justify-between items-center p-3 sm:p-4 border-b border-border-dark flex-wrap gap-2">
+          <div className="min-w-[200px]">
+            <h2 className="text-lg sm:text-xl font-bold truncate">
               {editableProduct?.name || product.name}
             </h2>
-            <p className="text-xs text-text-secondary">SKU: {product.id}</p>
+            <p className="text-xs text-text-secondary truncate">
+              SKU: {product.id}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-background"
+            className="p-1 rounded-full hover:bg-background transition"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex items-center px-6 border-b border-border-dark">
+        {/* TABS */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start px-2 sm:px-6 border-b border-border-dark overflow-x-auto gap-1 sm:gap-2">
           <TabButton
-            label="Calculadora e Simulador"
+            label="Calculadora"
             icon={TrendingUp}
             isActive={activeTab === "calculator"}
             onClick={() => setActiveTab("calculator")}
@@ -102,11 +106,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           />
         </div>
 
-        <div className="flex-grow overflow-y-auto p-6">
+        {/* CONTENT */}
+        <div className="flex-grow overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 text-sm">
           {activeTab === "calculator" && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {/* Precificação */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Precificação</h3>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  Precificação
+                </h3>
                 <CalculationInputField
                   label="Preço de Venda"
                   value={price}
@@ -120,7 +128,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   unit="R$"
                 />
                 <CalculationInputField
-                  label="Custo de Frete (Envio)"
+                  label="Custo de Frete"
                   value={shipping}
                   onChange={(e) => setShipping(Number(e.target.value))}
                   unit="R$"
@@ -133,12 +141,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 />
               </div>
 
+              {/* Resultados */}
               <div className="space-y-4 bg-background p-4 rounded-md">
-                <h3 className="font-semibold text-lg">Resultados</h3>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  Resultados
+                </h3>
                 <div className="text-center py-2">
                   <p className="text-sm text-text-secondary">Lucro por Venda</p>
                   <p
-                    className={`text-3xl font-bold ${
+                    className={`text-2xl sm:text-3xl font-bold ${
                       profit < 0 ? "text-error" : "text-primary"
                     }`}
                   >
@@ -151,7 +162,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <div className="text-center py-2 border-t border-border-dark">
                   <p className="text-sm text-text-secondary">Margem de Lucro</p>
                   <p
-                    className={`text-3xl font-bold ${
+                    className={`text-2xl sm:text-3xl font-bold ${
                       margin < 0 ? "text-error" : "text-primary"
                     }`}
                   >
@@ -160,8 +171,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
+              {/* Simulador */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Simulador de Metas</h3>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  Simulador de Metas
+                </h3>
                 <CalculationInputField
                   label="Para ter X% de margem..."
                   value={targetMargin}
@@ -170,7 +184,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   placeholder="Ex: 25"
                 />
                 {requiredPriceForMargin !== null && (
-                  <div className="bg-primary-dark/20 p-3 rounded-md text-center">
+                  <div className="bg-primary-dark/10 p-3 rounded-md text-center">
                     <p className="text-xs text-primary">
                       Preço de venda sugerido:
                     </p>
@@ -190,7 +204,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   placeholder="Ex: 500"
                 />
                 {salesNeededForProfit !== null && (
-                  <div className="bg-primary-dark/20 p-3 rounded-md text-center">
+                  <div className="bg-primary-dark/10 p-3 rounded-md text-center">
                     <p className="text-xs text-primary">Vendas necessárias:</p>
                     <p className="text-lg font-bold text-primary">
                       {salesNeededForProfit} unidades
@@ -202,13 +216,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           )}
 
           {activeTab === "competitors" && (
-            <div className="text-center bg-background p-8 rounded-md border border-dashed border-border-dark">
+            <div className="text-center bg-background p-6 rounded-md border border-dashed border-border-dark">
               <h3 className="font-semibold text-lg mb-2">
                 Análise de Concorrência
               </h3>
-              <p className="text-text-secondary">
-                Funcionalidade em desenvolvimento. Em breve será possível
-                comparar preços e margens automaticamente.
+              <p className="text-text-secondary text-sm">
+                Em breve será possível comparar preços e margens
+                automaticamente.
               </p>
             </div>
           )}
@@ -250,14 +264,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           )}
         </div>
 
-        <div className="flex justify-end items-center p-4 border-t border-border-dark gap-3">
+        {/* FOOTER */}
+        <div className="flex flex-col sm:flex-row justify-end items-center p-3 sm:p-4 border-t border-border-dark gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-md bg-background hover:bg-opacity-80 transition-colors text-text-secondary"
+            className="w-full sm:w-auto px-4 py-2 rounded-md bg-background hover:bg-opacity-80 transition-colors text-text-secondary text-sm sm:text-base"
           >
             FECHAR
           </button>
-          <button className="px-4 py-2 rounded-md bg-primary hover:bg-primary-dark transition-colors text-white font-semibold">
+          <button className="w-full sm:w-auto px-4 py-2 rounded-md bg-primary hover:bg-primary-dark transition-colors text-white font-semibold text-sm sm:text-base">
             SALVAR ALTERAÇÕES
           </button>
         </div>

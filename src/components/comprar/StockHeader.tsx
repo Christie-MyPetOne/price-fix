@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
 import { CalendarDays, ShoppingCart } from "lucide-react";
-import { PurchaseHeaderProps } from "@/lib/types";
+import { StockHeaderProps } from "@/lib/types";
 
-export const PurchaseHeader: React.FC<PurchaseHeaderProps> = ({
+export const StockHeader: React.FC<StockHeaderProps> = ({
   cartItems,
   onOpenCart,
 }) => {
@@ -51,5 +50,3 @@ export const PurchaseHeader: React.FC<PurchaseHeaderProps> = ({
     </div>
   );
 };
-
-export default PurchaseHeader;

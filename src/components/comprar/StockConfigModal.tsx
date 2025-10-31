@@ -4,17 +4,17 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { Product } from "@/lib/types";
 
-interface PurchaseConfigModalProps {
+interface StockConfigModalProps {
   open: boolean;
   onClose: () => void;
   products?: Product[];
 }
 
-export const PurchaseConfigModal = ({
+export const StockConfigModal = ({
   open,
   onClose,
   products = [],
-}: PurchaseConfigModalProps) => {
+}: StockConfigModalProps) => {
   const [config, setConfig] = useState({
     comprarPara: 40,
     entregaEstimada: 5,
