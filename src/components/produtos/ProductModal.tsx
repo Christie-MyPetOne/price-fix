@@ -12,21 +12,26 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>("calculator");
-  const [editableProduct, setEditableProduct] = useState<Product | null>(
-    product
-  );
+  const [editableProduct, setEditableProduct] = useState<Product | null>(null);
+
+  // Todos os valores já começam com os dados da API
   const [price, setPrice] = useState(product?.price || 0);
   const [cost, setCost] = useState(product?.cost || 0);
-  const [shipping, setShipping] = useState(15);
-  const [marketplaceFee, setMarketplaceFee] = useState(16);
+  const [shipping, setShipping] = useState(product?.shipping || 0);
+  const [marketplaceFee, setMarketplaceFee] = useState(
+    product?.marketplaceFee || 0
+  );
   const [targetMargin, setTargetMargin] = useState("");
   const [targetProfit, setTargetProfit] = useState("");
 
+  // Atualiza quando o product muda
   useEffect(() => {
     if (product) {
       setEditableProduct(product);
       setPrice(product.price);
       setCost(product.cost || 0);
+      setShipping(product.shipping || 0);
+      setMarketplaceFee(product.marketplaceFee || 0);
       setTargetMargin("");
       setTargetProfit("");
     }
@@ -55,7 +60,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     return Math.ceil(profitNum / profit);
   }, [targetProfit, profit]);
 
-  if (!product) return null;
+  if (!editableProduct) return null;
 
   return (
     <div
@@ -66,14 +71,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         className="bg-card text-text rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* HEADER */}
         <div className="flex justify-between items-center p-3 sm:p-4 border-b border-border-dark flex-wrap gap-2">
           <div className="min-w-[200px]">
             <h2 className="text-lg sm:text-xl font-bold truncate">
-              {editableProduct?.name || product.name}
+              {editableProduct?.name || ""}
             </h2>
             <p className="text-xs text-text-secondary truncate">
-              SKU: {product.id}
+              SKU: {editableProduct?.sku || ""}
             </p>
           </div>
           <button
@@ -84,7 +88,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </button>
         </div>
 
-        {/* TABS */}
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start px-2 sm:px-6 border-b border-border-dark overflow-x-auto gap-1 sm:gap-2">
           <TabButton
             label="Calculadora"
@@ -106,11 +109,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           />
         </div>
 
-        {/* CONTENT */}
         <div className="flex-grow overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 text-sm">
-          {activeTab === "calculator" && (
+          {activeTab === "calculator" && editableProduct && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {/* Precificação */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-base sm:text-lg">
                   Precificação
@@ -141,7 +142,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 />
               </div>
 
-              {/* Resultados */}
               <div className="space-y-4 bg-background p-4 rounded-md">
                 <h3 className="font-semibold text-base sm:text-lg">
                   Resultados
@@ -171,7 +171,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
-              {/* Simulador */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-base sm:text-lg">
                   Simulador de Metas
@@ -227,7 +226,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
           )}
 
-          {activeTab === "history" && (
+          {activeTab === "history" && editableProduct && (
             <div>
               <h3 className="font-semibold text-lg mb-4">
                 Histórico de Performance
@@ -238,10 +237,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     Vendas (últimos 7 dias)
                   </p>
                   <PerformanceChart
-                    data={(product.salesHistory || []).map((value, index) => ({
-                      name: `Dia ${index + 1}`,
-                      value,
-                    }))}
+                    data={(editableProduct.salesHistory || []).map(
+                      (value, index) => ({
+                        name: `Dia ${index + 1}`,
+                        value,
+                      })
+                    )}
                     color="var(--color-info)"
                     yAxisLabel="Vendas"
                   />
@@ -251,10 +252,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     Lucro (últimos 7 dias)
                   </p>
                   <PerformanceChart
-                    data={(product.profitHistory || []).map((value, index) => ({
-                      name: `Dia ${index + 1}`,
-                      value,
-                    }))}
+                    data={(editableProduct.profitHistory || []).map(
+                      (value, index) => ({
+                        name: `Dia ${index + 1}`,
+                        value,
+                      })
+                    )}
                     color="var(--color-primary)"
                     yAxisLabel="Lucro (R$)"
                   />
@@ -264,7 +267,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           )}
         </div>
 
-        {/* FOOTER */}
         <div className="flex flex-col sm:flex-row justify-end items-center p-3 sm:p-4 border-t border-border-dark gap-3">
           <button
             onClick={onClose}

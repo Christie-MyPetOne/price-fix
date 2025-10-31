@@ -1,20 +1,36 @@
+export interface ProductState {
+  products: Product[];
+  sortedProducts: Product[];
+  selected: string[];
+  sortConfig: { key: keyof Product | null; direction: "asc" | "desc" };
+
+  // Funções da store
+  fetchProducts: () => Promise<void>;
+  toggleOne: (id: string) => void;
+  toggleAll: () => void;
+  sortBy: (key: keyof Product) => void;
+}
 export interface Product {
   id: string;
+  sku: string;
   name: string;
   price: number;
-  cost?: number;
+  cost: number;
   margin: number;
   totalProfit: number;
   workingCapital: number;
   sales: number;
-  status: "Precificado" | "Pendente" | "Erro";
-  origin?: string;
+  status: string;
+  origin: string;
   image?: string;
-  stockLevel?: number;
-  salesHistory?: number[];
-  profitHistory?: number[];
-  supplier?: string;
-  stockHealthStatus?: "Bom" | "Moderado" | "Risco" | "Parado";
+  stockLevel: number;
+  salesHistory: number[]; // <-- aqui
+  profitHistory: number[]; // <-- e aqui
+  supplier: string;
+  stockHealthStatus: string;
+  stockHealthOptions: string[];
+  shipping: number;
+  marketplaceFee: number;
 }
 export interface Venda {
   id: string;
@@ -79,16 +95,6 @@ export interface FakeProduct {
   price: number;
   category: string;
   image: string;
-}
-export interface ProductState {
-  products: Product[];
-  sortedProducts: Product[];
-  selected: string[];
-  sortConfig: { key: keyof Product | null; direction: "asc" | "desc" };
-  fetchProducts: () => Promise<void>;
-  toggleOne: (id: string) => void;
-  toggleAll: () => void;
-  sortBy: (key: keyof Product) => void;
 }
 export interface NavLinkProps {
   href: string;

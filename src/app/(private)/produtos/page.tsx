@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { RefreshCcw } from "lucide-react";
 import { Product } from "@/lib/types";
-import { useProductStore } from "@/store/useProductStore";
+import { useProductStore } from "@/store/useProductsStore";
 import { ProductFilters } from "@/components/produtos/ProductFilters";
 import { ProductTable } from "@/components/produtos/ProductTable";
 import { ProductDetailModal } from "@/components/produtos/ProductModal";
@@ -11,9 +11,7 @@ import { ProductDetailModal } from "@/components/produtos/ProductModal";
 export default function ProductsPage() {
   const { sortedProducts, fetchProducts } = useProductStore();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({});
   const [loading, setLoading] = useState(true);
-
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -27,26 +25,21 @@ export default function ProductsPage() {
 
   const handleSearch = (term: string) => setSearchTerm(term);
 
-  const handleFilterChange = (filterName: string, value: string) =>
-    setFilters((prev) => ({ ...prev, [filterName]: value }));
-
-  const handleSelectAll = () => console.log("Selecionar todos os produtos");
-
   const handleRowClick = (product: Product) => {
     setSelectedProduct(product);
   };
 
-  const handleCloseModal = () => {
-    setSelectedProduct(null);
-  };
+  const handleCloseModal = () => setSelectedProduct(null);
 
-  const filteredProducts = sortedProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = sortedProducts.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <>
-      <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full  px-3 sm:px-4 md:px-6 pb-6">
+      <div className="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full px-3 sm:px-4 md:px-6 pb-6">
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-2xl font-bold mb-4 text-text">
             Meus produtos
@@ -54,8 +47,8 @@ export default function ProductsPage() {
 
           <ProductFilters
             onSearch={handleSearch}
-            onFilterChange={handleFilterChange}
-            onSelectAll={handleSelectAll}
+            onFilterChange={() => {}}
+            onSelectAll={() => {}}
           />
 
           {loading ? (
@@ -73,10 +66,12 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <ProductDetailModal
-        product={selectedProduct}
-        onClose={handleCloseModal}
-      />
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          onClose={handleCloseModal}
+        />
+      )}
     </>
   );
 }

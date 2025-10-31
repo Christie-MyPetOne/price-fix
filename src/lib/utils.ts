@@ -26,8 +26,8 @@ export function sortData<T>(
     const ka = typeof keyOrAccessor === "function" ? "" : String(keyOrAccessor);
     const kb = ka;
 
-    let va = getVal(a);
-    let vb = getVal(b);
+    const va = getVal(a);
+    const vb = getVal(b);
 
     const aNull = va === null || va === undefined;
     const bNull = vb === null || vb === undefined;
@@ -70,8 +70,7 @@ function toTime(v: unknown): number {
 }
 
 /**
- * Alterna a seleção de um item em um array de IDs selecionados.
- * Se o item já estiver selecionado, remove; caso contrário, adiciona.
+ * Alterna a seleção de um item (single click)
  */
 export function toggleSelection(selected: string[], id: string): string[] {
   return selected.includes(id)
@@ -80,8 +79,7 @@ export function toggleSelection(selected: string[], id: string): string[] {
 }
 
 /**
- * Alterna a seleção de todas as linhas exibidas em uma tabela paginada.
- * Se todas as linhas da página estiverem selecionadas, remove; caso contrário, adiciona todas.
+ * Alterna a seleção de todas as linhas da página
  */
 export function toggleSelectAll<T extends { id: string }>(
   rowsOnPage: T[],
@@ -92,4 +90,36 @@ export function toggleSelectAll<T extends { id: string }>(
   if (allSelected) return selected.filter((id) => !pageIds.includes(id));
   const set = new Set([...selected, ...pageIds]);
   return Array.from(set);
+}
+
+/**
+ * Lógica de seleção universal com shift+click
+ */
+export function handleShiftSelection<T extends { id: string }>(
+  clickedId: string,
+  rows: T[],
+  selected: string[],
+  lastIndex: number | null
+): string[] {
+  const currentIndex = rows.findIndex((r) => r.id === clickedId);
+
+  if (lastIndex !== null) {
+    const start = Math.min(lastIndex, currentIndex);
+    const end = Math.max(lastIndex, currentIndex);
+    const idsInRange = rows.slice(start, end + 1).map((r) => r.id);
+    return Array.from(new Set([...selected, ...idsInRange]));
+  } else {
+    return toggleSelection(selected, clickedId);
+  }
+}
+
+/**
+ * Paginação
+ */
+export function paginate<T>(data: T[], page: number, perPage: number) {
+  const totalPages = Math.max(1, Math.ceil(data.length / perPage));
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const pageData = data.slice(start, end);
+  return { pageData, totalPages };
 }

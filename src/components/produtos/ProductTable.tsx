@@ -1,135 +1,81 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import { Product, ProductTableProps } from "@/lib/types";
-import { sortData, toggleSelection, toggleSelectAll } from "@/lib/utils";
-import { useProductStore } from "@/store/useProductStore";
+import {
+  sortData,
+  toggleSelection,
+  toggleSelectAll,
+  handleShiftSelection,
+  paginate,
+} from "@/lib/utils";
 import { ProductHealthIcons } from "./ProductHealthIcons";
 
+// Importa dinamicamente o gráfico
 const RechartsSparkline = dynamic(
-  () => import("../produtos/Charts").then((mod) => mod.RechartsSparkline),
-  {
-    ssr: false,
-    loading: () => (
-      <div style={{ width: 60, height: 20 }} className="inline-block ml-2" />
-    ),
-  }
+  () => import("./Charts").then((mod) => mod.RechartsSparkline),
+  { ssr: false }
 );
 
 export const ProductTable: React.FC<ProductTableProps> = ({
   products,
   onRowClick,
 }) => {
-  const {
-    sortedProducts: storeSorted,
-    selected: storeSelected,
-    sortConfig: storeSortConfig,
-    toggleOne: storeToggleOne,
-    toggleAll: storeToggleAll,
-    sortBy: storeSortBy,
-    fetchProducts,
-  } = useProductStore();
-
-  const sourceProducts = products ?? storeSorted;
-
-  const [localSelected, setLocalSelected] = useState<string[]>(
-    products ? [] : storeSelected
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
   );
-
-  const [localSort, setLocalSort] = useState<{
+  const [sortConfig, setSortConfig] = useState<{
     key: keyof Product | null;
     direction: "asc" | "desc";
-  }>(products ? { key: null, direction: "asc" } : storeSortConfig);
-
+  }>({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
-    if (!products) fetchProducts();
-  }, [products, fetchProducts]);
+  // Ordenação
+  const orderedProducts = useMemo(() => {
+    if (!products) return [];
+    if (sortConfig.key)
+      return sortData(products, sortConfig.key, sortConfig.direction);
+    return products;
+  }, [products, sortConfig]);
 
-  useEffect(() => {
-    if (products) {
-      setLocalSelected([]);
-      setCurrentPage(1);
-    }
-  }, [products]);
+  // Paginação
+  const { pageData: displayedProducts, totalPages } = useMemo(
+    () => paginate(orderedProducts, currentPage, rowsPerPage),
+    [orderedProducts, currentPage, rowsPerPage]
+  );
 
-  const toggleOne = (id: string) => {
-    if (products) {
-      setLocalSelected((prev) => toggleSelection(prev, id));
-    } else {
-      storeToggleOne(id);
-    }
+  // Seleção
+  const allSelected =
+    selectedIds.length === displayedProducts.length &&
+    displayedProducts.length > 0;
+
+  const handleToggleOne = (id: string, index: number, shiftKey?: boolean) => {
+    setSelectedIds((prev) => {
+      const updated = shiftKey
+        ? handleShiftSelection(id, displayedProducts, prev, lastSelectedIndex)
+        : toggleSelection(prev, id);
+      return updated;
+    });
+    setLastSelectedIndex(index);
   };
 
-  const toggleAll = () => {
-    if (products) {
-      setLocalSelected((prev) =>
-        toggleSelectAll(sourceProducts as Product[], prev)
-      );
-    } else {
-      storeToggleAll();
-    }
+  const handleToggleAll = () => {
+    setSelectedIds((prev) => toggleSelectAll(displayedProducts, prev));
   };
 
   const handleSort = (key: keyof Product) => {
-    if (products) {
-      const direction =
-        localSort.key === key && localSort.direction === "asc" ? "desc" : "asc";
-      setLocalSort({ key, direction });
-    } else {
-      storeSortBy(key);
-    }
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortConfig({ key, direction });
   };
-
-  const orderedProducts = useMemo(() => {
-    if (!sourceProducts) return [];
-    if (products && localSort.key) {
-      return sortData(sourceProducts, localSort.key, localSort.direction);
-    }
-    return sourceProducts;
-  }, [sourceProducts, products, localSort]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(orderedProducts.length / rowsPerPage)
-  );
-
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [totalPages, currentPage]);
-
-  const displayedProducts = orderedProducts.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-  const selected = products ? localSelected : storeSelected;
-  const allSelected =
-    selected.length === displayedProducts.length &&
-    displayedProducts.length > 0;
-
-  const headers: {
-    key: keyof Product | "alerts";
-    label: string;
-    hideOnMobile?: boolean;
-  }[] = [
-    { key: "name", label: "Nome" },
-    { key: "status", label: "Status" },
-    { key: "alerts", label: "Alertas" },
-    { key: "sales", label: "Vendas", hideOnMobile: true },
-    { key: "price", label: "Faturamento", hideOnMobile: true },
-    { key: "margin", label: "Margem", hideOnMobile: true },
-    { key: "totalProfit", label: "Lucro total", hideOnMobile: true },
-  ];
 
   return (
     <div className="bg-card p-4 sm:p-6 rounded-lg shadow-md mt-6 border border-border-dark w-full">
-      {/* TOPO CONTROLES */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
         <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-2">
           Mostrar
@@ -151,7 +97,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </label>
 
         <p className="text-[0.65rem] sm:text-xs text-text-secondary text-center sm:text-right">
-          Mostrando{" "}
+          Selecionados:{" "}
+          <span className="font-medium">{selectedIds.length}</span> - Mostrando{" "}
           <span className="font-medium">
             {(currentPage - 1) * rowsPerPage + 1}
           </span>{" "}
@@ -160,7 +107,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             {Math.min(currentPage * rowsPerPage, orderedProducts.length)}
           </span>{" "}
           de <span className="font-medium">{orderedProducts.length}</span>{" "}
-          resultados
+          produtos
         </p>
       </div>
 
@@ -173,11 +120,23 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 <input
                   type="checkbox"
                   checked={allSelected}
-                  onChange={toggleAll}
+                  onChange={handleToggleAll}
                   className="rounded border-border-dark text-primary cursor-pointer"
                 />
               </th>
-              {headers.map(({ key, label, hideOnMobile }) => (
+              {[
+                { key: "name", label: "Nome" },
+                { key: "status", label: "Status" },
+                { key: "alerts", label: "Alertas" },
+                { key: "sales", label: "Vendas", hideOnMobile: true },
+                { key: "price", label: "Faturamento", hideOnMobile: true },
+                { key: "margin", label: "Margem", hideOnMobile: true },
+                {
+                  key: "totalProfit",
+                  label: "Lucro total",
+                  hideOnMobile: true,
+                },
+              ].map(({ key, label, hideOnMobile }) => (
                 <th
                   key={String(key)}
                   onClick={() =>
@@ -201,21 +160,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                       <ArrowUpDown
                         size={13}
                         className={`transition-transform ${
-                          (
-                            products
-                              ? localSort.key === key
-                              : storeSortConfig.key === key
-                          )
+                          sortConfig.key === key
                             ? "text-primary"
                             : "text-gray-400"
                         } ${
-                          (
-                            products
-                              ? localSort.key === key &&
-                                localSort.direction === "asc"
-                              : storeSortConfig.key === key &&
-                                storeSortConfig.direction === "asc"
-                          )
+                          sortConfig.key === key &&
+                          sortConfig.direction === "asc"
                             ? "rotate-180"
                             : ""
                         }`}
@@ -228,88 +178,134 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           </thead>
 
           <tbody className="bg-card divide-y divide-border-dark text-xs sm:text-sm">
-            {displayedProducts.map((product) => (
-              <tr
-                key={product.id}
-                onClick={() => onRowClick(product)}
-                className="hover:bg-background transition-colors cursor-pointer"
-              >
-                <td className="px-2 py-2" onClick={(e) => e.stopPropagation()}>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(product.id)}
-                    onChange={() => toggleOne(product.id)}
-                    className="rounded border-border-dark text-primary cursor-pointer"
-                  />
-                </td>
-
-                <td className="py-3 text-xs font-medium text-text flex items-center gap-2">
-                  <div className="w-9 h-9 flex-shrink-0 relative">
-                    {product.image ? (
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover rounded"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-border-dark rounded" />
-                    )}
-                  </div>
-                  <span className="truncate max-w-[120px] sm:max-w-none">
-                    {product.name}
-                  </span>
-                </td>
-
-                <td className="px-2 py-1.5 text-[0.65rem] sm:text-xs">
-                  <span
-                    className={`px-1.5 py-0.5 inline-flex text-xs font-semibold rounded-full ${
-                      product.status === "Precificado"
-                        ? "bg-primary-dark text-white"
-                        : product.status === "Pendente"
-                        ? "bg-warning text-gray-900"
-                        : "bg-error text-white"
-                    }`}
+            {displayedProducts.length ? (
+              displayedProducts.map((product, index) => (
+                <tr
+                  key={product.id}
+                  onClick={() => onRowClick(product)}
+                  className="hover:bg-background transition-colors cursor-pointer"
+                >
+                  {/* Checkbox */}
+                  <td
+                    className="px-2 py-2"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {product.status}
-                  </span>
-                </td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(product.id)}
+                      onChange={() => {}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleOne(product.id, index, e.shiftKey);
+                      }}
+                      className="rounded border-border-dark text-primary cursor-pointer"
+                    />
+                  </td>
 
-                <td className="px-3 py-3 text-center">
-                  <ProductHealthIcons product={product} />
-                </td>
+                  {/* Nome e Imagem */}
+                  <td className="py-3 text-xs font-medium text-text flex flex-col sm:flex-row sm:items-center gap-2">
+                    <div className="w-9 h-9 flex-shrink-0 relative mr-2">
+                      {product.image ? (
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          className="object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-border-dark rounded" />
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="truncate max-w-[120px] sm:max-w-none">
+                        {product.name}
+                      </span>
+                      <span className="text-[0.6rem] text-text-secondary mt-0.5">
+                        SKU: {product.sku}
+                      </span>
+                    </div>
+                  </td>
 
-                <td className="px-3 py-3 hidden sm:table-cell text-xs text-text-secondary">
-                  {product.sales}
-                </td>
+                  {/* Status */}
+                  <td className="px-2 py-1.5 text-[0.65rem] sm:text-xs">
+                    <span
+                      className={`px-1.5 py-0.5 inline-flex text-xs font-semibold rounded-full ${
+                        product.status === "Precificado"
+                          ? "bg-primary-dark text-white"
+                          : product.status === "Pendente"
+                          ? "bg-warning text-gray-900"
+                          : "bg-error text-white"
+                      }`}
+                    >
+                      {product.status}
+                    </span>
+                  </td>
 
-                <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
-                  {product.price.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </td>
+                  {/* Alertas */}
+                  <td className="px-3 py-3 text-center">
+                    <ProductHealthIcons product={product} />
+                  </td>
 
-                <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
-                  {product.margin.toFixed(2)}%
-                </td>
+                  {/* Vendas + Sparkline */}
+                  <td className="px-3 py-3 hidden sm:table-cell text-xs text-text-secondary">
+                    <div className="flex items-center justify-between">
+                      <span>{product.sales}</span>
+                      <div className="flex items-center justify-center w-[3.8rem]">
+                        <RechartsSparkline
+                          data={(product.salesHistory || []).map((value) => ({
+                            value,
+                          }))}
+                          color="var(--color-info)"
+                        />
+                      </div>
+                    </div>
+                  </td>
 
-                <td className="px-3 py-3 hidden sm:table-cell text-xs">
-                  <span
-                    className={`whitespace-nowrap ${
-                      product.totalProfit < 0 ? "text-error" : "text-primary"
-                    }`}
-                  >
-                    {product.totalProfit.toLocaleString("pt-BR", {
+                  {/* Faturamento */}
+                  <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
+                    {product.price.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     })}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                  </td>
 
-            {displayedProducts.length === 0 && (
+                  {/* Margem */}
+                  <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
+                    {product.margin.toFixed(2)}%
+                  </td>
+
+                  {/* Lucro + Sparkline */}
+                  <td className="px-3 py-3 hidden sm:table-cell text-xs">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`${
+                          product.totalProfit < 0
+                            ? "text-error"
+                            : "text-primary"
+                        }`}
+                      >
+                        {product.totalProfit.toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </span>
+                      <div className="flex items-center justify-center w-[3.8rem]">
+                        <RechartsSparkline
+                          data={(product.profitHistory || []).map((value) => ({
+                            value,
+                          }))}
+                          color={
+                            product.totalProfit < 0
+                              ? "var(--color-error)"
+                              : "var(--color-primary)"
+                          }
+                        />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td
                   colSpan={9}
@@ -333,9 +329,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           >
             <ChevronLeft size={16} />
           </button>
+
           <span className="text-xs sm:hidden">
             {currentPage}/{totalPages}
           </span>
+
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .slice(0, 5)
             .map((page) => (
@@ -351,6 +349,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 {page}
               </button>
             ))}
+
           <button
             className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-40"
             disabled={currentPage === totalPages}
