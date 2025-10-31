@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { X, TrendingUp, History, Users } from "lucide-react";
 import { Product, ProductDetailModalProps, type Tab } from "@/lib/types";
-import { PerformanceChart } from "./Charts";
+import { PerformanceChart } from "../ui/Charts";
 import { TabButton } from "../ui/TabButton";
 import { CalculationInputField } from "../ui/CalculationInputField";
 
@@ -13,8 +13,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>("calculator");
   const [editableProduct, setEditableProduct] = useState<Product | null>(null);
-
-  // Todos os valores já começam com os dados da API
   const [price, setPrice] = useState(product?.price || 0);
   const [cost, setCost] = useState(product?.cost || 0);
   const [shipping, setShipping] = useState(product?.shipping || 0);
@@ -24,7 +22,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [targetMargin, setTargetMargin] = useState("");
   const [targetProfit, setTargetProfit] = useState("");
 
-  // Atualiza quando o product muda
   useEffect(() => {
     if (product) {
       setEditableProduct(product);

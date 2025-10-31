@@ -4,7 +4,7 @@ import React from "react";
 import { Flame, TrendingDown, AlertTriangle, Snowflake } from "lucide-react";
 import { Product } from "@/lib/types";
 
-export const ProductHealthIcons = ({ product }: { product: Product }) => {
+export const StockStatusIcons = ({ product }: { product: Product }) => {
   const alerts = [];
 
   // 🔥 Regra 1: "Queimando Caixa" (lucro negativo)

@@ -12,11 +12,10 @@ import {
   handleShiftSelection,
   paginate,
 } from "@/lib/utils";
-import { ProductHealthIcons } from "./ProductHealthIcons";
+import { StockStatusIcons } from "../ui/StockStatusIcons";
 
-// Importa dinamicamente o gráfico
 const RechartsSparkline = dynamic(
-  () => import("./Charts").then((mod) => mod.RechartsSparkline),
+  () => import("../ui/Charts").then((mod) => mod.RechartsSparkline),
   { ssr: false }
 );
 
@@ -35,7 +34,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Ordenação
   const orderedProducts = useMemo(() => {
     if (!products) return [];
     if (sortConfig.key)
@@ -43,13 +41,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     return products;
   }, [products, sortConfig]);
 
-  // Paginação
   const { pageData: displayedProducts, totalPages } = useMemo(
     () => paginate(orderedProducts, currentPage, rowsPerPage),
     [orderedProducts, currentPage, rowsPerPage]
   );
 
-  // Seleção
   const allSelected =
     selectedIds.length === displayedProducts.length &&
     displayedProducts.length > 0;
@@ -111,9 +107,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </p>
       </div>
 
-      {/* TABELA */}
-      <div className="overflow-x-auto w-full rounded-md">
-        <table className="min-w-full divide-y divide-border-dark">
+      <div className="w-full rounded-md">
+        <table className="w-full table-auto divide-y divide-border-dark">
           <thead className="bg-background">
             <tr>
               <th className="px-3 py-3">
@@ -185,7 +180,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   onClick={() => onRowClick(product)}
                   className="hover:bg-background transition-colors cursor-pointer"
                 >
-                  {/* Checkbox */}
                   <td
                     className="px-2 py-2"
                     onClick={(e) => e.stopPropagation()}
@@ -193,7 +187,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(product.id)}
-                      onChange={() => {}}
+                      readOnly
                       onClick={(e) => {
                         e.stopPropagation();
                         handleToggleOne(product.id, index, e.shiftKey);
@@ -202,7 +196,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     />
                   </td>
 
-                  {/* Nome e Imagem */}
                   <td className="py-3 text-xs font-medium text-text flex flex-col sm:flex-row sm:items-center gap-2">
                     <div className="w-9 h-9 flex-shrink-0 relative mr-2">
                       {product.image ? (
@@ -226,7 +219,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Status */}
                   <td className="px-2 py-1.5 text-[0.65rem] sm:text-xs">
                     <span
                       className={`px-1.5 py-0.5 inline-flex text-xs font-semibold rounded-full ${
@@ -241,16 +233,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     </span>
                   </td>
 
-                  {/* Alertas */}
                   <td className="px-3 py-3 text-center">
-                    <ProductHealthIcons product={product} />
+                    <StockStatusIcons product={product} />
                   </td>
 
-                  {/* Vendas + Sparkline */}
                   <td className="px-3 py-3 hidden sm:table-cell text-xs text-text-secondary">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between min-w-[80px]">
                       <span>{product.sales}</span>
-                      <div className="flex items-center justify-center w-[3.8rem]">
+                      <div className="flex items-center justify-center w-[3rem]">
                         <RechartsSparkline
                           data={(product.salesHistory || []).map((value) => ({
                             value,
@@ -261,7 +251,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Faturamento */}
                   <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
                     {product.price.toLocaleString("pt-BR", {
                       style: "currency",
@@ -269,14 +258,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     })}
                   </td>
 
-                  {/* Margem */}
                   <td className="px-3 py-3 hidden sm:table-cell text-xs text-text">
                     {product.margin.toFixed(2)}%
                   </td>
 
-                  {/* Lucro + Sparkline */}
                   <td className="px-3 py-3 hidden sm:table-cell text-xs">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between min-w-[80px]">
                       <span
                         className={`${
                           product.totalProfit < 0
@@ -289,7 +276,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                           currency: "BRL",
                         })}
                       </span>
-                      <div className="flex items-center justify-center w-[3.8rem]">
+                      <div className="flex items-center justify-center w-[3rem]">
                         <RechartsSparkline
                           data={(product.profitHistory || []).map((value) => ({
                             value,
@@ -319,7 +306,6 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </table>
       </div>
 
-      {/* PAGINAÇÃO */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border-dark bg-card px-4 py-3 mt-2">
         <div className="flex gap-2">
           <button
