@@ -36,6 +36,29 @@ export const kpiData = [
   },
 ];
 
+export const kpiData2 = [
+  {
+    title: "Faturamento Total",
+    value: "R$ 489.7K",
+    change: 12.5,
+    sparklineData: [
+      { value: 10 }, { value: 15 }, { value: 12 },
+      { value: 18 }, { value: 20 }, { value: 25 }, { value: 23 },
+    ],
+    icon: DollarSign,
+  },
+  {
+    title: "Lucro Líquido",
+    value: "R$ 112.3K",
+    change: -2.1,
+    sparklineData: [
+      { value: 30 }, { value: 28 }, { value: 32 },
+      { value: 25 }, { value: 26 }, { value: 22 }, { value: 24 },
+    ],
+    icon: TrendingUp,
+  },
+];
+
 export const kpiDataPlus = [
   {
     title: "Faturamento Total",
