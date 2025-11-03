@@ -26,6 +26,7 @@ interface StockStatusCardProps {
   products: Product[];
   getPurchaseStatus: (product: Product) => string;
 }
+
 interface ChartDataItem {
   status: string;
   count: number;
@@ -38,14 +39,7 @@ interface ChartDataItem {
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;
   if (active && payload && payload.length) {
-    const dataItem = payload[0].payload as {
-      name: string;
-      value: number;
-      color?: string;
-      count?: number;
-      totalValue?: number;
-      icon?: React.ElementType;
-    };
+    const dataItem = payload[0].payload as any;
     return (
       <div className="bg-card p-3 border border-border-dark rounded-md shadow-lg text-xs">
         <p className="font-semibold text-text">{dataItem.name}</p>
@@ -72,71 +66,60 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
   getPurchaseStatus,
 }) => {
   const [activeStatuses, setActiveStatuses] = useState<string[]>([
-    "Sem Estoque",
-    "Reposição",
-    "Estável",
-    "Encomendado",
+    "Acabou",
+    "Comprar",
+    "Bom",
+    "Pedido",
   ]);
 
   const [data, setData] = useState<ChartDataItem[]>([]);
 
   useEffect(() => {
-    const grouped: Record<string, { count: number; totalValue: number }> = {};
-    const normalizeStatus = (status: string) =>
-      status
-        .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+    const grouped: Record<string, { count: number; totalValue: number }> = {
+      Acabou: { count: 0, totalValue: 0 },
+      Comprar: { count: 0, totalValue: 0 },
+      Bom: { count: 0, totalValue: 0 },
+      Pedido: { count: 0, totalValue: 0 },
+    };
 
     const colors: Record<string, string> = {
-      "Sem Estoque": "#ef4444",
-      Reposição: "#f59e0b",
-      Estável: "#22c55e",
-      Encomendado: "#3b82f6",
+      Acabou: "#ef4444",
+      Comprar: "#f59e0b",
+      Bom: "#22c55e",
+      Pedido: "#6b7280",
     };
 
     const icons: Record<string, React.ElementType> = {
-      "Sem Estoque": XCircle,
-      Reposição: ShoppingCart,
-      Estável: CheckCircle2,
-      Encomendado: PackageCheck,
+      Acabou: XCircle,
+      Comprar: ShoppingCart,
+      Bom: CheckCircle2,
+      Pedido: PackageCheck,
     };
 
     products.forEach((p) => {
-      const statusRaw = getPurchaseStatus(p) ?? "ok";
-      const status = normalizeStatus(statusRaw);
-      const price = (p as any).price ?? (p as any).value ?? 0;
-      const stockLevel = (p as any).stockLevel ?? 0;
-      const value = stockLevel * price;
+      const statusRaw = getPurchaseStatus(p);
+      const status = statusRaw === "Acabou" ? "Acabou" : statusRaw;
 
-      if (!grouped[status]) grouped[status] = { count: 0, totalValue: 0 };
-      grouped[status].count += 1;
-      grouped[status].totalValue += value;
-    });
+      if (status in grouped) {
+        const price = p.price ?? 0;
+        const stockLevel = p.stockLevel ?? 0;
+        const value = stockLevel * price;
 
-    const allStatuses = ["Sem Estoque", "Reposição", "Estável", "Encomendado"];
-    allStatuses.forEach((s) => {
-      if (!grouped[s]) {
-        grouped[s] = {
-          count: Math.floor(Math.random() * 8) + 1,
-          totalValue: Math.floor(Math.random() * 2000) + 500,
-        };
+        grouped[status].count += 1;
+        grouped[status].totalValue += value;
       }
     });
 
-    const totalProductsCount = Object.values(grouped).reduce(
-      (acc, cur) => acc + cur.count,
-      0
-    );
+    const totalProductsCount = products.length;
+    const allStatuses = Object.keys(grouped);
 
     const chartData: ChartDataItem[] = allStatuses.map((statusKey) => {
       const { count, totalValue } = grouped[statusKey];
-      const color = colors[statusKey];
-      const icon = icons[statusKey];
-      const label = statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
+      const color = colors[statusKey] ?? "#6b7280";
+      const icon = icons[statusKey] ?? PackageCheck;
+
       return {
-        status: label,
+        status: statusKey,
         count,
         totalValue,
         percentage:

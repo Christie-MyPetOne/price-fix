@@ -10,6 +10,7 @@ interface ShoppingCartModalProps {
   cartItems: CartItem[];
   onRemove: (id: string) => void;
   onClose: () => void;
+  onUpdateQuantity: (id: string, newQuantity: number) => void; // ✅ ADICIONE ESTA LINHA
 }
 
 export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
