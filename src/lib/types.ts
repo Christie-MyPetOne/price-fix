@@ -1,22 +1,20 @@
 export interface Product {
   id: string;
   name: string;
-  sales: number;
-  status: "Precificado" | "Pendente" | "Erro";
   price: number;
+  cost?: number;
   margin: number;
   totalProfit: number;
   workingCapital: number;
-  line?: string;
+  sales: number;
+  status: "Precificado" | "Pendente" | "Erro";
   origin?: string;
-  salesChannel?: string;
-  supplier?: string;
-  problems?: string[];
-  image: string;
-  cost?: number;
+  image?: string;
+  stockLevel?: number;
   salesHistory?: number[];
   profitHistory?: number[];
-  stockLevel?: number;
+  supplier?: string;
+  stockHealthStatus?: "Bom" | "Moderado" | "Risco" | "Parado";
 }
 export interface Venda {
   id: string;
@@ -74,10 +72,7 @@ export interface DrawerProps {
   children: React.ReactNode;
   side?: "right" | "left";
 }
-export interface CardVendasProps {
-  Nome: string;
-  Valor: string | number;
-}
+
 export interface FakeProduct {
   id: number;
   title: string;
@@ -106,4 +101,71 @@ export interface DropdownLinkProps {
   children: React.ReactNode;
   icon?: React.ElementType | null;
   onClick: () => void;
+}
+
+export interface PurchaseFiltersProps {
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  stockHealthFilter: string;
+  setStockHealthFilter: React.Dispatch<React.SetStateAction<string>>;
+  onFilter: () => void;
+  onOpenConfigModal: (selectedProducts: Product[]) => void; // ✅ passa produtos
+  selectedProducts: Product[]; // ✅ lista dos produtos selecionados
+}
+
+export interface PurchaseTableProps {
+  loading: boolean;
+  displayedProducts: Product[];
+  filteredProducts: Product[];
+  selectedItems: string[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
+  totalProducts: number;
+  searchTerm: string;
+  getPurchaseStatus: (product: Product) => string;
+  getStockHealth: (product: Product) => string;
+  currentPage: number;
+  totalPages: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  onAddToCart?: (product: Product) => void;
+  cartItems: CartItem[];
+  onRemove: (id: string) => void;
+}
+export interface StockConfig {
+  useDefault: boolean;
+  purchaseForDays: number;
+  deliveryEstimateDays: number;
+  healthLevels: {
+    good: number;
+    ruim: number; // O limite para "Ruim" (Média fica entre good e ruim)
+    frozen: number; // O limite para "Congelado"
+  };
+}
+
+export interface CartItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  cost: number;
+  estimatedRevenue: number;
+  estimatedProfit: number;
+  supplier: string;
+  description?: string;
+  sku?: string;
+  imageUrl?: string;
+  coverageDays?: number;
+  image?: string; // <- Adicione isso
+  coverage?: number; // ✅ Adiciona isso
+}
+
+export interface PurchaseHeaderProps {
+  cartItems: CartItem[];
+  onRemove?: (id: string) => void;
+  onAddToCart?: (product: Product) => void;
+  onOpenCart?: () => void;
+}
+
+export interface PurchaseHealthCard {
+  stockConfig: StockConfig;
+  onConfigClick: () => void;
 }

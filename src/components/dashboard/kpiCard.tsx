@@ -4,19 +4,10 @@ import React from "react";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line } from "recharts";
 import { Span } from "next/dist/trace";
+import { Card } from "@/components/ui/Card";
 
-/* --- Card base simples --- */
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className = "", ...props }, ref) => (
-  <div
-    ref={ref}
-    className={`rounded-xl border border-border-dark bg-card text-text shadow-lg ${className}`}
-    {...props}
-  />
-));
-Card.displayName = "Card";
+
+
 
 /* --- Tipos do KPI --- */
 export interface KpiCardProps {
@@ -26,7 +17,7 @@ export interface KpiCardProps {
   sparklineData: { value: number }[];
   comparedLabel?: string;
   comparedValue?: string | number;
-  className?: string;
+  className?: string; 
 }
 
 /* --- Componente KPI Card --- */
@@ -47,15 +38,15 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       {/* Título / Valor */}
       <span>
         <p className="text-sm text-text-secondary">{title}</p>
-        <p className="text-3xl font-bold mt-1">{value}</p>
+        <p className="text-2xl font-bold mt-10 mb-2">{value}</p>
       </span>
 
       {/* Gráfico + Variação */}
-      <div className="-mt-5 -mb-5 flex justify-end">
+      <div className="-mt-12 -mb-5 flex justify-end">
         <div className="flex grid-cols-5   relative w-36 h-20">
           {/* Badge de variação GRANDE */}
           <div
-            className={`mb-2 -mt-4 absolute -top-6 right-0 flex items-center gap-2 rounded-lg px-3 py-1.5 text-base font-bold shadow-md
+            className={`mb-2 -mt-6 absolute -top-6 right-0 flex items-center gap-2 rounded-lg px-3 py-1.5 text-base font-bold shadow-md
             ${isPositive ? "text-primary bg-primary/15" : "text-error bg-error/15"}`}
             title={isPositive ? "Subindo" : "Caindo"}
           >
@@ -65,7 +56,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
 
           {/* Gráfico mais alto e mais próximo do topo */}
           <ResponsiveContainer>
-            <LineChart data={sparklineData} margin={{ top: 5, bottom: 0, left: 0, right: 0 }}>
+            <LineChart data={sparklineData} margin={{ top: 8, bottom: 0, left: 0, right: 0 }}>
               <Line
                 type="monotone"
                 dataKey="value"
