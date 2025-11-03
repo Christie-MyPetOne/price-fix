@@ -3,9 +3,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Check, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
+/* ========= base visual (compacta) ========= */
 const fieldBase =
-  "bg-card h-8 w-full px-3 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary";
+  "bg-card h-7 w-full px-2 border border-border-dark rounded-md bg-background text-text text-xs focus:ring-primary focus:border-primary";
 
+/* ========= opções de período ========= */
 const periodOptions: Record<string, string[]> = {
   Hoje: ["Ontem"],
   Ontem: ["7 dias anteriores", "15 dias anteriores", "30 dias anteriores", "Período personalizado"],
@@ -70,7 +72,7 @@ function useOutsideClose<T extends HTMLElement>(open: boolean, onClose: () => vo
   return ref;
 }
 
-/* ============ Calendário de intervalo (um único calendário) ============ */
+/* ============ Calendário de intervalo (compacto) ============ */
 function DateRangeCalendar({
   value,
   onChange,
@@ -107,20 +109,16 @@ function DateRangeCalendar({
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
   const grid: (Date | null)[] = [];
-  // preencher vazios até o primeiro dia (ajustando para Dom->0)
   for (let i = 0; i < startWeekday; i++) grid.push(null);
   for (let d = 1; d <= daysInMonth; d++) grid.push(new Date(viewYear, viewMonth, d));
 
   function clickDay(d: Date) {
     const key = toKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
     if (!anchor || (anchor && rangeEnd)) {
-      // primeira escolha (ou reinicia)
       setAnchor(key);
       setRangeEnd(undefined);
       onChange({ start: key, end: undefined });
     } else {
-      // segunda escolha
-      // se clicou antes do anchor, invertê-las
       const a = parseYMD(anchor)!.getTime();
       const b = d.getTime();
       const start = a <= b ? anchor : key;
@@ -135,20 +133,20 @@ function DateRangeCalendar({
   const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"]; // Dom..Sáb
 
   return (
-    <div className="w-[320px]">
+    <div className="w-[280px]">
       <div className="flex items-center justify-between px-2 py-1">
-        <button onClick={prevMonth} className="h-8 w-8 rounded-md hover:bg-muted" type="button" aria-label="Mês anterior">
+        <button onClick={prevMonth} className="h-7 w-7 rounded-md hover:bg-muted" type="button" aria-label="Mês anterior">
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <div className="text-sm font-medium capitalize">{monthLabel}</div>
-        <button onClick={nextMonth} className="h-8 w-8 rounded-md hover:bg-muted" type="button" aria-label="Próximo mês">
+        <div className="text-xs font-medium capitalize">{monthLabel}</div>
+        <button onClick={nextMonth} className="h-7 w-7 rounded-md hover:bg-muted" type="button" aria-label="Próximo mês">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 px-2 pb-2">
         {weekDays.map((d) => (
-          <div key={d} className="text-[11px] text-text-secondary text-center py-1">
+          <div key={d} className="text-[10px] text-text-secondary text-center py-1">
             {d}
           </div>
         ))}
@@ -169,7 +167,7 @@ function DateRangeCalendar({
               type="button"
               onClick={() => clickDay(date)}
               className={[
-                "h-8 rounded-md text-sm text-center",
+                "h-7 rounded-md text-xs text-center",
                 inRange ? "bg-primary/10" : "hover:bg-muted",
                 isStart || isEnd ? "ring-2 ring-primary font-medium" : "",
                 isToday ? "border border-border-dark" : "",
@@ -181,7 +179,7 @@ function DateRangeCalendar({
         })}
       </div>
 
-      <div className="flex items-center justify-between text-xs px-2 pb-2">
+      <div className="flex items-center justify-between text-[11px] px-2 pb-2">
         <div>
           {anchor && !rangeEnd && <span>Início: {formatDate(anchor)}</span>}
           {anchor && rangeEnd && (
@@ -192,7 +190,7 @@ function DateRangeCalendar({
         </div>
         <button
           type="button"
-          className="px-2 h-7 rounded border border-border-dark hover:bg-muted"
+          className="px-2 h-7 rounded border border-border-dark hover:bg-muted text-xs"
           onClick={() => {
             setAnchor(undefined);
             setRangeEnd(undefined);
@@ -206,7 +204,7 @@ function DateRangeCalendar({
   );
 }
 
-/* ============ Popover de Período (usa o calendário único) ============ */
+/* ============ Popover de Período (compacto) ============ */
 function DateRangePopover({
   open,
   onClose,
@@ -220,31 +218,27 @@ function DateRangePopover({
   value?: { start?: string; end?: string };
   onApply: (range: { start?: string; end?: string }) => void;
   title?: string;
-  /** "bottom" ou "right" */
   placement?: "bottom" | "right";
 }) {
   const ref = useOutsideClose<HTMLDivElement>(open, onClose);
   if (!open) return null;
 
-  // posicionamento consistente
   const positionClass =
-    placement === "right"
-      ? "left-[calc(100%+8px)] top-0"
-      : "left-0 top-[calc(100%+8px)]";
+    placement === "right" ? "left-[calc(100%+8px)] top-0" : "left-0 top-[calc(100%+8px)]";
 
   return (
     <div
       ref={ref}
-      className={`absolute ${positionClass} z-50 rounded-lg border border-border-dark bg-card shadow-lg p-3`}
+      className={`absolute ${positionClass} z-50 rounded-lg border border-border-dark bg-card shadow-lg p-2`}
     >
-      <div className="text-sm font-medium mb-2">{title}</div>
+      <div className="text-xs font-medium mb-2">{title}</div>
       <DateRangeCalendar value={value} onChange={onApply} />
       <div className="flex justify-end gap-2 mt-2">
-        <button className="h-8 px-3 rounded-md border border-border-dark text-sm" onClick={onClose} type="button">
+        <button className="h-7 px-3 rounded-md border border-border-dark text-xs" onClick={onClose} type="button">
           Fechar
         </button>
         <button
-          className="h-8 px-3 rounded-md bg-primary text-white text-sm disabled:opacity-50"
+          className="h-7 px-3 rounded-md bg-primary text-white text-xs disabled:opacity-50"
           onClick={onClose}
           disabled={!value?.start || !value?.end}
           type="button"
@@ -256,7 +250,7 @@ function DateRangePopover({
   );
 }
 
-/* ============ SingleSelect (dropdown estilizado) ============ */
+/* ============ SingleSelect (dropdown) ============ */
 type SingleSelectOption = { value: string; label: string };
 
 function SingleSelect({
@@ -265,7 +259,7 @@ function SingleSelect({
   options,
   placeholder = "Selecione...",
   className = "",
-  minWidthClass = "min-w-[220px]",
+  minWidthClass = "min-w-[160px]", // reduzido
   onOptionClick,
   renderLabel,
   placement = "bottom",
@@ -285,9 +279,7 @@ function SingleSelect({
   const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
 
   const positionClass =
-    placement === "right"
-      ? "left-[calc(100%+8px)] top-0"
-      : "left-0 top-[calc(100%+8px)]";
+    placement === "right" ? "left-[calc(100%+8px)] top-0" : "left-0 top-[calc(100%+8px)]";
 
   return (
     <div className={`relative ${minWidthClass}`}>
@@ -314,7 +306,7 @@ function SingleSelect({
                 <button
                   key={opt.value}
                   type="button"
-                  className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm flex items-center justify-between"
+                  className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center justify-between"
                   onClick={() => {
                     const preventClose = onOptionClick?.(opt);
                     if (!preventClose) {
@@ -335,7 +327,7 @@ function SingleSelect({
   );
 }
 
-/* ============ Multi-selects (iguais aos anteriores) ============ */
+/* ============ Multi-select: Empresas (compacto) ============ */
 function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (next: string[]) => void }) {
   const [open, setOpen] = useState(false);
   const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
@@ -360,14 +352,18 @@ function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (
 
   return (
     <div className="relative">
-      <button type="button" className={`${fieldBase} min-w-[220px] flex items-center justify-between`} onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className={`${fieldBase} min-w-[180px] flex items-center justify-between`} // reduzido
+        onClick={() => setOpen((o) => !o)}
+      >
         <span className="truncate">{buttonText}</span>
         <ChevronDown className="w-4 h-4 opacity-70" />
       </button>
 
       {open && (
         <div ref={panelRef} className="absolute left-0 top-[calc(100%+8px)] z-50 w-full rounded-lg border border-border-dark bg-card shadow-lg p-2">
-          <button type="button" className=" w-full text-left px-3 py-2 rounded hover:bg-muted text-sm flex items-center gap-2" onClick={toggleAll}>
+          <button type="button" className=" w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2" onClick={toggleAll}>
             <input
               type="checkbox"
               className="accent-primary"
@@ -387,7 +383,7 @@ function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (
               <button
                 key={opt.id}
                 type="button"
-                className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2"
                 onClick={() => toggle(opt.id)}
               >
                 <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
@@ -397,7 +393,7 @@ function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (
           </div>
 
           <div className="flex justify-end p-2">
-            <button className="h-8 px-3 rounded-md bg-primary text-white text-sm" onClick={() => setOpen(false)}>
+            <button className="h-7 px-3 rounded-md bg-primary text-white text-xs" onClick={() => setOpen(false)}>
               Fechar
             </button>
           </div>
@@ -407,6 +403,7 @@ function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (
   );
 }
 
+/* ============ Multi-select: Marketplaces (compacto) ============ */
 function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChange: (next: string[]) => void }) {
   const [open, setOpen] = useState(false);
   const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
@@ -431,14 +428,18 @@ function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChang
 
   return (
     <div className="relative">
-      <button type="button" className={`${fieldBase} min-w-[220px] flex items-center justify-between`} onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className={`${fieldBase} min-w-[180px] flex items-center justify-between`} // reduzido
+        onClick={() => setOpen((o) => !o)}
+      >
         <span className="truncate">{buttonText}</span>
         <ChevronDown className="w-4 h-4 opacity-70" />
       </button>
 
       {open && (
         <div ref={panelRef} className="absolute left-0 top-[calc(100%+8px)] z-50 w-full rounded-lg border border-border-dark bg-card shadow-lg p-2">
-          <button type="button" className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm flex items-center gap-2" onClick={toggleAll}>
+          <button type="button" className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2" onClick={toggleAll}>
             <input
               type="checkbox"
               className="accent-primary"
@@ -458,7 +459,7 @@ function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChang
               <button
                 key={opt.id}
                 type="button"
-                className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2"
                 onClick={() => toggle(opt.id)}
               >
                 <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
@@ -468,7 +469,7 @@ function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChang
           </div>
 
           <div className="flex justify-end p-2">
-            <button className="h-8 px-3 rounded-md bg-primary text-white text-sm" onClick={() => setOpen(false)}>
+            <button className="h-7 px-3 rounded-md bg-primary text-white text-xs" onClick={() => setOpen(false)}>
               Fechar
             </button>
           </div>
@@ -478,7 +479,7 @@ function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChang
   );
 }
 
-/* ============ Filtro Principal ============ */
+/* ============ Filtro Principal (compacto) ============ */
 export function DashFilter() {
   const [resultado, setResultado] = useState<string>("Hoje");
   const [comparado, setComparado] = useState<string>("Ontem");
@@ -553,9 +554,9 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
   }
 
   return (
-    <div className="justify-center flex gap-4 p-4 rounded-lg flex-wrap">
+    <div className="justify-center flex gap-3 p-2 rounded-lg flex-wrap">
       {/* Comparar por */}
-      <div className="flex flex-col h-8">
+      <div className="flex flex-col h-7">
         <SingleSelect
           value={compararPor}
           onChange={(v) => setCompararPor(v as "Média" | "Somatória")}
@@ -563,7 +564,7 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
             { value: "Somatória", label: "Somatória" },
             { value: "Média", label: "Média" },
           ]}
-          minWidthClass="min-w-[180px]"
+          minWidthClass="min-w-[160px]"
           placement="bottom"
         />
       </div>
@@ -579,15 +580,15 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
       </div>
 
       {/* Linha de filtros + botões */}
-      <div className="w-full flex flex-col justify-center md:flex-row md:items-end gap-3 md:gap-4">
+      <div className="w-full flex flex-col justify-center md:flex-row md:items-end gap-2 md:gap-3">
         {/* Resultado de */}
         <div className="relative flex flex-col md:flex-row md:items-center w-full md:w-auto gap-1">
-          <label className="text-sm font-medium text-text-secondary md:w-32 shrink-0">Resultado de</label>
+          <label className="text-xs font-medium text-text-secondary md:w-28 shrink-0">Resultado de</label>
           <SingleSelect
             value={resultado}
             onChange={handleResultadoChange}
             options={Object.keys(periodOptions).map((k) => ({ value: k, label: k }))}
-            className="md:min-w-[220px]"
+            className="md:min-w-[160px]"
             renderLabel={() => <>{resultadoLabel}</>}
             onOptionClick={(opt) => {
               if (opt.value === "Período personalizado") {
@@ -596,7 +597,7 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
                 return true;
               }
             }}
-            placement="bottom" 
+            placement="bottom"
           />
           <DateRangePopover
             open={showResultadoCalendar}
@@ -604,18 +605,18 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
             value={resultadoRange}
             onApply={(range) => setResultadoRange(range)}
             title="Período personalizado (Resultado de)"
-            placement="bottom" /* troque para "right" para abrir ao lado */
+            placement="bottom"
           />
         </div>
 
         {/* Comparado com */}
         <div className="relative flex flex-col md:flex-row md:items-center w-full md:w-auto gap-1">
-          <label className="text-sm font-medium text-text-secondary md:w-32 shrink-0">Comparado com</label>
+          <label className="text-xs font-medium text-text-secondary md:w-28 shrink-0">Comparado com</label>
           <SingleSelect
             value={comparado}
             onChange={setComparado}
             options={(periodOptions[resultado] ?? []).map((opt) => ({ value: opt, label: opt }))}
-            className="md:min-w-[220px]"
+            className="md:min-w-[160px]"
             renderLabel={() => <>{comparadoLabel}</>}
             onOptionClick={(opt) => {
               if (opt.value === "Período personalizado") {
@@ -638,12 +639,15 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
 
         {/* Botões */}
         <div className="flex items-center gap-2">
-          <button onClick={applyFilters} className="px-6 py-1 rounded-md bg-[#10b97c] hover:bg-[#0d9d6b] text-white font-medium">
+          <button
+            onClick={applyFilters}
+            className="px-4 py-1 rounded-md bg-[#10b97c] hover:bg-[#0d9d6b] text-white text-xs font-medium h-7"
+          >
             Aplicar
           </button>
           <button
             onClick={clearFilters}
-            className="h-8 aspect-square flex items-center justify-center rounded-md border border-border-dark hover:bg-muted"
+            className="h-7 aspect-square flex items-center justify-center rounded-md border border-border-dark hover:bg-muted"
             aria-label="Limpar filtros"
             title="Limpar filtros"
             type="button"
@@ -655,3 +659,5 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
     </div>
   );
 }
+
+export default DashFilter;
