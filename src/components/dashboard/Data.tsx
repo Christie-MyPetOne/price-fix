@@ -36,8 +36,6 @@ export const kpiData = [
   },
 ];
 
-<<<<<<< HEAD
-=======
 export const kpiData2 = [
   {
     title: "Margem de contribuição nominal",
@@ -61,7 +59,6 @@ export const kpiData2 = [
   },
 ];
 
->>>>>>> 5551a156736630b3eedef4b1649ac727b2c28fc7
 export const kpiDataPlus = [
   {
     title: "Custos variáveis",

@@ -226,6 +226,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
           <ComposedChart
             data={data}
             margin={{ top: 5, right: 12, bottom: 8, left: 8 }}
+            barSize={25}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-dark)" />
             <XAxis

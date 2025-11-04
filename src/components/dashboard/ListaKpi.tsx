@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Card } from "@/components/ui/Card"; // mantém seu Card
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -14,16 +13,6 @@ import {
   TrendingDown,
   MoreHorizontal,
 } from "lucide-react";
-
-/**
- * Melhorias aplicadas:
- * - Tipografia consistente (tamanhos e pesos uniformes)
- * - Alinhamento vertical/horizontal mais "encaixado"
- * - Uso disciplinado de verde (queda de custo) e vermelho (aumento de custo)
- * - Badges de status com contraste adequado
- * - Espaçamento responsivo e cartões com mesma altura
- * - Hovers sutis e foco acessível
- */
 
 export default function ListaKpi() {
   const dados = [
@@ -38,89 +27,88 @@ export default function ListaKpi() {
   ];
 
   return (
-    <div className="w-full transition-all duration-300 ease-in-out">
-      <Card className="p-5 sm:p-6 bg-[var(--color-card)] shadow-sm rounded-2xl border border-[var(--color-border-dark)]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {dados.map((item) => {
-            const Icon = item.icon;
-            const aumento = item.variacao > 0;
-            const semMudanca = item.variacao === 0;
+    <div className="rounded-2xl border border-[var(--color-border-dark)] bg-[var(--color-background)] p-4 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {dados.map((item) => {
+          const Icon = item.icon;
+          const aumento = item.variacao > 0;
+          const semMudanca = item.variacao === 0;
 
-            // Cores centralizadas nos tokens existentes do seu tema
-            const corTexto = semMudanca
-              ? "text-[var(--color-text-secondary)]"
-              : aumento
-              ? "text-[var(--color-error)]"
-              : "text-[var(--color-success)]";
+          const corTexto = semMudanca
+            ? "text-[var(--color-text-secondary)]"
+            : aumento
+            ? "text-[var(--color-error)]"
+            : "text-[var(--color-success)]";
 
-            const corBgBadge = semMudanca
-              ? "bg-[var(--color-border-dark)]"
-              : aumento
-              ? "bg-[color:rgb(254_242_242)]" /* red-50 */
-              : "bg-[color:rgb(240_253_244)]" /* green-50 */;
+          const bgIcone = semMudanca
+            ? "bg-[var(--color-border-dark)]/40"
+            : aumento
+            ? "bg-[var(--color-error)]/10"
+            : "bg-[var(--color-success)]/10";
 
-            const corRingIcon = semMudanca
-              ? "ring-[var(--color-border-dark)]"
-              : aumento
-              ? "ring-[color:rgb(254_202_202)]" /* red-200 */
-              : "ring-[color:rgb(187_247_208)]" /* green-200 */;
+          const bgCard =
+            "bg-[var(--color-card)] hover:bg-[rgba(255,255,255,0.85)] dark:hover:bg-[rgba(44,44,44,0.85)]";
 
-            return (
-              <div
-                key={item.label}
-                className="group flex min-h-[92px] items-center justify-between rounded-xl p-4 border border-[var(--color-border-dark)] bg-[var(--color-background)] shadow-sm hover:shadow transition-shadow focus-within:ring-2 focus-within:ring-[var(--color-primary)] focus-within:ring-offset-0"
-                role="region"
-                aria-label={item.label}
-              >
-                {/* Bloco esquerdo: Ícone + Títulos */}
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${corBgBadge} ring-1 ${corRingIcon}`}
-                  >
-                    <Icon className={`h-5 w-5 ${corTexto}`} />
+          const sombra =
+            "shadow-[0_2px_6px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_10px_rgba(0,0,0,0.08)]";
+
+          return (
+            <div
+              key={item.label}
+              className={`flex flex-col justify-between rounded-xl border border-[var(--color-border-dark)] ${bgCard} ${sombra} transition-all duration-200`}
+            >
+              {/* Topo: ícone e texto */}
+              <div className="flex items-center justify-between px-4 pt-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${bgIcone}`}>
+                    <Icon className={`w-5 h-5 ${corTexto}`} />
                   </div>
-
-                  <div className="flex flex-col min-w-0">
-                    <span className="truncate text-[13px] sm:text-sm font-medium text-[var(--color-text)]">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text)]">
                       {item.label}
-                    </span>
-                    <span className={`text-[11px] sm:text-xs ${semMudanca ? "text-[var(--color-text-secondary)]" : corTexto}`}>
+                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">
                       {semMudanca
                         ? "Sem variação"
                         : aumento
                         ? "Aumento de custo"
                         : "Redução de custo"}
-                    </span>
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                {/* Bloco direito: Valor + Variação */}
-                <div className="flex flex-col items-end text-right gap-1 min-w-[120px]">
-                  <span className="text-sm sm:text-[15px] font-semibold leading-none text-[var(--color-text)]">
-                    {item.valor}
-                  </span>
+              {/* Meio: valor */}
+              <div className="px-4 py-3">
+                <p className="text-base font-semibold text-[var(--color-text)]">
+                  {item.valor}
+                </p>
+              </div>
 
-                  {semMudanca ? (
-                    <span className="text-[11px] sm:text-xs text-[var(--color-text-secondary)]">0,0%</span>
+              {/* Rodapé: chip de variação */}
+              <div className="px-4 pb-4">
+                <div
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${corTexto} ${
+                    semMudanca
+                      ? "bg-[var(--color-border-dark)]/60"
+                      : aumento
+                      ? "bg-[var(--color-error)]/10"
+                      : "bg-[var(--color-success)]/10"
+                  }`}
+                >
+                  {semMudanca ? null : aumento ? (
+                    <ArrowUpRight size={14} strokeWidth={2.5} />
                   ) : (
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-[10px] px-2 py-1 text-[11px] sm:text-xs font-semibold ${corTexto} ${corBgBadge}`}
-                    >
-                      {aumento ? (
-                        <ArrowUpRight size={14} strokeWidth={2.4} className={corTexto} />
-                      ) : (
-                        <ArrowDownRight size={14} strokeWidth={2.4} className={corTexto} />
-                      )}
-                      {aumento ? "+" : ""}
-                      {item.variacao.toFixed(1)}%
-                    </span>
+                    <ArrowDownRight size={14} strokeWidth={2.5} />
                   )}
+                  {aumento ? "+" : ""}
+                  {item.variacao.toFixed(1)}%
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </Card>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
