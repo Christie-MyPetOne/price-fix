@@ -117,7 +117,7 @@ export function handleShiftSelection<T extends { id: string }>(
  * Paginação
  */
 export function paginate<T>(data: T[], page: number, perPage: number) {
-  const totalPages = Math.max(1, Math.ceil(data.length / perPage));
+  const totalPages = Math.ceil(data.length / perPage) || 1;
   const start = (page - 1) * perPage;
   const end = start + perPage;
   const pageData = data.slice(start, end);

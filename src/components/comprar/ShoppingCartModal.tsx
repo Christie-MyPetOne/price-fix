@@ -10,6 +10,7 @@ interface ShoppingCartModalProps {
   cartItems: CartItem[];
   onRemove: (id: string) => void;
   onClose: () => void;
+  onUpdateQuantity: (id: string, newQuantity: number) => void; // ✅ ADICIONE ESTA LINHA
 }
 
 export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
@@ -17,14 +18,9 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
   cartItems,
   onRemove,
   onClose,
+  onUpdateQuantity,
 }) => {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>(
-    cartItems.reduce((acc, item) => {
-      acc[item.id] = item.quantity || 1;
-      return acc;
-    }, {} as { [key: string]: number })
-  );
 
   if (!open) return null;
 
@@ -44,10 +40,7 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
   const totalItemTypes = cartItems.length;
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [itemId]: newQuantity,
-    }));
+    onUpdateQuantity(itemId, newQuantity);
   };
 
   const toggleItemDetails = (itemId: string) => {
@@ -224,17 +217,12 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
                           <input
                             type="number"
                             min={1}
-                            value={
-                              Number.isNaN(quantities[item.id]) ||
-                              !quantities[item.id]
-                                ? 1
-                                : quantities[item.id]
-                            }
+                            value={item.quantity}
                             onChange={(e) => {
                               const val = parseInt(e.target.value, 10);
                               handleQuantityChange(
                                 item.id,
-                                isNaN(val) ? 1 : val
+                                isNaN(val) || val < 1 ? 1 : val
                               );
                             }}
                             className="w-20 mt-1 p-1 text-sm border border-border-dark rounded"

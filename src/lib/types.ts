@@ -1,36 +1,42 @@
-export interface ProductState {
-  products: Product[];
-  sortedProducts: Product[];
-  selected: string[];
-  sortConfig: { key: keyof Product | null; direction: "asc" | "desc" };
+import { Dispatch, SetStateAction } from "react";
 
-  // Funções da store
-  fetchProducts: () => Promise<void>;
-  toggleOne: (id: string) => void;
-  toggleAll: () => void;
-  sortBy: (key: keyof Product) => void;
-}
+export type HealthStatus = "Excelente" | "Média" | "Risco" | "Parado";
+
 export interface Product {
   id: string;
   sku: string;
   name: string;
   price: number;
-  cost: number;
+  cost?: number;
   margin: number;
   totalProfit: number;
   workingCapital: number;
   sales: number;
-  status: string;
-  origin: string;
+  status: "Precificado" | "Pendente" | "Erro";
+  origin?: string;
   image?: string;
-  stockLevel: number;
-  salesHistory: number[]; // <-- aqui
-  profitHistory: number[]; // <-- e aqui
-  supplier: string;
-  stockHealthStatus: string;
-  stockHealthOptions: string[];
-  shipping: number;
-  marketplaceFee: number;
+  stockLevel?: number;
+  salesHistory?: number[];
+  profitHistory?: number[];
+  supplier?: string;
+  stockHealthStatus?: "Excelente" | "Média" | "Risco" | "Parado";
+  stockHealthOptions?: string[];
+  shipping?: number;
+  marketplaceFee?: number;
+  coverage?: number;
+}
+
+export interface ProductState {
+  products: Product[];
+  sortedProducts: Product[];
+  selected: string[];
+  sortConfig: { key: null | keyof Product; direction: "asc" | "desc" };
+
+  fetchProducts: () => Promise<void>;
+  toggleOne: (id: string) => void;
+  toggleAll: () => void;
+  updateProductHealthStatus: (id: string, status: HealthStatus) => void;
+  sortBy: (key: keyof Product) => void;
 }
 export interface Venda {
   id: string;
@@ -112,8 +118,8 @@ export interface DropdownLinkProps {
 export interface StockFiltersProps {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  stockHealthFilter: string;
-  setStockHealthFilter: React.Dispatch<React.SetStateAction<string>>;
+  stockHealthFilter: HealthStatus | "";
+  setStockHealthFilter: React.Dispatch<React.SetStateAction<HealthStatus | "">>;
   onFilter: () => void;
   onOpenConfigModal: (selectedProducts: Product[]) => void; // ✅ passa produtos
   selectedProducts: Product[]; // ✅ lista dos produtos selecionados
@@ -121,47 +127,38 @@ export interface StockFiltersProps {
 
 export interface StockTableProps {
   loading: boolean;
-  displayedProducts: Product[];
-  filteredProducts: Product[];
+  displayedProducts: Product[]; // Esta é a lista COMPLETA e FILTRADA do pai
   selectedItems: string[];
-  setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
-  totalProducts: number;
-  searchTerm: string;
+  setSelectedItems: Dispatch<SetStateAction<string[]>>;
+  searchTerm: string; // Usado para resetar a página no filtro
   getPurchaseStatus: (product: Product) => string;
-  getStockHealth: (product: Product) => string;
-  currentPage: number;
-  totalPages: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  onAddToCart?: (product: Product) => void;
-  cartItems: CartItem[];
+  onAddToCart: (product: Product) => void;
   onRemove: (id: string) => void;
+  cartItems: CartItem[];
+  onOpenConfig: (product: Product) => void;
 }
 export interface StockConfig {
-  useDefault: boolean;
-  purchaseForDays: number;
-  deliveryEstimateDays: number;
-  healthLevels: {
-    good: number;
-    ruim: number; // O limite para "Ruim" (Média fica entre good e ruim)
-    frozen: number; // O limite para "Congelado"
-  };
+  comprarPara: number;
+  entregaEstimada: number;
+  excelente: number;
+  moderado: number;
+  risco: number;
+  parado: number;
 }
 
 export interface CartItem {
   id: string;
   name: string;
-  quantity: number;
-  price: number;
+  sku: string;
+  image: string;
+  price?: number;
   cost: number;
-  estimatedRevenue: number;
-  estimatedProfit: number;
+  quantity: number;
   supplier: string;
   description?: string;
-  sku?: string;
-  imageUrl?: string;
-  coverageDays?: number;
-  image?: string; // <- Adicione isso
-  coverage?: number; // ✅ Adiciona isso
+  estimatedRevenue: number;
+  estimatedProfit: number;
+  coverage?: number;
 }
 
 export interface StockHeaderProps {
@@ -169,4 +166,12 @@ export interface StockHeaderProps {
   onRemove?: (id: string) => void;
   onAddToCart?: (product: Product) => void;
   onOpenCart?: () => void;
+}
+
+export interface StockConfigModalProps {
+  open: boolean;
+  onClose: () => void;
+  products?: Product[];
+  config: StockConfig;
+  onSave?: (config: StockConfig) => void;
 }

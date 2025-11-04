@@ -1,17 +1,25 @@
 "use client";
 
 import React from "react";
-import { Settings2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Settings2,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Snowflake,
+} from "lucide-react";
 import { StockConfig } from "@/lib/types";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 
-interface StockHealthCard {
+interface StockHealthCardProps {
   stockConfig: StockConfig;
   onConfigClick: () => void;
 }
 
-export const StockHealthCard: React.FC<StockHealthCard> = ({
+export const StockHealthCard: React.FC<StockHealthCardProps> = ({
   stockConfig,
   onConfigClick,
 }) => {
@@ -19,60 +27,64 @@ export const StockHealthCard: React.FC<StockHealthCard> = ({
     <Card className="md:col-span-1 p-4 h-full flex flex-col justify-between">
       <div>
         <h2 className="text-md font-semibold mb-3">Saúde de estoque</h2>
+
         <div className="text-xs text-text-secondary space-y-1 mb-4">
           <p>
             Comprando para{" "}
             <span className="font-semibold text-text">
-              {stockConfig.purchaseForDays} Dias
+              {stockConfig.comprarPara} dias
             </span>
           </p>
           <p>
             Entrega estimada em{" "}
             <span className="font-semibold text-text">
-              {stockConfig.deliveryEstimateDays} Dias
+              {stockConfig.entregaEstimada} dias
             </span>
           </p>
         </div>
 
         <div className="space-y-2 text-sm border-l-2 border-border-dark pl-4">
-          <div className="flex justify-between items-center text-primary">
+          {/* Excelente */}
+          <div className="flex justify-between items-center text-green-500">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-primary block"></span>
+              <CheckCircle2 size={16} className="text-green-500" />
               <span>Excelente</span>
             </div>
             <span className="flex items-center gap-1 text-text-secondary">
-              <ChevronLeft size={12} /> {stockConfig.healthLevels.good}
+              <ChevronLeft size={12} /> {stockConfig.excelente}
             </span>
           </div>
 
-          <div className="flex justify-between items-center text-warning">
+          {/* Moderado */}
+          <div className="flex justify-between items-center text-yellow-500">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-warning block"></span>
+              <AlertTriangle size={16} className="text-yellow-500" />
               <span>Moderado</span>
             </div>
             <span className="text-text-secondary">
-              {stockConfig.healthLevels.good + 1} -{" "}
-              {stockConfig.healthLevels.ruim}
+              {stockConfig.excelente + 1} - {stockConfig.moderado}
             </span>
           </div>
 
-          <div className="flex justify-between items-center text-error">
+          {/* Risco */}
+          <div className="flex justify-between items-center text-red-500">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-error block"></span>
+              <XCircle size={16} className="text-red-500" />
               <span>Risco</span>
             </div>
-            <span className="flex items-center gap-1 text-text-secondary">
-              <ChevronRight size={12} /> {stockConfig.healthLevels.ruim + 1}
+            <span className="text-text-secondary">
+              {stockConfig.moderado + 1} - {stockConfig.risco}
             </span>
           </div>
 
+          {/* Parado */}
           <div className="flex justify-between items-center text-blue-400">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-blue-400 block"></span>
+              <Snowflake size={16} className="text-blue-400" />
               <span>Parado</span>
             </div>
             <span className="flex items-center gap-1 text-text-secondary">
-              <ChevronRight size={12} /> {stockConfig.healthLevels.frozen}
+              <ChevronRight size={12} /> {stockConfig.risco + 1}
             </span>
           </div>
         </div>

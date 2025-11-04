@@ -1,9 +1,9 @@
 import axios from "axios";
 import { create } from "zustand";
-import { Product, ProductState } from "@/lib/types";
+import { Product, ProductState, HealthStatus } from "@/lib/types";
 import { sortData, toggleSelection, toggleSelectAll } from "@/lib/utils";
 
-export const useProductStore = create<ProductState>((set, get) => ({
+export const useProductsStore = create<ProductState>((set, get) => ({
   products: [],
   sortedProducts: [],
   selected: [],
@@ -11,9 +11,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   fetchProducts: async () => {
     try {
-      // ✅ Corrigido: agora usando o endpoint JSON da sua coleção
       const res = await axios.get<{ products: Product[] }>(
-        "https://dummyjson.com/c/2506-2c78-4ee8-8bcb"
+        "https://dummyjson.com/c/4f26-e607-409a-950b"
       );
 
       const data = res.data.products;
@@ -36,7 +35,15 @@ export const useProductStore = create<ProductState>((set, get) => ({
     set({ selected: toggleSelectAll(state.sortedProducts, state.selected) });
   },
 
-  sortBy: (key) => {
+  updateProductHealthStatus: (id: string, status: HealthStatus) => {
+    set((state) => ({
+      products: state.products.map((product) =>
+        product.id === id ? { ...product, stockHealthStatus: status } : product
+      ),
+    }));
+  },
+
+  sortBy: (key: keyof Product) => {
     const state = get();
     const direction =
       state.sortConfig.key === key && state.sortConfig.direction === "asc"

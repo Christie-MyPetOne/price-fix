@@ -31,13 +31,28 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
         </div>
         <Select
           value={stockHealthFilter}
+          onChange={(e) => setStockHealthFilter(e.target.value)}
+          className="border rounded-md p-2 text-sm"
+        >
+          <option value="">Saúde de Estoque</option>
+          <option value="Excelente">Excelente</option>
+          <option value="Média">Média</option>
+          <option value="Risco">Risco</option>
+          <option value="Parado">Parado</option>
+        </Select>
+
+        <Select
+          value=""
           onChange={(e) => {
             const value = e.target.value;
             if (value === "config") {
               onOpenConfigModal(selectedProducts);
-              setStockHealthFilter("");
-            } else {
-              setStockHealthFilter(value);
+            } else if (value === "export") {
+              // Lógica de exportação
+              console.log("Exportar");
+            } else if (value === "lista") {
+              // Lógica de lista de compras
+              console.log("Lista de compras");
             }
           }}
           className="border rounded-md p-2 text-sm"
@@ -48,17 +63,6 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
           <option value="config">Configuração</option>
           <option value="export">Exportar</option>
           <option value="lista">Lista de compras</option>
-        </Select>
-
-        <Select
-          value={stockHealthFilter}
-          onChange={(e) => setStockHealthFilter(e.target.value)}
-        >
-          <option value="">Saúde de Estoque</option>
-          <option value="Bom">Bom</option>
-          <option value="Média">Média</option>
-          <option value="Ruim">Ruim</option>
-          <option value="Congelado">Congelado</option>
         </Select>
 
         <Button
