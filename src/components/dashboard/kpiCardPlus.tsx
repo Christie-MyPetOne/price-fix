@@ -44,6 +44,7 @@ export const kpiCardPlus: React.FC<KpiCardPlusProps> = ({
   const ChangeIcon = isPositive ? ArrowUpRight : ArrowDownRight;
 
   return (
+<<<<<<< HEAD
     <Card className={`p-6 flex w-full flex-col ${className}`}>
       {/* Título / Valor */}
         <span>
@@ -81,6 +82,16 @@ export const kpiCardPlus: React.FC<KpiCardPlusProps> = ({
                 </LineChart>
             </ResponsiveContainer>
             </div>
+=======
+    <Card
+      className={`p-6 flex w-full flex-col border border-border-dark bg-card text-text shadow-lg ${className}`}
+    >
+      {/* Cabeçalho com botões */}
+      <div className="flex items-start justify-between relative">
+        <div>
+          <p className="text-2sm text-muted-foreground">{title}</p>
+          <p className="text-2xl mt-10 mb-5 font-bold ">{displayValue}</p>
+>>>>>>> 5551a156736630b3eedef4b1649ac727b2c28fc7
         </div>
 
       {/* Rodapé */}
