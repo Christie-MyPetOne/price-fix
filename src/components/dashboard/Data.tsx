@@ -110,8 +110,8 @@ export const series = [
   { key: "one",    label: "MYPET ONE",         color: "#8b5cf6", total: 8267 },
   { key: "shopee", label: "Shopee",            color: "#10b981", total: 9566 },
   { key: "store",  label: "MYPETONE STORE",    color: "#84cc16", total: 8268 },
-  { key: "mypet",  label: "MY.PET.ONE",        color: "#374151", total: 7706 },
-  { key: "amazon", label: "Amazon",            color: "#06b6d4", total: 9804 },
+  { key: "mypet",  label: "MY.PET.ONE",        color: "#DBD527", total: 17706 },
+  { key: "amazon", label: "Amazon",            color: "#60C3DB", total: 9804 },
   { key: "full",   label: "MY.PET.ONE - FULL", color: "#3b82f6", total: 8544 },
 ];
 

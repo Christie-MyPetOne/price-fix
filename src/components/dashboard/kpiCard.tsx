@@ -7,8 +7,6 @@ import { Span } from "next/dist/trace";
 import { Card } from "@/components/ui/Card";
 
 
-
-
 /* --- Tipos do KPI --- */
 export interface KpiCardProps {
   title: string;
