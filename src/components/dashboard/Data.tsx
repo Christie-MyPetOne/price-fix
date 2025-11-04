@@ -38,7 +38,7 @@ export const kpiData = [
 
 export const kpiData2 = [
   {
-    title: "Faturamento Total",
+    title: "Margem de contribuição nominal",
     value: "R$ 489.7K",
     change: 12.5,
     sparklineData: [
@@ -48,7 +48,7 @@ export const kpiData2 = [
     icon: DollarSign,
   },
   {
-    title: "Lucro Líquido",
+    title: "Margem de contribuição média",
     value: "R$ 112.3K",
     change: -2.1,
     sparklineData: [
@@ -61,7 +61,7 @@ export const kpiData2 = [
 
 export const kpiDataPlus = [
   {
-    title: "Faturamento Total",
+    title: "Custos variáveis",
     value: "R$ 489.7K",
     change: 12.5,
     sparklineData: [

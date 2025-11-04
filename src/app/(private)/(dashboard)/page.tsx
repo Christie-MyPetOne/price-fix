@@ -31,7 +31,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl -mt-8 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
       <div className="flex items-center justify-between w-full mb-6">
-        <h1 className="text-3xl  justify-center font-semibold text-text">Dashboard</h1>
+        <h1 className="text-3xl justify-center font-semibold text-text">Dashboard</h1>
         <div className="flex -ml-60">
           <DashFilter />
         </div>
@@ -91,6 +91,14 @@ export default function DashboardPage() {
 
       {/* Lista visível somente quando mostrarLista for true */}
       {mostrarLista && <ListaKpi />}
+
+       {/* GRÁFICOS */}
+      <GraficoBar
+        title="Margem por canal de venda"
+        data={receitaPorCanal}
+        xKey="date"
+        series={series}
+      />
     </div>
   );
 }

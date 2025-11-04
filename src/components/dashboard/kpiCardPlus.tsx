@@ -46,7 +46,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
       {/* Cabeçalho com botões */}
       <div className="flex items-start justify-between relative">
         <div>
-          <p className="text-sm text-muted-foreground">{title}</p>
+          <p className="text-2sm text-muted-foreground">{title}</p>
           <p className="text-2xl mt-10 mb-5 font-bold ">{displayValue}</p>
         </div>
 

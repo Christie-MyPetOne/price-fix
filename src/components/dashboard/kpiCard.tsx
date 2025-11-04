@@ -37,7 +37,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
     <Card className={`p-6 flex w-full flex-col ${className}`}>
       {/* Título / Valor */}
       <span>
-        <p className="text-sm text-text-secondary">{title}</p>
+        <p className="text-2sm text-text-secondary">{title}</p>
         <p className="text-2xl font-bold mt-10 mb-2">{value}</p>
       </span>
 
