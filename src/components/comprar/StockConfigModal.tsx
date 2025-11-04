@@ -26,7 +26,6 @@ export const StockConfigModal = ({
 
   if (!open) return null;
 
-  // ✅ Níveis com ícones e cores consistentes
   const healthLevels = [
     {
       label: "Excelente",
@@ -60,8 +59,6 @@ export const StockConfigModal = ({
     } else {
       products.forEach((p) => setConfigProduto(p.id, localConfig));
     }
-
-    // Chame onSave para propagar as alterações
     onSave?.(localConfig);
     onClose();
   };
@@ -75,7 +72,6 @@ export const StockConfigModal = ({
         className="bg-card text-text rounded-lg shadow-xl w-full max-w-lg flex flex-col relative border border-border-dark"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-border-dark">
           <h2 className="text-lg font-semibold">
             {products.length > 0
@@ -90,9 +86,7 @@ export const StockConfigModal = ({
           </button>
         </div>
 
-        {/* Conteúdo */}
         <div className="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
-          {/* Produtos selecionados */}
           {products.length === 0 ? (
             <p className="text-sm text-text-secondary">
               As definições padrão de estoque serão utilizadas para todos os
@@ -115,7 +109,6 @@ export const StockConfigModal = ({
             </div>
           )}
 
-          {/* --- Parâmetros de Compra --- */}
           <div className="space-y-4">
             <h3 className="text-base font-semibold text-text">
               Parâmetros de Compra
@@ -172,7 +165,6 @@ export const StockConfigModal = ({
             </div>
           </div>
 
-          {/* --- Níveis de Saúde de Estoque --- */}
           <div className="space-y-4 pt-4 border-t border-border-dark">
             <h3 className="text-base font-semibold text-text mb-1">
               Níveis de Saúde de Estoque
@@ -221,7 +213,6 @@ export const StockConfigModal = ({
           </div>
         </div>
 
-        {/* --- Rodapé --- */}
         <div className="flex justify-end items-center p-4 border-t border-border-dark gap-3">
           <button
             onClick={() => setLocalConfig(config)}

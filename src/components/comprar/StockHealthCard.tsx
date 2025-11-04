@@ -10,14 +10,9 @@ import {
   XCircle,
   Snowflake,
 } from "lucide-react";
-import { StockConfig } from "@/lib/types";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
-
-interface StockHealthCardProps {
-  stockConfig: StockConfig;
-  onConfigClick: () => void;
-}
+import { StockHealthCardProps } from "@/lib/types";
 
 export const StockHealthCard: React.FC<StockHealthCardProps> = ({
   stockConfig,
@@ -44,7 +39,6 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
         </div>
 
         <div className="space-y-2 text-sm border-l-2 border-border-dark pl-4">
-          {/* Excelente */}
           <div className="flex justify-between items-center text-green-500">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={16} className="text-green-500" />
@@ -55,7 +49,6 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
             </span>
           </div>
 
-          {/* Moderado */}
           <div className="flex justify-between items-center text-yellow-500">
             <div className="flex items-center gap-2">
               <AlertTriangle size={16} className="text-yellow-500" />
@@ -66,7 +59,6 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
             </span>
           </div>
 
-          {/* Risco */}
           <div className="flex justify-between items-center text-red-500">
             <div className="flex items-center gap-2">
               <XCircle size={16} className="text-red-500" />
@@ -77,7 +69,6 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
             </span>
           </div>
 
-          {/* Parado */}
           <div className="flex justify-between items-center text-blue-400">
             <div className="flex items-center gap-2">
               <Snowflake size={16} className="text-blue-400" />

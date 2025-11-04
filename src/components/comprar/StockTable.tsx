@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import {
   RefreshCcw,
@@ -28,8 +28,6 @@ import { getDaysLeft, getPurchaseSuggestionUnits } from "@/lib/stockUtils";
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 
-
-// Badge de Status de Compra
 const StatusBadge = ({ status }: { status?: string }) => {
   const statusConfig: Record<
     string,
@@ -57,8 +55,6 @@ const StatusBadge = ({ status }: { status?: string }) => {
   );
 };
 
-
-// Badge de Saúde do Estoque
 const StockHealthBadge = ({ status }: { status?: string }) => {
   const healthConfig: Record<
     string,
@@ -116,14 +112,10 @@ export const StockTable: React.FC<StockTableProps> = ({
 
   const { getConfigProduto } = useStockConfigStore();
 
-  
-
-  // Ordenação
   const sortedProducts = useMemo(() => {
     return sortData<Product>(displayedProducts, sortKey, sortDirection);
   }, [displayedProducts, sortKey, sortDirection]);
 
-  // Paginação
   const { pageData: paginatedProducts, totalPages: computedTotalPages } =
     useMemo(
       () => paginate(sortedProducts, currentPage, rowsPerPage),
@@ -191,7 +183,6 @@ export const StockTable: React.FC<StockTableProps> = ({
 
   return (
     <div className="bg-card rounded-lg border border-border-dark shadow-sm p-4 w-full">
-      {/* Controle de paginação e seleção */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
         <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-2">
           Mostrar
@@ -228,7 +219,6 @@ export const StockTable: React.FC<StockTableProps> = ({
         </p>
       </div>
 
-      {/* Tabela */}
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left divide-border-dark">
           <thead className="bg-background text-xs text-text uppercase">
@@ -271,25 +261,24 @@ export const StockTable: React.FC<StockTableProps> = ({
 
           <tbody className="divide-y divide-border-dark">
             {paginatedProducts.map((product, index) => {
-              const salesPerDay = (product.salesHistory?.reduce((a, b) => a + b, 0) || 0) / (product.salesHistory?.length || 7);
+              const salesPerDay =
+                (product.salesHistory?.reduce((a, b) => a + b, 0) || 0) /
+                (product.salesHistory?.length || 7);
 
               const daysLeft = getDaysLeft(product);
-
               const produtoConfig = getConfigProduto(product.id);
               const idealPurchaseDays = produtoConfig.comprarPara;
-
-              const purchaseSuggestionUnits = getPurchaseSuggestionUnits(product, produtoConfig);
-
+              const purchaseSuggestionUnits = getPurchaseSuggestionUnits(
+                product,
+                produtoConfig
+              );
               const purchaseStatus = getPurchaseStatus(product);
-
               const stockHealthStatus = product.stockHealthStatus || "Parado";
-
               const isExpanded = expandedProductId === product.id;
               const isInCart = cartItems.some((item) => item.id === product.id);
 
               return (
                 <React.Fragment key={product.id}>
-                  {/* Linha principal */}
                   <tr className="hover:bg-background transition-colors">
                     <td className="px-3 py-2 text-center">
                       <input
@@ -385,7 +374,6 @@ export const StockTable: React.FC<StockTableProps> = ({
                     </td>
                   </tr>
 
-                  {/* Linha expandida */}
                   {isExpanded && (
                     <tr className="bg-background-light border-t border-border-dark">
                       <td colSpan={10} className="px-6 py-4 text-xs text-text">
@@ -466,7 +454,6 @@ export const StockTable: React.FC<StockTableProps> = ({
         </table>
       </div>
 
-      {/* Paginação */}
       {computedTotalPages > 1 && (
         <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
           <div className="flex gap-2">

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Filter } from "lucide-react";
-import { StockFiltersProps } from "@/lib/types";
+import { StockFiltersProps, HealthStatus } from "@/lib/types";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
@@ -17,6 +17,11 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
   onOpenConfigModal,
   selectedProducts,
 }) => {
+  const handleStockHealthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as HealthStatus | "";
+    setStockHealthFilter(value);
+  };
+
   return (
     <Card className="p-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -31,7 +36,7 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
         </div>
         <Select
           value={stockHealthFilter}
-          onChange={(e) => setStockHealthFilter(e.target.value)}
+          onChange={handleStockHealthChange}
           className="border rounded-md p-2 text-sm"
         >
           <option value="">Saúde de Estoque</option>
@@ -48,10 +53,8 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
             if (value === "config") {
               onOpenConfigModal(selectedProducts);
             } else if (value === "export") {
-              // Lógica de exportação
               console.log("Exportar");
             } else if (value === "lista") {
-              // Lógica de lista de compras
               console.log("Lista de compras");
             }
           }}

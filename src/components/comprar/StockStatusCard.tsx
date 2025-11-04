@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  TooltipProps,
-} from "recharts";
+import { TooltipProps } from "recharts";
 import {
   ValueType,
   NameType,
@@ -19,22 +12,10 @@ import {
   XCircle,
   PackageCheck,
 } from "lucide-react";
-import { Product } from "@/lib/types";
+import { StockStatusCardProps, ChartDataItem } from "@/lib/types";
+import { getPurchaseSuggestionUnits } from "@/lib/stockUtils";
 import { ToggleButton } from "../ui/ToggleButton";
-
-interface StockStatusCardProps {
-  products: Product[];
-  getPurchaseStatus: (product: Product) => string;
-}
-
-interface ChartDataItem {
-  status: string;
-  count: number;
-  totalValue: number;
-  percentage: number;
-  color: string;
-  icon: React.ElementType;
-}
+import { StatusPieChart } from "../ui/Charts";
 
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;
@@ -43,7 +24,7 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
     return (
       <div className="bg-card p-3 border border-border-dark rounded-md shadow-lg text-xs">
         <p className="font-semibold text-text">{dataItem.name}</p>
-        <p className="text-text-secondary">
+        <p className="text-text-secondary hidden md:block">
           {dataItem.count ?? 0} produtos ({(dataItem.value ?? 0).toFixed(2)}%)
         </p>
         <p className="text-text-secondary">
@@ -64,6 +45,7 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
 export const StockStatusCard: React.FC<StockStatusCardProps> = ({
   products,
   getPurchaseStatus,
+  stockConfig,
 }) => {
   const [activeStatuses, setActiveStatuses] = useState<string[]>([
     "Acabou",
@@ -160,6 +142,30 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
     );
   };
 
+  const acabouProducts = useMemo(
+    () => products.filter((p) => getPurchaseStatus(p) === "Acabou"),
+    [products, getPurchaseStatus]
+  );
+
+  const totalToBuy = useMemo(
+    () =>
+      acabouProducts.reduce(
+        (sum, p) => sum + getPurchaseSuggestionUnits(p, stockConfig),
+        0
+      ),
+    [acabouProducts, stockConfig]
+  );
+
+  const totalCostToBuy = useMemo(
+    () =>
+      acabouProducts.reduce(
+        (sum, p) =>
+          sum + getPurchaseSuggestionUnits(p, stockConfig) * (p.cost ?? 0),
+        0
+      ),
+    [acabouProducts, stockConfig]
+  );
+
   return (
     <div className="bg-card rounded-lg p-6 border border-border-dark shadow-sm">
       <div className="flex justify-between items-start mb-4">
@@ -175,38 +181,35 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
         </div>
       </div>
 
-      <div
-        className="h-64 w-full border-b-2 border-border-dark pb-2"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Tooltip content={<CustomTooltip />} />
-            <Pie
-              data={filteredPieData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={90}
-              innerRadius={50}
-              paddingAngle={3}
-              labelLine={false}
-              label={(entry: any) =>
-                `${entry.count} Produtos (${entry.value.toFixed(1)}%)`
-              }
-            >
-              {filteredPieData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color ?? "#6b7280"}
-                  className="cursor-pointer"
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
+          <p className="text-sm text-text-secondary mb-1">
+            Produtos que acabaram
+          </p>
+          <p className="text-lg font-bold text-red-500">
+            {acabouProducts.length}
+          </p>
+        </div>
+        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
+          <p className="text-sm text-text-secondary mb-1">
+            Total sugerido para comprar
+          </p>
+          <p className="text-lg font-bold text-orange-500">{totalToBuy}</p>{" "}
+        </div>
+        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
+          <p className="text-sm text-text-secondary mb-1">
+            Custo total estimado
+          </p>
+          <p className="text-lg font-bold text-green-600">
+            {totalCostToBuy.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </p>
+        </div>
       </div>
+
+      <StatusPieChart data={filteredPieData} CustomTooltip={CustomTooltip} />
 
       <div className="grid grid-cols-4 gap-4 text-xs pt-4">
         {data.map((item) => {
@@ -218,7 +221,9 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
               className="text-center space-y-1 flex flex-col items-center"
             >
               <p
-                className="font-semibold flex items-center justify-center gap-1 text-text"
+                className={`font-semibold flex items-center justify-center gap-1 text-text ${
+                  window.innerWidth < 768 ? "hidden" : "block"
+                }`}
                 style={{ color: item.color }}
               >
                 <IconComponent className="w-4 h-4" />

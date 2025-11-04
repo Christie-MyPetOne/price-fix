@@ -3,15 +3,7 @@
 import React, { useState } from "react";
 import { X, Trash2, ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
-import { CartItem } from "@/lib/types";
-
-interface ShoppingCartModalProps {
-  open: boolean;
-  cartItems: CartItem[];
-  onRemove: (id: string) => void;
-  onClose: () => void;
-  onUpdateQuantity: (id: string, newQuantity: number) => void; // ✅ ADICIONE ESTA LINHA
-}
+import { ShoppingCartModalProps } from "@/lib/types";
 
 export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
   open,
@@ -57,7 +49,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
           <X size={20} />
         </button>
 
-        {/* Cabeçalho */}
         <div className="flex-shrink-0 p-6 border-b border-border-dark">
           <h2 className="text-xl font-semibold mb-2">Lista de compras</h2>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-secondary">
@@ -91,7 +82,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
           </div>
         </div>
 
-        {/* Conteúdo */}
         <div className="flex-grow overflow-y-auto p-6 space-y-4">
           {cartItems.length === 0 ? (
             <p className="text-sm text-text-secondary">
@@ -104,7 +94,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
                   key={item.id}
                   className="border border-border-dark rounded-lg overflow-hidden shadow-sm"
                 >
-                  {/* Cabeçalho do fornecedor */}
                   <div className="bg-background p-3 border-b border-border-dark">
                     <div className="flex justify-between items-center">
                       <h3 className="font-semibold text-text">
@@ -157,7 +146,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Detalhes expandíveis */}
                   {expandedItemId === item.id && (
                     <div className="p-3 flex gap-3 items-start">
                       {item.image ? (
@@ -209,7 +197,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
                           </span>
                         </div>
 
-                        {/* Campo de quantidade */}
                         <div className="mt-3">
                           <label className="text-xs text-text-secondary">
                             Pedido {""}
@@ -237,7 +224,6 @@ export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
           )}
         </div>
 
-        {/* Rodapé */}
         <div className="border-t border-border-dark p-4 flex-shrink-0 flex justify-end">
           <button className="px-4 py-2 rounded-md bg-primary hover:bg-primary-dark transition-colors text-white font-semibold">
             Exportar

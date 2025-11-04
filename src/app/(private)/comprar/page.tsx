@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useProductsStore } from "@/store/useProductsStore";
-import { StockConfigModal } from "@/components/comprar/StockConfigModal";
 import {
   getDaysLeft,
   calculateStockHealth,
   getPurchaseStatus,
 } from "@/lib/stockUtils";
+import { Product, StockConfig, CartItem, HealthStatus } from "@/lib/types";
+import { StockConfigModal } from "@/components/comprar/StockConfigModal";
 import { StockTable } from "@/components/comprar/StockTable";
 import { StockFilters } from "@/components/comprar/StockFilters";
-import { Product, StockConfig, CartItem, HealthStatus } from "@/lib/types";
 import { StockStatusCard } from "@/components/comprar/StockStatusCard";
 import { StockHealthCard } from "@/components/comprar/StockHealthCard";
 import { StockHeader } from "@/components/comprar/StockHeader";
@@ -47,9 +47,6 @@ export default function OtimizarComprasPage() {
     load();
   }, [fetchProducts]);
 
-  // ...existing code...
-
-  // Efeito para recalcular o status de saúde do estoque
   useEffect(() => {
     if (products.length > 0 && stockConfig) {
       const updatedHealthStatus = new Map();
@@ -58,20 +55,16 @@ export default function OtimizarComprasPage() {
         const daysLeft = getDaysLeft(product);
         const healthStatus = calculateStockHealth(daysLeft, stockConfig);
 
-        // Só atualiza se o status mudou
         if (product.stockHealthStatus !== healthStatus) {
           updatedHealthStatus.set(product.id, healthStatus);
         }
       });
 
-      // Faz todas as atualizações necessárias de uma vez
       updatedHealthStatus.forEach((status, id) => {
         updateProductHealthStatus(id, status);
       });
     }
-  }, [stockConfig]); // Remove products e updateProductHealthStatus das dependências
-
-  // ...existing code...
+  }, [products, stockConfig, updateProductHealthStatus]);
 
   const handleOpenConfigForSingleProduct = (product: Product) => {
     setSelectedItems([product.id]);
@@ -80,7 +73,6 @@ export default function OtimizarComprasPage() {
 
   const processedProducts = useMemo(() => {
     return products.map((product) => {
-      // Garantir que o status de saúde está presente (calculado no useEffect)
       const healthStatus = product.stockHealthStatus || "Parado";
       return {
         ...product,
@@ -170,7 +162,6 @@ export default function OtimizarComprasPage() {
   const handleSaveConfig = (newConfig: StockConfig) => {
     setStockConfig(newConfig);
 
-    // Recalcular o status de saúde para todos os produtos
     if (products.length > 0) {
       products.forEach((product) => {
         const daysLeft = getDaysLeft(product);
@@ -192,8 +183,9 @@ export default function OtimizarComprasPage() {
         <div className="grid grid-cols-3 gap-6">
           <div className="md:col-span-2 col-span-3">
             <StockStatusCard
-              products={filteredProducts}
+              products={products}
               getPurchaseStatus={getPurchaseStatusForProduct}
+              stockConfig={stockConfig}
             />
           </div>
           <div className="md:col-span-1 col-span-3">
@@ -209,12 +201,11 @@ export default function OtimizarComprasPage() {
           setSearchTerm={setSearchTerm}
           stockHealthFilter={stockHealthFilter}
           setStockHealthFilter={setStockHealthFilter}
-          onFilter={() => {}} // A tabela reseta a página internamente
+          onFilter={() => {}}
           selectedProducts={selectedProducts}
           onOpenConfigModal={handleOpenConfigModal}
         />
 
-        {/* ✅ A tabela agora recebe a lista filtrada completa e gerencia a própria paginação */}
         <StockTable
           loading={loading}
           displayedProducts={filteredProducts}
