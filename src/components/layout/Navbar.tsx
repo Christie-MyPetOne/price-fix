@@ -155,9 +155,6 @@ export function Navbar() {
           <NavLink href="#" icon={null}>
             Histórico
           </NavLink>
-          <NavLink href="#" icon={null}>
-            Configurar
-          </NavLink>
         </div>
       </div>
 
