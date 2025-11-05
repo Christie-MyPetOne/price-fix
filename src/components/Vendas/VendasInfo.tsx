@@ -2,6 +2,14 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 
+import {
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Snowflake,
+} from "lucide-react";
+
 /* =================== TIPOS =================== */
 type Money = number | null | undefined;
 type StatusVenda =
@@ -193,13 +201,12 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
               <span style={{ color: statusColor, fontWeight: 800 }}>{data.status}</span>
             </div>
           </div>
-          <button onClick={onClose} style={pillBtn} aria-label="Fechar">✕</button>
-        </div>
-
-        {/* Barra de ações */}
-        <div style={{ padding: 12, borderBottom: "1px solid var(--color-border-dark)", display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button style={pillBtn} onClick={() => setOpenAll(false)}>Minimizar tudo</button>
-          <button style={{ ...pillBtn, background: "var(--color-primary)", color: "#fff", borderColor: "var(--color-primary-dark)" }} onClick={() => setOpenAll(true)}>Expandir tudo</button>
+          <button
+            onClick={onClose}
+            className="p-1 h-7 rounded-full hover:bg-background"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Identificador / Canal */}
@@ -213,82 +220,145 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           </div>
         </div>
 
-        {/* KPIs principais */}
-        <div style={{ padding: 16, ...gridCols(4) }}>
-          <div style={chip}><div style={mutedTitle}>Valor de venda</div><div style={{ fontWeight: 900, fontSize: 18 }}>{fmtBRL(data.valorVenda ?? K.receita)}</div></div>
-          <div style={chip}><div style={mutedTitle}>Lucro</div><div style={{ fontWeight: 900, fontSize: 18 }}>{fmtBRL(K.lucro)}</div></div>
-          <div style={chip}><div style={mutedTitle}>Margem</div><div style={{ fontWeight: 900, fontSize: 18, color: "var(--color-primary-dark)" }}>{fmtPct(K.margem)}</div></div>
-          <div style={chip}><div style={mutedTitle}>UF destino</div><div style={{ fontWeight: 900, fontSize: 18 }}>{data.estadoDestino ?? "—"}</div></div>
-        </div>
-
-        {/* ===== BLOCO ÚNICO: RECEITA + CUSTOS + IMPOSTOS ===== */}
+        {/* ===== SEÇÃO: KPIs + BLOCO ÚNICO ===== */}
         <div style={{ padding: 16 }}>
-          <Collapsible title="Receita, custos e impostos" openAll={openAll} defaultOpen>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12 }}>
-              {/* Receita */}
-              <div style={card}>
-                <div style={mutedTitle}>Receita</div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Receita de produtos</span><strong>{fmtBRL(data.receitaProdutos)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Receita de frete</span><strong>{fmtBRL(data.receitaFrete)}</strong></div>
-                <div style={{ ...row, borderBottom: "none" }}>
-                  <span style={{ color: "var(--color-text-secondary)" }}>Descontos</span>
-                  <strong>- {fmtBRL(data.descontos)}</strong>
-                </div>
-                <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px dashed var(--color-border-dark)", fontSize: 12, color: "var(--color-text-secondary)" }}>
-                  receita_total = {fmtBRL(data.receitaProdutos)} + {fmtBRL(data.receitaFrete)} − {fmtBRL(data.descontos)} = <b>{fmtBRL(K.receita)}</b>
+          <div style={{ ...card }}>
+            {/* KPIs principais */}
+            <div style={{ padding: 16, ...gridCols(4), gap: 12, marginBottom: 12 }}>
+              <div style={chip}>
+                <div style={mutedTitle}>Valor de venda</div>
+                <div style={{ fontWeight: 900, fontSize: 18 }}>
+                  {fmtBRL(data.valorVenda ?? K.receita)}
                 </div>
               </div>
 
-              {/* Custos variáveis */}
-              <div style={card}>
-                <div style={mutedTitle}>Custos variáveis</div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Custo dos Produtos</span><strong>{fmtBRL(data.custoProdutos)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Comissão do Canal</span><strong>{fmtBRL(data.comissaoCanal)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Taxa fixa do MKTPlace</span><strong>{fmtBRL(data.taxaFixaMktplace)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Custo de Envio</span><strong>{fmtBRL(data.custoEnvio)}</strong></div>
-                <div style={{ ...row, borderBottom: "none" }}>
-                  <span style={{ color: "var(--color-text-secondary)" }}>Taxa de Frete</span><strong>{fmtBRL(data.taxaFrete)}</strong>
-                </div>
-                <div style={{ marginTop: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
-                  subtotal_componentes = <b>{fmtBRL(K.variaveisComponentes)}</b> | campo agregado = <b>{fmtBRL(data.custosVariaveis)}</b><br/>
-                  usado no cálculo = <b>{fmtBRL(K.variaveisUsado)}</b> {K.variaveisCampo > 0 ? "(campo agregado)" : "(soma dos componentes)"}
+              <div style={chip}>
+                <div style={mutedTitle}>Lucro</div>
+                <div style={{ fontWeight: 900, fontSize: 18 }}>
+                  {fmtBRL(K.lucro)}
                 </div>
               </div>
 
-              {/* Impostos + Adicionais */}
-              <div style={card}>
-                <div style={mutedTitle}>Impostos e adicionais</div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Impostos (total)</span><strong>{fmtBRL(data.impostos)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Gastos fixos do pedido</span><strong>{fmtBRL(data.gastosFixosPedido)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Gastos de frete adicionais</span><strong>{fmtBRL(data.gastosFreteAdicionais)}</strong></div>
-                <div style={row}><span style={{ color: "var(--color-text-secondary)" }}>Descontos adicionais</span><strong>{fmtBRL(data.descontosAdicionais)}</strong></div>
-                <div style={{ ...row, borderBottom: "none" }}>
-                  <span style={{ color: "var(--color-text-secondary)" }}>Impostos adicionais</span><strong>{fmtBRL(data.impostosAdicionais)}</strong>
+              <div style={chip}>
+                <div style={mutedTitle}>Margem</div>
+                <div style={{ fontWeight: 900, fontSize: 18, color: "var(--color-primary-dark)" }}>
+                  {fmtPct(K.margem)}
                 </div>
-                <div style={{ marginTop: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
-                  subtotal_adicionais = <b>{fmtBRL(K.adicionais)}</b>
+              </div>
+
+              <div style={chip}>
+                <div style={mutedTitle}>UF destino</div>
+                <div style={{ fontWeight: 900, fontSize: 18 }}>
+                  {data.estadoDestino ?? "—"}
                 </div>
               </div>
             </div>
 
-            {/* Resumo do cálculo simples */}
-            <div style={{ ...card, marginTop: 12 }}>
-              <div style={mutedTitle}>Resumo do cálculo</div>
-              <div style={{ fontSize: 14 }}>
-                <div style={{ marginBottom: 6 }}>Receita total: <b>{fmtBRL(K.receita)}</b></div>
-                <div style={{ marginBottom: 6 }}>
-                  Custos totais: <b>{fmtBRL(K.variaveisUsado + K.impostos + K.adicionais)}</b>{" "}
-                  <span style={{ color: "var(--color-text-secondary)" }}>(variáveis + impostos + adicionais)</span>
+            {/* ===== BLOCO ÚNICO: RECEITA + CUSTOS + IMPOSTOS ===== */}
+            <div style={{ padding: 16 }}>
+              <Collapsible title="Receita, custos e impostos" openAll={openAll} defaultOpen>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12 }}>
+                  {/* Receita */}
+                  <div style={card}>
+                    <div style={mutedTitle}>Receita</div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Receita de produtos</span>
+                      <strong>{fmtBRL(data.receitaProdutos)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Receita de frete</span>
+                      <strong>{fmtBRL(data.receitaFrete)}</strong>
+                    </div>
+                    <div style={{ ...row, borderBottom: "none" }}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Descontos</span>
+                      <strong>- {fmtBRL(data.descontos)}</strong>
+                    </div>
+                    <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px dashed var(--color-border-dark)", fontSize: 12, color: "var(--color-text-secondary)" }}>
+                      receita_total = {fmtBRL(data.receitaProdutos)} + {fmtBRL(data.receitaFrete)} − {fmtBRL(data.descontos)} = <b>{fmtBRL(K.receita)}</b>
+                    </div>
+                  </div>
+
+                  {/* Custos variáveis */}
+                  <div style={card}>
+                    <div style={mutedTitle}>Custos variáveis</div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Custo dos Produtos</span>
+                      <strong>{fmtBRL(data.custoProdutos)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Comissão do Canal</span>
+                      <strong>{fmtBRL(data.comissaoCanal)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Taxa fixa do MKTPlace</span>
+                      <strong>{fmtBRL(data.taxaFixaMktplace)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Custo de Envio</span>
+                      <strong>{fmtBRL(data.custoEnvio)}</strong>
+                    </div>
+                    <div style={{ ...row, borderBottom: "none" }}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Taxa de Frete</span>
+                      <strong>{fmtBRL(data.taxaFrete)}</strong>
+                    </div>
+                    <div style={{ marginTop: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
+                      subtotal_componentes = <b>{fmtBRL(K.variaveisComponentes)}</b> | campo agregado = <b>{fmtBRL(data.custosVariaveis)}</b><br/>
+                      usado no cálculo = <b>{fmtBRL(K.variaveisUsado)}</b> {K.variaveisCampo > 0 ? "(campo agregado)" : "(soma dos componentes)"}
+                    </div>
+                  </div>
+
+                  {/* Impostos + Adicionais */}
+                  <div style={card}>
+                    <div style={mutedTitle}>Impostos e adicionais</div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Impostos (total)</span>
+                      <strong>{fmtBRL(data.impostos)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Gastos fixos do pedido</span>
+                      <strong>{fmtBRL(data.gastosFixosPedido)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Gastos de frete adicionais</span>
+                      <strong>{fmtBRL(data.gastosFreteAdicionais)}</strong>
+                    </div>
+                    <div style={row}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Descontos adicionais</span>
+                      <strong>{fmtBRL(data.descontosAdicionais)}</strong>
+                    </div>
+                    <div style={{ ...row, borderBottom: "none" }}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>Impostos adicionais</span>
+                      <strong>{fmtBRL(data.impostosAdicionais)}</strong>
+                    </div>
+                    <div style={{ marginTop: 10, fontSize: 12, color: "var(--color-text-secondary)" }}>
+                      subtotal_adicionais = <b>{fmtBRL(K.adicionais)}</b>
+                    </div>
+                  </div>
                 </div>
-                <div>Lucro: <b>{fmtBRL(K.lucro)}</b> &nbsp;|&nbsp; Margem: <b>{fmtPct(K.margem)}</b></div>
-              </div>
+
+                {/* Resumo do cálculo simples */}
+                <div style={{ ...card, marginTop: 12 }}>
+                  <div style={mutedTitle}>Resumo do cálculo</div>
+                  <div style={{ fontSize: 14 }}>
+                    <div style={{ marginBottom: 6 }}>
+                      Receita total: <b>{fmtBRL(K.receita)}</b>
+                    </div>
+                    <div style={{ marginBottom: 6 }}>
+                      Custos totais: <b>{fmtBRL(K.variaveisUsado + K.impostos + K.adicionais)}</b>{" "}
+                      <span style={{ color: "var(--color-text-secondary)" }}>(variáveis + impostos + adicionais)</span>
+                    </div>
+                    <div>
+                      Lucro: <b>{fmtBRL(K.lucro)}</b> &nbsp;|&nbsp; Margem: <b>{fmtPct(K.margem)}</b>
+                    </div>
+                  </div>
+                </div>
+              </Collapsible>
             </div>
-          </Collapsible>
+          </div>
         </div>
 
         {/* ===== PRODUTOS (sempre visível) ===== */}
         <div style={{ padding: 16 }}>
-
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {data.produtos.map((p, i) => {
               const I = calcItem(p);
@@ -329,7 +399,7 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
                     </div>
                   </div>
 
-                  {/* Detalhes do item: escondidos por padrão, controlados por Expandir/Minimizar tudo */}
+                  {/* Detalhes do item */}
                   <Collapsible title="Detalhes do item" openAll={openAll} defaultOpen={false}>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12 }}>
                       {/* Receita do item */}
@@ -417,12 +487,6 @@ export const VendasInfo: React.FC<Props> = ({ open, onClose, data }) => {
           </Collapsible>
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: 16, borderTop: "1px solid var(--color-border-dark)", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ ...pillBtn, background: "var(--color-primary)", color: "#fff", borderColor: "var(--color-primary-dark)" }}>
-            FECHAR
-          </button>
-        </div>
       </div>
     </div>
   );

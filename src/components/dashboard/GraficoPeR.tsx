@@ -16,7 +16,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 /* ================= Utils ================= */
 
 function formatBRLShort(n: number): string {
-  // R$ 50 mil / R$ 1,2 mi / R$ 350
   const abs = Math.abs(n);
   if (abs >= 1_000_000) return `R$ ${(n / 1_000_000).toFixed(1)} mi`;
   if (abs >= 1_000) return `R$ ${Math.round(n / 1000)} mil`;
@@ -31,10 +30,10 @@ function tooltipBRL(value: any) {
 
 /* ============== Types ============== */
 export interface SerieDef {
-  key: string;         // campo do objeto de data
-  label: string;       // nome exibido na legenda
-  color: string;       // cor da barra
-  total?: number;      // opcional: número entre parênteses na legenda
+  key: string;   // campo do objeto de data (ex.: "pedidos")
+  label: string; // nome na legenda
+  color?: string; // cor da barra (opcional se usar barColor global)
+  total?: number;
 }
 
 export interface LineDef {
@@ -47,25 +46,43 @@ export interface LineDef {
 export interface GraficoPeRLinhaProps {
   title?: string;
   data: Array<Record<string, any>>;
-  xKey: string;                 // ex: "date"
-  series: SerieDef[];           // barras empilhadas (ex.: pedidos por canal)
-  line?: LineDef;               // linha (ex.: receita)
-  legendPageSize?: number;      // itens por página na legenda (default 6)
+  xKey: string;           // ex.: "mes"
+  series?: SerieDef[];    // barras
+  line?: LineDef;         // linha
+  /** Cor global das barras. Se informado, sobrescreve series[].color */
+  barColor?: string;
+  /** Cor global da linha. Se informado, sobrescreve line.color */
+  lineColor?: string;
+  legendPageSize?: number;
 }
+
+/* ===== Defaults ===== */
+const DEFAULT_SERIES: SerieDef[] = [
+  { key: "pedidos", label: "Pedidos", color: "#00BF63" },
+];
+
+const DEFAULT_LINE: LineDef = {
+  key: "receita",
+  label: "Receita (R$)",
+  color: "#2563EB",
+  dot: true,
+};
 
 /* ============== Component ============== */
 export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
   title = "Pedidos (barras) x Receita (linha)",
   data,
   xKey,
-  series,
-  line = { key: "receita", label: "Receita (R$)", color: "#ff7300", dot: true },
+  series = DEFAULT_SERIES,
+  line = DEFAULT_LINE,
+  barColor="#4287f5",           // ← override global barras
+  lineColor="#000000",         // ← override global linha
   legendPageSize = 6,
 }) => {
   const [visible, setVisible] = useState<Set<string>>(
-    () => new Set(series.map(s => s.key)) // barras visíveis por padrão
+    () => new Set(series.map((s) => s.key))
   );
-  const [lineVisible, setLineVisible] = useState(true); // linha visível por padrão
+  const [lineVisible, setLineVisible] = useState(true);
   const [page, setPage] = useState(0);
 
   const pages = Math.max(1, Math.ceil(series.length / legendPageSize));
@@ -73,11 +90,8 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
   const end = start + legendPageSize;
   const pageItems = series.slice(start, end);
 
-  const visibleCount = visible.size + (lineVisible ? 1 : 0);
-  const totalCount = series.length + 1; // +1 da linha
-
   function toggleKey(k: string) {
-    setVisible(prev => {
+    setVisible((prev) => {
       const next = new Set(prev);
       if (next.has(k)) next.delete(k);
       else next.add(k);
@@ -85,44 +99,54 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
     });
   }
   function selectAll() {
-    setVisible(new Set(series.map(s => s.key)));
+    setVisible(new Set(series.map((s) => s.key)));
     setLineVisible(true);
   }
   function invertSelection() {
-    setVisible(prev => {
+    setVisible((prev) => {
       const next = new Set<string>();
-      series.forEach(s => {
+      series.forEach((s) => {
         if (!prev.has(s.key)) next.add(s.key);
       });
       return next;
     });
-    setLineVisible(v => !v);
+    setLineVisible((v) => !v);
   }
 
+  // Cor efetiva da linha (global > prop da linha > default)
+  const lineStroke = String(lineColor ?? line?.color ?? "#2563EB");
+
+  // Barras geradas a partir de 'series'
   const bars = useMemo(
     () =>
-      series.map(s => (
-        <Bar
-          key={s.key}
-          dataKey={s.key}
-          stackId="stack"
-          fill={s.color}
-          radius={[4, 4, 0, 0]}
-          hide={!visible.has(s.key)}
-          yAxisId="left"
-        />
-      )),
-    [series, visible]
+      series.map((s) => {
+        // Cor efetiva da barra (global > cor da série > fallback)
+        const barFill = String(barColor ?? s.color ?? "#00BF63");
+        return (
+          <Bar
+            key={s.key}
+            dataKey={s.key}
+            stackId="stack"
+            fill={barFill}
+            radius={[4, 4, 0, 0]}
+            hide={!visible.has(s.key)}
+            yAxisId="left"
+          />
+        );
+      }),
+    [series, visible, barColor]
   );
 
-  // Tooltip: BRL para linha, inteiro para barras
   function tooltipFormatter(value: any, name: string, entry: any) {
     if (entry?.dataKey === line.key) return [tooltipBRL(value), line.label];
-    return [formatInt(value as number), series.find(s => s.key === entry?.dataKey)?.label ?? name];
+    return [
+      formatInt(value as number),
+      series.find((s) => s.key === entry?.dataKey)?.label ?? name,
+    ];
   }
 
   return (
-    <div className="rounded-xl border border-border-dark bg-card text-text shadow-lg p-4">
+    <div className="grafico-per rounded-xl border border-border-dark bg-card text-text shadow-lg p-4">
       {/* Título + Legenda paginada */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
@@ -131,6 +155,8 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {pageItems.map((s) => {
             const active = visible.has(s.key);
+            // Mostrar na “pill” a cor real da barra
+            const chipColor = String(barColor ?? s.color ?? "#00BF63");
             return (
               <button
                 key={s.key}
@@ -146,7 +172,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
               >
                 <span
                   className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ backgroundColor: s.color }}
+                  style={{ backgroundColor: chipColor }}
                 />
                 <span className="whitespace-nowrap">
                   {s.label}
@@ -159,7 +185,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
           {/* Item da legenda para a LINHA */}
           <button
             type="button"
-            onClick={() => setLineVisible(v => !v)}
+            onClick={() => setLineVisible((v) => !v)}
             className={[
               "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs border",
               lineVisible
@@ -170,7 +196,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
           >
             <span
               className="inline-block h-2.5 w-2.5 rounded-sm"
-              style={{ backgroundColor: line.color || "#ff7300" }}
+              style={{ backgroundColor: lineStroke }}
             />
             <span className="whitespace-nowrap">{line.label}</span>
           </button>
@@ -180,7 +206,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
             <div className="ml-2 inline-flex items-center gap-1">
               <button
                 className="h-7 w-7 inline-flex items-center justify-center rounded-full border border-border-dark hover:bg-muted"
-                onClick={() => setPage(p => Math.max(0, p - 1))}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
                 aria-label="Página anterior"
               >
@@ -191,7 +217,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
               </span>
               <button
                 className="h-7 w-7 inline-flex items-center justify-center rounded-full border border-border-dark hover:bg-muted"
-                onClick={() => setPage(p => Math.min(pages - 1, p + 1))}
+                onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
                 disabled={page === pages - 1}
                 aria-label="Próxima página"
               >
@@ -273,14 +299,20 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
             {/* Linha de receita */}
             {lineVisible && (
               <Line
+                key={lineStroke} // força remount quando a cor muda
                 yAxisId="right"
                 type="monotone"
                 dataKey={line.key}
                 name={line.label}
-                stroke={line.color || "#ff7300"}
+                stroke={lineStroke}
                 strokeWidth={2.5}
-                dot={line.dot ?? true}
-                activeDot={{ r: 5 }}
+                isAnimationActive={false}
+                dot={
+                  line.dot ?? true
+                    ? { r: 3, stroke: lineStroke, fill: "#fff" }
+                    : false
+                }
+                activeDot={{ r: 5, stroke: lineStroke, fill: "#fff" }}
               />
             )}
           </ComposedChart>
