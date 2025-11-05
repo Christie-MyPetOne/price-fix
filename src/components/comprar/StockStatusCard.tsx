@@ -13,7 +13,6 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { StockStatusCardProps, ChartDataItem } from "@/lib/types";
-import { getPurchaseSuggestionUnits } from "@/lib/stockUtils";
 import { ToggleButton } from "../ui/ToggleButton";
 import { StatusPieChart } from "../ui/Charts";
 
@@ -45,7 +44,6 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
 export const StockStatusCard: React.FC<StockStatusCardProps> = ({
   products,
   getPurchaseStatus,
-  stockConfig,
 }) => {
   const [activeStatuses, setActiveStatuses] = useState<string[]>([
     "Acabou",
@@ -142,30 +140,6 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
     );
   };
 
-  const acabouProducts = useMemo(
-    () => products.filter((p) => getPurchaseStatus(p) === "Acabou"),
-    [products, getPurchaseStatus]
-  );
-
-  const totalToBuy = useMemo(
-    () =>
-      acabouProducts.reduce(
-        (sum, p) => sum + getPurchaseSuggestionUnits(p, stockConfig),
-        0
-      ),
-    [acabouProducts, stockConfig]
-  );
-
-  const totalCostToBuy = useMemo(
-    () =>
-      acabouProducts.reduce(
-        (sum, p) =>
-          sum + getPurchaseSuggestionUnits(p, stockConfig) * (p.cost ?? 0),
-        0
-      ),
-    [acabouProducts, stockConfig]
-  );
-
   return (
     <div className="bg-card rounded-lg p-6 border border-border-dark shadow-sm">
       <div className="flex justify-between items-start mb-4">
@@ -174,34 +148,6 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
           <p className="text-sm text-text-secondary">Valor total em estoque</p>
           <p className="text-2xl font-bold text-text mt-1">
             {totalStockValue.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
-          <p className="text-sm text-text-secondary mb-1">
-            Produtos que acabaram
-          </p>
-          <p className="text-lg font-bold text-red-500">
-            {acabouProducts.length}
-          </p>
-        </div>
-        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
-          <p className="text-sm text-text-secondary mb-1">
-            Total sugerido para comprar
-          </p>
-          <p className="text-lg font-bold text-orange-500">{totalToBuy}</p>{" "}
-        </div>
-        <div className="flex-1 bg-background rounded p-3 border border-border-dark">
-          <p className="text-sm text-text-secondary mb-1">
-            Custo total estimado
-          </p>
-          <p className="text-lg font-bold text-green-600">
-            {totalCostToBuy.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
             })}

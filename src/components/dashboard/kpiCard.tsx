@@ -40,11 +40,11 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       </span>
 
       {/* Gráfico + Variação */}
-      <div className="-mt-12 -mb-5 flex justify-end">
+      <div className="-mt-11 -mb-5 flex justify-end">
         <div className="flex grid-cols-5   relative w-36 h-20">
           {/* Badge de variação GRANDE */}
           <div
-            className={`mb-2 -mt-6 absolute -top-6 right-0 flex items-center gap-2 rounded-lg px-3 py-1.5 text-base font-bold shadow-md
+            className={`mb-2 -mt-5 absolute -top-6 right-0 flex items-center gap-2 rounded-lg px-3 py-1.5 text-base font-bold shadow-md
             ${isPositive ? "text-primary bg-primary/15" : "text-error bg-error/15"}`}
             title={isPositive ? "Subindo" : "Caindo"}
           >
