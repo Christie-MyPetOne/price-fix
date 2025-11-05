@@ -12,10 +12,10 @@ import {
   handleShiftSelection,
   paginate,
 } from "@/lib/utils";
-import { StockStatusIcons } from "../ui/StockStatusIcons";
+import { CheckCircle2, AlertTriangle, XCircle, Snowflake } from "lucide-react";
 
 const RechartsSparkline = dynamic(
-  () => import("../ui/Charts").then((mod) => mod.RechartsSparkline),
+  () => import("../charts/Charts").then((mod) => mod.RechartsSparkline),
   { ssr: false }
 );
 
@@ -68,6 +68,37 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     const direction =
       sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
+  };
+
+  const StockHealthBadge = ({ status }: { status?: string }) => {
+    const healthConfig: Record<
+      string,
+      { color: string; icon: React.ElementType; label: string }
+    > = {
+      Excelente: {
+        color: "text-green-500",
+        icon: CheckCircle2,
+        label: "Excelente",
+      },
+      Moderado: {
+        color: "text-yellow-500",
+        icon: AlertTriangle,
+        label: "Moderado",
+      },
+      Risco: { color: "text-red-500", icon: XCircle, label: "Risco" },
+      Parado: { color: "text-blue-400", icon: Snowflake, label: "Parado" },
+    };
+
+    const config = healthConfig[status || "Moderado"];
+    const Icon = config.icon;
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 text-xs font-medium ${config.color}`}
+      >
+        <Icon size={14} /> {config.label}
+      </span>
+    );
   };
 
   return (
@@ -234,7 +265,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   </td>
 
                   <td className="px-3 py-3 text-center">
-                    <StockStatusIcons product={product} />
+                    <StockHealthBadge status={product.stockHealthStatus} />
                   </td>
 
                   <td className="px-3 py-3 hidden sm:table-cell text-xs text-text-secondary">

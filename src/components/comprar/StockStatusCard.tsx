@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { StockStatusCardProps, ChartDataItem } from "@/lib/types";
 import { ToggleButton } from "../ui/ToggleButton";
-import { StatusPieChart } from "../ui/Charts";
+import { StatusPieChart } from "../charts/Charts";
 
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;

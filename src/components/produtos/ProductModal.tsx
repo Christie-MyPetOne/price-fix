@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { X, TrendingUp, History, Users } from "lucide-react";
 import { Product, ProductDetailModalProps, type Tab } from "@/lib/types";
-import { PerformanceChart } from "../ui/Charts";
+import { PerformanceChart } from "../charts/Charts";
 import { TabButton } from "../ui/TabButton";
-import { CalculationInputField } from "../ui/CalculationInputField";
+import { CalculationInputField } from "./ui/CalculationInputField";
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
