@@ -75,8 +75,8 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
   xKey,
   series = DEFAULT_SERIES,
   line = DEFAULT_LINE,
-  barColor="#4287f5",           // ← override global barras
-  lineColor="#000000",         // ← override global linha
+  barColor="#10B981",           // ← override global barras
+  lineColor="#1C2611",         // ← override global linha
   legendPageSize = 6,
 }) => {
   const [visible, setVisible] = useState<Set<string>>(
@@ -225,24 +225,6 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
               </button>
             </div>
           )}
-
-          {/* Ações */}
-          <div className="ml-2 inline-flex gap-2">
-            <button
-              onClick={selectAll}
-              className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
-              type="button"
-            >
-              Todos
-            </button>
-            <button
-              onClick={invertSelection}
-              className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
-              type="button"
-            >
-              Inverter
-            </button>
-          </div>
         </div>
       </div>
 

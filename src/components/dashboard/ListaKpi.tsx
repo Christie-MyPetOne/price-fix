@@ -14,10 +14,12 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
+import { useDisplayModeStore } from "@/store/useDisplayModeStore";
+
 type KPI = {
   label: string;
   valor: string;
-  variacao: number; // >0 = aumento (erro), <0 = redução (success), 0 = sem variação
+  variacao: number;
   icon:
     | typeof Package
     | typeof Percent
@@ -41,6 +43,8 @@ const dados: KPI[] = [
 ];
 
 export default function ListaKpi() {
+  const mode = useDisplayModeStore((s) => s.mode); // ✅ estado global
+
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -56,6 +60,13 @@ export default function ListaKpi() {
               ? "text-[var(--color-error)]"
               : "text-[var(--color-success)]";
 
+          // ✅ Conversão de reais → percentual
+          const numeric = parseFloat(item.valor.replace(/[^\d.-]/g, ""));
+          const valorExibido =
+            mode === "reais"
+              ? item.valor
+              : `${(numeric / 1000).toFixed(2)}%`;
+
           return (
             <article
               key={item.label}
@@ -69,7 +80,7 @@ export default function ListaKpi() {
                 p-5
               "
             >
-              {/* topo: ícone em stroke + título/subtítulo */}
+              {/* TOPO */}
               <div className="flex items-start gap-3">
                 <Icon className={`w-5 h-5 ${tone}`} strokeWidth={2} />
                 <div>
@@ -82,10 +93,10 @@ export default function ListaKpi() {
                 </div>
               </div>
 
-              {/* base: valor grande à esquerda e variação à direita */}
+              {/* BASE */}
               <div className="mt-6 flex items-baseline justify-between">
                 <p className="text-[26px] font-semibold tracking-tight text-[var(--color-text)]">
-                  {item.valor}
+                  {valorExibido} {/* ✅ Atualizado dinamicamente */}
                 </p>
 
                 <div className={`flex items-center gap-1 ${tone}`}>
@@ -94,6 +105,7 @@ export default function ListaKpi() {
                   ) : (
                     <ArrowDownRight size={18} strokeWidth={2.5} />
                   )}
+
                   <span className="text-sm font-semibold">
                     {flat ? "0%" : `${up ? "+" : ""}${item.variacao.toFixed(1)}%`}
                   </span>
