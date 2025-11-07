@@ -272,3 +272,90 @@ export interface ProductDetailModalProps {
   product: Product | null;
   onClose: () => void;
 }
+
+// =================================================================
+// TIPOS DE VENDAS (Sale Types)
+// =================================================================
+
+/**
+ * Representa um item individual dentro de uma Venda.
+ * (Baseado no array 'items' do seu JSON)
+ */
+export interface SaleItem {
+  id: string;
+  productId: string;
+  sku: string;
+  name: string;
+  image: string;
+
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+/**
+ * Representa os dados do cliente em uma Venda.
+ * (Baseado no objeto 'client')
+ */
+export interface Client {
+  nome: string;
+  tipo_pessoa: "F" | "J";
+  cpf_cnpj: string;
+  ie?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cep?: string;
+  cidade?: string;
+  uf?: string;
+  fone?: string;
+  email?: string;
+}
+
+/**
+ * Representa os detalhes financeiros e de impostos de uma Venda.
+ * (Baseado no objeto 'financials' que você pediu)
+ */
+export interface FinancialDetails {
+  base_icms: number;
+  valor_icms: number;
+  base_icms_st: number;
+  valor_icms_st: number;
+  valor_servicos: number;
+  valor_produtos: number;
+  valor_frete: number;
+  valor_seguro: number;
+  valor_outras: number;
+  valor_ipi: number;
+  valor_issqn: number;
+  valor_nota: number;
+  valor_desconto: number;
+  valor_faturado: number;
+  fretePorConta: string;
+}
+
+/**
+ * Representa a estrutura de uma Venda unificada (o "cabeçalho").
+ */
+export interface Sale {
+  id: string;
+  erpId: string;
+  ecommerceId?: string | null;
+  originERP: string;
+  date: string; // formato ISO (ex: "2025-11-06T14:26:00.000Z")
+  status: string; // "aprovado", "cancelado", "pendente"
+  client: Client;
+  financials: FinancialDetails;
+  items: SaleItem[];
+}
+
+/**
+ * Representa o estado da sua store do Zustand (useSalesStore).
+ */
+export interface SaleState {
+  sales: Sale[];
+  loading: boolean;
+  fetchSales: () => Promise<void>;
+  getSaleById: (id: string) => Sale | undefined;
+}
