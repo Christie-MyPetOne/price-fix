@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { ProductDetailModal } from "./ProductDetailModal";
 import {
   ChevronLeft,
   ChevronRight,
@@ -28,8 +29,9 @@ const RechartsSparkline = dynamic(
 
 export const ProductTable: React.FC<ProductTableProps> = ({
   products,
-  onRowClick,
 }) => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
@@ -110,8 +112,21 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     );
   };
 
+  const handleRowClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="bg-card rounded-lg border border-border-dark shadow-sm p-4 w-full">
+      <ProductDetailModal
+        product={selectedProduct}
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProduct(null);
+        }}
+      />
       {/* Cabeçalho superior */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
         <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-2">
@@ -200,7 +215,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               displayedProducts.map((product, index) => (
                 <tr
                   key={product.id}
-                  onClick={() => onRowClick(product)}
+                  onClick={() => handleRowClick(product)}
                   className="hover:bg-background transition-colors"
                 >
                   <td

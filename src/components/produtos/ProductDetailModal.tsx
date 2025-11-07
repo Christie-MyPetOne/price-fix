@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { X, TrendingUp, History, Users } from "lucide-react";
+import { TrendingUp, History, Users } from "lucide-react";
 import { Product, ProductDetailModalProps, type Tab } from "@/lib/types";
 import { PerformanceChart } from "../charts/Charts";
 import { TabButton } from "../ui/TabButton";
-import { CalculationInputField } from "./ui/CalculationInputField";
+import { CalculationInputField } from "@/components/ui/CalculationInputField";
+import Modal from "../ui/Modal";
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
+  open,
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>("calculator");
@@ -60,32 +62,23 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   if (!editableProduct) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-2 sm:p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-card text-text rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col relative overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center p-3 sm:p-4 border-b border-border-dark flex-wrap gap-2">
-          <div className="min-w-[200px]">
-            <h2 className="text-lg sm:text-xl font-bold truncate">
-              {editableProduct?.name || ""}
-            </h2>
-            <p className="text-xs text-text-secondary truncate">
-              SKU: {editableProduct?.sku || ""}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-background transition"
-          >
-            <X size={20} />
-          </button>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold truncate">
+            {editableProduct?.name || ""}
+          </h2>
+          <p className="text-xs text-text-secondary truncate">
+            SKU: {editableProduct?.sku || ""}
+          </p>
         </div>
-
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start px-2 sm:px-6 border-b border-border-dark overflow-x-auto gap-1 sm:gap-2">
+      }
+      size="xl"
+    >
+      <div>
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start overflow-x-auto gap-1 sm:gap-2 mb-4">
           <TabButton
             label="Calculadora"
             icon={TrendingUp}
@@ -106,7 +99,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           />
         </div>
 
-        <div className="flex-grow overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 text-sm">
+        <div className="space-y-4 sm:space-y-6 text-sm">
           {activeTab === "calculator" && editableProduct && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div className="space-y-4">
@@ -116,25 +109,33 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <CalculationInputField
                   label="Preço de Venda"
                   value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPrice(Number(e.target.value))
+                  }
                   unit="R$"
                 />
                 <CalculationInputField
                   label="Custo do Produto"
                   value={cost}
-                  onChange={(e) => setCost(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCost(Number(e.target.value))
+                  }
                   unit="R$"
                 />
                 <CalculationInputField
                   label="Custo de Frete"
                   value={shipping}
-                  onChange={(e) => setShipping(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setShipping(Number(e.target.value))
+                  }
                   unit="R$"
                 />
                 <CalculationInputField
                   label="Taxa do Marketplace"
                   value={marketplaceFee}
-                  onChange={(e) => setMarketplaceFee(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setMarketplaceFee(Number(e.target.value))
+                  }
                   unit="%"
                 />
               </div>
@@ -175,7 +176,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <CalculationInputField
                   label="Para ter X% de margem..."
                   value={targetMargin}
-                  onChange={(e) => setTargetMargin(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTargetMargin(e.target.value)
+                  }
                   unit="%"
                   placeholder="Ex: 25"
                 />
@@ -195,7 +198,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <CalculationInputField
                   label="Para lucrar R$ Y..."
                   value={targetProfit}
-                  onChange={(e) => setTargetProfit(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTargetProfit(e.target.value)
+                  }
                   unit="R$"
                   placeholder="Ex: 500"
                 />
@@ -264,7 +269,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-end items-center p-3 sm:p-4 border-t border-border-dark gap-3">
+        <div className="flex flex-col sm:flex-row justify-end items-center mt-6 gap-3">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-4 py-2 rounded-md bg-background hover:bg-opacity-80 transition-colors text-text-secondary text-sm sm:text-base"
@@ -276,6 +281,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

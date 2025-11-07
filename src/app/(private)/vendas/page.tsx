@@ -5,7 +5,7 @@ import { VendasFilters } from "@/components/vendas/VendasFilters";
 import { VendasTable } from "@/components/vendas/VendasTable";
 import { Card } from "@/components/ui/Card";
 import MargensChart from "@/components/vendas/MargensChart";
-import { useSalesStore } from "@/store/useSalesStore";
+import { useSaleStore } from "@/store/useSaleStore";
 
 type FiltersState = {
   date: string;
@@ -15,7 +15,7 @@ type FiltersState = {
 };
 
 export default function VendasPage() {
-  const { filterSales, clearFilters } = useSalesStore();
+  const { filterSales, clearFilters } = useSaleStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<FiltersState>({
     date: "",

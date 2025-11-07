@@ -2,17 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { RefreshCcw } from "lucide-react";
-import { Product } from "@/lib/types";
 import { useProductsStore } from "@/store/useProductsStore";
 import { ProductFilters } from "@/components/produtos/ProductFilters";
 import { ProductTable } from "@/components/produtos/ProductTable";
-import { ProductDetailModal } from "@/components/produtos/ProductModal";
 
 export default function ProductsPage() {
   const { sortedProducts, fetchProducts } = useProductsStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -24,12 +21,6 @@ export default function ProductsPage() {
   }, [fetchProducts]);
 
   const handleSearch = (term: string) => setSearchTerm(term);
-
-  const handleRowClick = (product: Product) => {
-    setSelectedProduct(product);
-  };
-
-  const handleCloseModal = () => setSelectedProduct(null);
 
   const filteredProducts = sortedProducts.filter(
     (product) =>
@@ -60,18 +51,10 @@ export default function ProductsPage() {
           ) : (
             <ProductTable
               products={filteredProducts}
-              onRowClick={handleRowClick}
             />
           )}
         </div>
       </div>
-
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          onClose={handleCloseModal}
-        />
-      )}
     </>
   );
 }

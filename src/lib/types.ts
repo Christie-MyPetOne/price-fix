@@ -1,21 +1,16 @@
 // React e utilitários
 import { Dispatch, SetStateAction } from "react";
 
-/* -----------------------------------------------
- Tipos básicos e genéricos
------------------------------------------------ */
-
-// Estado de saúde do estoque
+/* --------------------------------------------------------------------------
+  Tipos básicos
+  - Pequenos aliases e unions usados pelo app
+--------------------------------------------------------------------------- */
 export type HealthStatus = "Excelente" | "Média" | "Risco" | "Parado";
-
-// Aba ativa em uma interface com múltiplas seções
 export type Tab = "calculator" | "competitors" | "history";
 
-/* -----------------------------------------------
- Modelos principais de dados
------------------------------------------------ */
-
-// Produto principal utilizado no sistema
+/* --------------------------------------------------------------------------
+  Product-related models
+--------------------------------------------------------------------------- */
 export interface Product {
   id: string;
   sku: string;
@@ -40,44 +35,9 @@ export interface Product {
   coverage?: number;
 }
 
-// Modelo alternativo para exibição de vendas
-export interface Venda {
-  id: string;
-  name: string;
-  sales: number;
-  status: "Precificado" | "Pendente" | "Erro";
-  price: number;
-  margin: number;
-  consiliacao: string;
-  totalProfit: number;
-  workingCapital: number;
-  imagens: string;
-  line?: string;
-  salesChannel?: string;
-  supplier?: string;
-  problems?: string[];
-}
-
-// Dados do usuário logado
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
-
-// Produto genérico usado em mocks ou exemplos
-export interface FakeProduct {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  image: string;
-}
-
-/* -----------------------------------------------
- Estado global e gerenciamento (Zustand)
------------------------------------------------ */
-
+/* --------------------------------------------------------------------------
+  Product store state (Zustand)
+--------------------------------------------------------------------------- */
 export interface ProductState {
   products: Product[];
   sortedProducts: Product[];
@@ -91,11 +51,9 @@ export interface ProductState {
   sortBy: (key: keyof Product) => void;
 }
 
-/* -----------------------------------------------
- Estoque e compras
------------------------------------------------ */
-
-// Configurações do cálculo de estoque
+/* --------------------------------------------------------------------------
+  Stock / cart models
+--------------------------------------------------------------------------- */
 export interface StockConfig {
   comprarPara: number;
   entregaEstimada: number;
@@ -105,7 +63,6 @@ export interface StockConfig {
   parado: number;
 }
 
-// Item presente no carrinho de compras
 export interface CartItem {
   id: string;
   name: string;
@@ -121,17 +78,13 @@ export interface CartItem {
   coverage?: number;
 }
 
-/* -----------------------------------------------
- Props de componentes reutilizáveis
------------------------------------------------ */
-
-// Botão genérico com variantes
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+/* --------------------------------------------------------------------------
+  Reusable component props
+--------------------------------------------------------------------------- */
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline";
 }
 
-// Filtros da tabela de estoque
 export interface StockFiltersProps {
   searchTerm: string;
   setSearchTerm: Dispatch<SetStateAction<string>>;
@@ -142,7 +95,6 @@ export interface StockFiltersProps {
   selectedProducts: Product[];
 }
 
-// Cabeçalho da página de estoque (ícone do carrinho e período)
 export interface StockHeaderProps {
   cartItems: CartItem[];
   onRemove?: (id: string) => void;
@@ -150,7 +102,6 @@ export interface StockHeaderProps {
   onOpenCart?: () => void;
 }
 
-// Tabela principal de estoque
 export interface StockTableProps {
   loading: boolean;
   displayedProducts: Product[];
@@ -164,20 +115,17 @@ export interface StockTableProps {
   onOpenConfig: (product: Product) => void;
 }
 
-// Cartão com status do estoque
 export interface StockStatusCardProps {
   products: Product[];
   getPurchaseStatus: (product: Product) => string;
   stockConfig: StockConfig;
 }
 
-// Cartão de saúde do estoque
 export interface StockHealthCardProps {
   stockConfig: StockConfig;
   onConfigClick: () => void;
 }
 
-// Modal de configuração de estoque
 export interface StockConfigModalProps {
   open: boolean;
   onClose: () => void;
@@ -186,7 +134,6 @@ export interface StockConfigModalProps {
   onSave?: (config: StockConfig) => void;
 }
 
-// Modal do carrinho de compras
 export interface ShoppingCartModalProps {
   open: boolean;
   cartItems: CartItem[];
@@ -195,11 +142,9 @@ export interface ShoppingCartModalProps {
   onUpdateQuantity: (id: string, newQuantity: number) => void;
 }
 
-/* -----------------------------------------------
- Componentes de gráfico
------------------------------------------------ */
-
-// Dados para o gráfico de status do estoque
+/* --------------------------------------------------------------------------
+  Chart component props
+--------------------------------------------------------------------------- */
 export interface ChartDataItem {
   status: string;
   count: number;
@@ -209,24 +154,20 @@ export interface ChartDataItem {
   icon: React.ElementType;
 }
 
-// Sparkline (gráfico pequeno)
 export interface SparklineProps {
   data: { value: number }[];
   color?: string;
 }
 
-// Gráfico detalhado com eixo Y
 export interface DetailedChartProps {
   data: { name: string; value: number }[];
   color?: string;
   yAxisLabel?: string;
 }
 
-/* -----------------------------------------------
- Navegação e layout
------------------------------------------------ */
-
-// Drawer (menu lateral)
+/* --------------------------------------------------------------------------
+  Layout / navigation props
+--------------------------------------------------------------------------- */
 export interface DrawerProps {
   open: boolean;
   onClose: () => void;
@@ -235,14 +176,12 @@ export interface DrawerProps {
   side?: "right" | "left";
 }
 
-// Links de navegação
 export interface NavLinkProps {
   href: string;
   children: React.ReactNode;
   icon?: React.ElementType | null;
 }
 
-// Links dentro de dropdowns
 export interface DropdownLinkProps {
   href: string;
   children: React.ReactNode;
@@ -250,37 +189,28 @@ export interface DropdownLinkProps {
   onClick: () => void;
 }
 
-/* -----------------------------------------------
- Componentes auxiliares
------------------------------------------------ */
-
-// Tabela de produtos genérica
+/* --------------------------------------------------------------------------
+  Product UI props
+--------------------------------------------------------------------------- */
 export interface ProductTableProps {
   products?: Product[];
-  onRowClick: (product: Product) => void;
 }
 
-// Filtros de produtos (busca, filtro e seleção)
 export interface ProductFiltersProps {
   onSearch: (searchTerm: string) => void;
   onFilterChange: (filterName: string, value: string) => void;
   onSelectAll: () => void;
 }
 
-// Modal de detalhes de um produto
 export interface ProductDetailModalProps {
   product: Product | null;
+  open: boolean;
   onClose: () => void;
 }
 
-// =================================================================
-// TIPOS DE VENDAS (Sale Types)
-// =================================================================
-
-/**
- * Representa um item individual dentro de uma Venda.
- * (Baseado no array 'items' do seu JSON)
- */
+/* --------------------------------------------------------------------------
+  Sales / Venda related types
+--------------------------------------------------------------------------- */
 export interface SaleItem {
   id: string;
   productId: string;
@@ -293,10 +223,6 @@ export interface SaleItem {
   totalPrice: number;
 }
 
-/**
- * Representa os dados do cliente em uma Venda.
- * (Baseado no objeto 'client')
- */
 export interface Client {
   nome: string;
   tipo_pessoa: "F" | "J";
@@ -313,10 +239,6 @@ export interface Client {
   email?: string;
 }
 
-/**
- * Representa os detalhes financeiros e de impostos de uma Venda.
- * (Baseado no objeto 'financials' que você pediu)
- */
 export interface FinancialDetails {
   base_icms: number;
   valor_icms: number;
@@ -335,27 +257,24 @@ export interface FinancialDetails {
   fretePorConta: string;
 }
 
-/**
- * Representa a estrutura de uma Venda unificada (o "cabeçalho").
- */
 export interface Sale {
   id: string;
   erpId: string;
   ecommerceId?: string | null;
   originERP: string;
-  date: string; // formato ISO (ex: "2025-11-06T14:26:00.000Z")
-  status: string; // "aprovado", "cancelado", "pendente"
+  date: string; // ISO
+  status: string;
   client: Client;
   financials: FinancialDetails;
   items: SaleItem[];
 }
 
-/**
- * Representa o estado da sua store do Zustand (useSalesStore).
- */
 export interface SaleState {
   sales: Sale[];
   loading: boolean;
   fetchSales: () => Promise<void>;
   getSaleById: (id: string) => Sale | undefined;
+  filterSales: (opts: { q?: string; date?: string; empresa?: string; canal?: string; produto?: string }) => void;
+  clearFilters: () => void;
 }
+
