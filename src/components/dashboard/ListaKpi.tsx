@@ -14,7 +14,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
-import { useDisplayModeStore } from "@/store/useDisplayModeStore";
+
 
 type KPI = {
   label: string;
@@ -42,8 +42,7 @@ const dados: KPI[] = [
   { label: "Outros custos", valor: "R$ 420", variacao: 0.0, icon: MoreHorizontal },
 ];
 
-export default function ListaKpi() {
-  const mode = useDisplayModeStore((s) => s.mode); // ✅ estado global
+export default function ListaKpi({ mode }: { mode: "reais" | "percentual" }) {
 
   return (
     <div className="w-full">

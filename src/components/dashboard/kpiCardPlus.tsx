@@ -4,7 +4,7 @@ import React from "react";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { useDisplayModeStore } from "@/store/useDisplayModeStore";
+
 
 /* --- Tipos --- */
 export interface KpiCardPlusProps {
@@ -16,6 +16,8 @@ export interface KpiCardPlusProps {
   className?: string;
   onToggleLista?: () => void;
   listaAtiva?: boolean;
+  mode: "reais" | "percentual";
+  setMode: (mode: "reais" | "percentual") => void;
 }
 
 /* --- Componente KPI Card --- */
@@ -28,11 +30,11 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
   comparedLabel = "Período comparado",
   comparedValue = "—",
   className = "",
+  mode,
+  setMode,
 }) => {
   
-  // ✅ estado global
-  const mode = useDisplayModeStore((s) => s.mode);
-  const setMode = useDisplayModeStore((s) => s.setMode);
+
 
   const isPositive = change >= 0;
   const ChangeIcon = isPositive ? ArrowUpRight : ArrowDownRight;
@@ -64,7 +66,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
                   ? "bg-primary text-white"
                   : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
-              onClick={() => setMode("reais")}   // ✅ agora é global
+              onClick={() => setMode("reais")}
             >
               R$
             </Button>
@@ -75,7 +77,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
                   ? "bg-primary text-white"
                   : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
-              onClick={() => setMode("percentual")} // ✅ agora é global
+              onClick={() => setMode("percentual")}
             >
               %
             </Button>

@@ -7,7 +7,7 @@ import KpiCardPlus from "@/components/dashboard/kpiCardPlus";
 import GraficoBar from "@/components/dashboard/GraficoBar";
 import GraficoPeR from "@/components/dashboard/GraficoPeR";
 import GraficoMargem from "@/components/dashboard/GraficoMargen";
-import { Card } from "@/components/ui/Card"; 
+
 import ListaKpi from "@/components/dashboard/ListaKpi";
 import {
   kpiData,
@@ -17,15 +17,18 @@ import {
   series,
   pedidosReceita,
   dataMargem,
-  topMarketplacesData,
+
 } from  "@/components/dashboard/Data"
 
+
 export default function DashboardPage() {
-  // 👇 Estado e função devem estar DENTRO do componente
+  // Estado para mostrar lista
   const [mostrarLista, setMostrarLista] = useState(false);
+  // Estado para modo de exibição
+  const [mode, setMode] = useState<"reais" | "percentual">("reais");
 
   const toggleLista = () => {
-    setMostrarLista((prev) => !prev); // alterna entre true e false
+    setMostrarLista((prev) => !prev);
   };
 
   return (
@@ -75,12 +78,15 @@ export default function DashboardPage() {
 
       {/* KPI PLUS + LISTA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
         {kpiDataPlus.map((kpiP) => (
           <KpiCardPlus
             key={kpiP.title}
             {...kpiP}
             onToggleLista={toggleLista}
             listaAtiva={mostrarLista}
+            mode={mode}
+            setMode={setMode}
           />
         ))}
 
@@ -89,8 +95,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Lista visível somente quando mostrarLista for true */}
-      {mostrarLista && <ListaKpi />}
+
+  {/* Lista visível somente quando mostrarLista for true */}
+  {mostrarLista && <ListaKpi mode={mode} />}
 
        {/* GRÁFICOS */}
       <GraficoBar
