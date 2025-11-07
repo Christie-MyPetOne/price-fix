@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useDisplayModeStore } from "@/store/useDisplayModeStore";
 
 /* --- Tipos --- */
 export interface KpiCardPlusProps {
@@ -13,14 +14,14 @@ export interface KpiCardPlusProps {
   comparedLabel?: string;
   comparedValue?: string | number;
   className?: string;
-  onToggleLista?: () => void; // 👈 adicionamos o tipo da função
-  listaAtiva?: boolean; // 👈 para mudar o botão quando a lista estiver aberta
+  onToggleLista?: () => void;
+  listaAtiva?: boolean;
 }
 
 /* --- Componente KPI Card --- */
 export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
   onToggleLista,
-  listaAtiva = false, // 👈 valor padrão
+  listaAtiva = false,
   title,
   value,
   change,
@@ -28,7 +29,10 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
   comparedValue = "—",
   className = "",
 }) => {
-  const [mode, setMode] = useState<"reais" | "percentual">("reais");
+  
+  // ✅ estado global
+  const mode = useDisplayModeStore((s) => s.mode);
+  const setMode = useDisplayModeStore((s) => s.setMode);
 
   const isPositive = change >= 0;
   const ChangeIcon = isPositive ? ArrowUpRight : ArrowDownRight;
@@ -37,7 +41,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
   const displayValue =
     mode === "reais"
       ? value
-      : `${(numericValue / 1000).toFixed(2)}%`; // Exemplo de conversão
+      : `${(numericValue / 1000).toFixed(2)}%`; // Exemplo
 
   return (
     <Card
@@ -47,10 +51,10 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
       <div className="flex items-start justify-between relative">
         <div>
           <p className="text-2sm text-muted-foreground">{title}</p>
-          <p className="text-2xl mt-10 mb-5 font-bold ">{displayValue}</p>
+          <p className="text-2xl mt-10 mb-5 font-bold">{displayValue}</p>
         </div>
 
-        {/* Contêiner à direita (botões + badge) */}
+        {/* Contêiner à direita */}
         <div className="flex flex-col items-end gap-2">
           {/* Botões */}
           <div className="flex gap-2">
@@ -60,7 +64,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
                   ? "bg-primary text-white"
                   : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
-              onClick={() => setMode("reais")}
+              onClick={() => setMode("reais")}   // ✅ agora é global
             >
               R$
             </Button>
@@ -71,7 +75,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
                   ? "bg-primary text-white"
                   : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
-              onClick={() => setMode("percentual")}
+              onClick={() => setMode("percentual")} // ✅ agora é global
             >
               %
             </Button>
@@ -88,7 +92,7 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
             </Button>
           </div>
 
-          {/* Badge logo abaixo dos botões */}
+          {/* Badge abaixo dos botões */}
           <div
             className={`mt-4 flex items-center justify-center rounded-lg px-3 py-1 text-base font-bold shadow-md
             ${isPositive ? "text-primary bg-primary/15" : "text-error bg-error/15"}`}
@@ -99,8 +103,6 @@ export const KpiCardPlus: React.FC<KpiCardPlusProps> = ({
           </div>
         </div>
       </div>
-
-
 
       {/* Rodapé */}
       <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between">
