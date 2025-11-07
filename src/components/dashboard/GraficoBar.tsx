@@ -184,7 +184,7 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
         <ResponsiveContainer>
           <BarChart
             data={data}
-            margin={{ top: 5, right: 12, bottom: 8, left: 8 }}
+            margin={{ top: 15, right: 12, bottom: 8, left: 8 }}
             barSize={18}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-dark)" />
