@@ -2,27 +2,35 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useSaleStore } from "@/store/useSaleStore";
-import type { Sale } from "@/lib/types";
+import type { Sale, Product, SaleItem } from "@/lib/types";
 import {
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
   Calculator,
 } from "lucide-react";
-import { sortData, toggleSelection } from "@/lib/utils";
+import {
+  sortData,
+  toggleSelection,
+  toggleSelectAll,
+  handleShiftSelection,
+  paginate,
+} from "@/lib/utils";
 import Drawer from "../ui/Drawer";
 import { VendasModal } from "./VendasModal";
 import CalculadoraMargem from "./Calculadora";
 
 type SortDir = "asc" | "desc";
-type SortKey = keyof Sale | "clientName" | "margin" | "profit";
+type SortKey = keyof Sale | "clientName" | "margin" | "profit" | "marketplace";
 
-export function VendasTable() {
-  const { fetchSales, sales, loading } = useSaleStore();
+export interface VendasTableProps {
+  sales: Sale[];
+  selectedMargemIds: string[];
+}
 
+export function VendasTable({ sales }: VendasTableProps) {
   const [localSort, setLocalSort] = useState<{
-    key: SortKey;
+    key: SortKey | null;
     direction: SortDir;
   }>({
     key: "date",
@@ -31,16 +39,16 @@ export function VendasTable() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [vendaSelecionada, setVendaSelecionada] = useState<Sale | null>(null);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
+  );
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const selectAllRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    fetchSales();
-  }, [fetchSales]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRowsPerPage(Number(e.target.value));
@@ -53,76 +61,106 @@ export function VendasTable() {
     setLocalSort({ key, direction });
   };
 
-  const fakeById = (s: Sale) => {
-    const id = (s as any)?.id?.toString?.() ?? "";
-    let h = 0;
-    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-    const rng = Math.abs(h % 1000) / 1000;
-    const margin = 5 + rng * 25;
-    const profit = (rng - 0.2) * 2500;
-    return { margin, profit };
+  const calcProfitAndMargin = (sale: Sale) => {
+    const faturado = sale.financials?.valor_faturado ?? 0;
+    const custoTotal =
+      sale.items?.reduce((acc, item) => acc + (item.totalCost ?? 0), 0) ?? 0;
+    const lucro = faturado - custoTotal;
+    const margem = faturado > 0 ? (lucro / faturado) * 100 : 0;
+    return { profit: lucro, margin: margem };
   };
 
   const sortedSales = useMemo(() => {
     if (!localSort.key) return sales;
 
-    if (localSort.key === "clientName") {
-      const dir = localSort.direction === "asc" ? 1 : -1;
-      return [...sales].sort(
-        (a, b) => a.client.nome.localeCompare(b.client.nome, "pt-BR") * dir
-      );
-    }
+    const accessor = (sale: Sale) => {
+      const key = localSort.key as SortKey;
 
-    if (localSort.key === "margin" || localSort.key === "profit") {
-      const dir = localSort.direction === "asc" ? 1 : -1;
-      return [...sales].sort((a, b) => {
-        const aValues = fakeById(a);
-        const bValues = fakeById(b);
-        const key = localSort.key as "margin" | "profit";
-        return (aValues[key] - bValues[key]) * dir;
-      });
-    }
+      if (key === "margin" || key === "profit") {
+        const values = calcProfitAndMargin(sale);
+        return values[key];
+      }
+      return (sale as any)[key];
+    };
 
     return sortData<Sale>(
       sales,
-      localSort.key as keyof Sale,
-      localSort.direction
+      localSort.key === "margin" || localSort.key === "profit"
+        ? accessor
+        : (localSort.key as keyof Sale),
+      localSort.direction,
+      { dateKeys: ["date"] }
     );
   }, [sales, localSort]);
 
-  const totalPages = Math.max(1, Math.ceil(sortedSales.length / rowsPerPage));
-  const displayedSales = sortedSales.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
+  const { pageData: displayedSales, totalPages } = useMemo(
+    () => paginate(sortedSales, currentPage, rowsPerPage),
+    [sortedSales, currentPage, rowsPerPage]
   );
 
-  const visibleIds = useMemo(
-    () => displayedSales.map((s, idx) => s.id ?? String(idx)),
-    [displayedSales]
-  );
-
-  const toggleOne = (id: string) => setSelected(toggleSelection(selected, id));
   const allSelected =
-    visibleIds.length > 0 && visibleIds.every((id) => selected.includes(id));
-  const someSelected =
-    visibleIds.some((id) => selected.includes(id)) && !allSelected;
+    displayedSales.length > 0 &&
+    displayedSales.every((sale) => selectedIds.includes(sale.id));
+  const isIndeterminate =
+    selectedIds.length > 0 && !allSelected && displayedSales.length > 0;
+
+  const handleToggleOne = (id: string, index: number, shiftKey?: boolean) => {
+    setSelectedIds((prev) => {
+      const updated = shiftKey
+        ? handleShiftSelection(id, displayedSales, prev, lastSelectedIndex)
+        : toggleSelection(prev, id);
+      return updated;
+    });
+    setLastSelectedIndex(index);
+  };
+
+  const handleToggleAll = () => {
+    setSelectedIds((prev) => toggleSelectAll(displayedSales, prev));
+  };
 
   useEffect(() => {
     if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = someSelected;
+      selectAllRef.current.indeterminate = isIndeterminate;
     }
-  }, [someSelected]);
+  }, [isIndeterminate]);
 
-  const toggleAll = () => {
-    setSelected((prev) => {
-      if (allSelected) return prev.filter((id) => !visibleIds.includes(id));
-      const merged = new Set([...prev, ...visibleIds]);
-      return Array.from(merged);
-    });
+  const handleAbrirCalculadora = (sale: Sale) => {
+    const item: SaleItem | undefined = sale.items?.[0];
+    if (!item) return;
+
+    const produtoConvertido: Product = {
+      id: item.id ?? "",
+      sku: item.sku ?? "SEM-SKU",
+      name: item.name ?? "Produto sem nome",
+      price: (item as any).price ?? item.unitPrice ?? 0,
+      cost: item.totalCost ?? 0,
+      margin: 0,
+      totalProfit: 0,
+      workingCapital: 0,
+      sales: 0,
+      status: "Pendente",
+      createdAt: new Date().toISOString(),
+
+      freight: 0,
+      freightRevenue: 0,
+      shipping: 0,
+      discount: 0,
+      subsidy: 0,
+      tax: 0.23,
+      commission: 14,
+      saleFee: 0,
+      otherCosts: 0,
+
+      image: item.image ?? "",
+      marketplace: sale.marketplace ?? "",
+    };
+
+    setSelectedProduct(produtoConvertido);
+    setVendaSelecionada(sale);
+    setOpenDrawer(true);
   };
 
   const handleAbrirInfo = (sale: Sale) => {
-    // abrir modal local com os dados da venda
     setSelectedSale(sale);
     setShowDetails(true);
   };
@@ -154,7 +192,8 @@ export function VendasTable() {
           itens
         </label>
         <p className="text-sm text-text-secondary hidden sm:block">
-          Mostrando{" "}
+          Selecionados:{" "}
+          <span className="font-medium">{selectedIds.length}</span> - Mostrando{" "}
           <span className="font-medium">
             {sortedSales.length ? (currentPage - 1) * rowsPerPage + 1 : 0}
           </span>{" "}
@@ -167,201 +206,222 @@ export function VendasTable() {
         </p>
       </div>
 
-      {loading ? (
-        <div className="mt-6 p-6 rounded-xl bg-card shadow-lg">
-          Carregando...
-        </div>
-      ) : (
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full divide-y divide-border-dark">
-            <thead className="bg-background">
-              <tr>
-                <th className="px-4 py-3 w-10">
-                  <input
-                    ref={selectAllRef}
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleAll}
-                    className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full divide-y divide-border-dark">
+          <thead className="bg-background">
+            <tr>
+              <th className="px-4 py-3 w-10">
+                <input
+                  ref={selectAllRef}
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleToggleAll}
+                  className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+                />
+              </th>
+              <th
+                onClick={() => handleSort("orderId" as SortKey)}
+                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
+              >
+                <div className="flex items-center gap-1">
+                  Pedido
+                  <ArrowUpDown
+                    size={14}
+                    className={arrowClass("orderId" as SortKey)}
                   />
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("status")}
-                >
-                  <div className="flex items-center gap-1">
-                    Pedido
-                    <ArrowUpDown size={14} className={arrowClass("status")} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("date")}
-                >
-                  <div className="flex items-center gap-1">
-                    Data
-                    <ArrowUpDown size={14} className={arrowClass("date")} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer select-none"
-                  onClick={() => handleSort("clientName")}
-                >
-                  <div className="flex items-center gap-1">
-                    Cliente
-                    <ArrowUpDown
-                      size={14}
-                      className={arrowClass("clientName")}
-                    />
-                  </div>
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("date")}
+                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
+              >
+                <div className="flex items-center gap-1">
+                  Data
+                  <ArrowUpDown size={14} className={arrowClass("date")} />
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("marketplace")}
+                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
+              >
+                <div className="flex items-center gap-1">
+                  Canal de Venda
+                  <ArrowUpDown
+                    size={14}
+                    className={arrowClass("marketplace")}
+                  />
+                </div>
+              </th>
+              <th
+                onClick={() =>
+                  handleSort("financials.valor_faturado" as SortKey)
+                }
+                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-1">
                   Valor de Venda
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase">
+                  <ArrowUpDown
+                    size={14}
+                    className={arrowClass(
+                      "financials.valor_faturado" as SortKey
+                    )}
+                  />
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("margin")}
+                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-1">
                   Margem
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase">
+                  <ArrowUpDown size={14} className={arrowClass("margin")} />
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("profit")}
+                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
+              >
+                <div className="flex items-center justify-center gap-1">
                   Lucro
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase">
-                  Ações
-                </th>
-              </tr>
-            </thead>
+                  <ArrowUpDown size={14} className={arrowClass("profit")} />
+                </div>
+              </th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase">
+                Ações
+              </th>
+            </tr>
+          </thead>
 
-            <tbody className="bg-card divide-y divide-border-dark">
-              {displayedSales.map((sale, index) => {
-                const id = sale.id ?? String(index);
-                const fake = fakeById(sale);
-                const isSelected = selected.includes(id);
+          <tbody className="bg-card divide-y divide-border-dark">
+            {displayedSales.map((sale, index) => {
+              const id = sale.id;
+              const real = calcProfitAndMargin(sale);
+              const isSelected = selectedIds.includes(id);
 
-                return (
-                  <tr
-                    key={id}
-                    className={`hover:bg-background transition-colors cursor-pointer ${
-                      isSelected ? "bg-background/60" : ""
-                    }`}
-                    onClick={() => handleAbrirInfo(sale)}
+              return (
+                <tr
+                  key={id}
+                  className={`hover:bg-background transition-colors cursor-pointer ${
+                    isSelected ? "bg-background/60" : ""
+                  }`}
+                  onClick={() => handleAbrirInfo(sale)}
+                >
+                  <td
+                    className="px-4 py-3 w-10"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <td
-                      className="px-4 py-3 w-10"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleOne(id)}
-                        className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
-                      />
-                    </td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(id)}
+                      readOnly
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleOne(id, index, e.shiftKey);
+                      }}
+                      className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+                    />
+                  </td>
 
-                    {/* Produto + imagem */}
-                    <td className="px-4 py-3 text-sm font-medium text-text">
-                      <div className="flex items-center gap-3">
-                        {sale.items[0]?.image && (
-                          <Image
-                            src={sale.items[0].image}
-                            alt={sale.items[0].name}
-                            width={50}
-                            height={50}
-                            className="rounded-md object-cover border border-border-dark"
-                          />
-                        )}
-                        <div className="flex flex-col">
-                          <span className="text-xs text-text-secondary">
-                            <strong>Status:</strong> {sale.status}
-                          </span>
-                          <span className="text-xs text-text-secondary">
-                            <strong>Produto:</strong>{" "}
-                            {sale.items.map((i) => i.name).join(", ")}
-                          </span>
-                        </div>
+                  <td className="px-4 py-3 text-sm font-medium text-text">
+                    <div className="flex items-center gap-3">
+                      {sale.items[0]?.image && (
+                        <Image
+                          src={sale.items[0].image}
+                          alt={sale.items[0].name}
+                          width={50}
+                          height={50}
+                          className="rounded-md object-cover border border-border-dark"
+                        />
+                      )}
+                      <div className="flex flex-col">
+                        <span className="text-xs text-text-secondary">
+                          <strong>Status:</strong> {sale.status}
+                        </span>
+                        <span className="text-xs text-text-secondary">
+                          <strong>Produto:</strong>{" "}
+                          {sale.items.map((i) => i.name).join(", ")}
+                        </span>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    <td className="px-4 py-3 text-sm text-text-secondary">
-                      {new Date(sale.date).toLocaleDateString("pt-BR")}
-                    </td>
+                  <td className="px-4 py-3 text-sm text-text-secondary">
+                    {new Date(sale.date).toLocaleDateString("pt-BR")}
+                  </td>
 
-                    <td className="px-4 py-3 text-sm text-text-secondary">
-                      {sale.client?.nome ?? "N/A"}
-                    </td>
+                  <td className="px-4 py-3 text-sm text-text-secondary">
+                    {sale.ecommerce ?? "Loja própria"}
+                  </td>
 
-                    <td className="px-4 py-3 text-sm text-text text-center">
-                      {sale.financials?.valor_nota?.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </td>
+                  <td className="px-4 py-3 text-sm text-center">
+                    {sale.financials?.valor_nota?.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
 
-                    <td className="px-4 py-3 text-sm text-text text-center">
-                      {`${fake.margin.toFixed(2)}%`}
-                    </td>
+                  <td className="px-4 py-3 text-sm text-center">
+                    {`${real.margin.toFixed(2)}%`}
+                  </td>
 
-                    <td className="px-4 py-3 text-sm text-text text-center">
-                      {fake.profit.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </td>
+                  <td className="px-4 py-3 text-sm text-center">
+                    {real.profit.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
 
-                    <td
-                      className="px-4 py-3 text-right"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() => {
-                          setVendaSelecionada(sale);
-                          setOpenDrawer(true);
-                        }}
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b]"
-                      >
-                        <Calculator size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Paginação */}
-          <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
-            <div className="flex gap-2">
-              <button
-                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    className={`p-2 rounded-md text-sm font-semibold ${
-                      page === currentPage
-                        ? "bg-primary text-white"
-                        : "ring-1 ring-border-dark hover:bg-background"
-                    }`}
-                    onClick={() => setCurrentPage(page)}
+                  <td
+                    className="px-4 py-3 text-right"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {page}
-                  </button>
-                )
-              )}
+                    <button
+                      onClick={() => handleAbrirCalculadora(sale)}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b]"
+                    >
+                      <Calculator size={16} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
+          <div className="flex gap-2">
+            <button
+              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
-                className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
+                key={page}
+                className={`p-2 rounded-md text-sm font-semibold ${
+                  page === currentPage
+                    ? "bg-primary text-white"
+                    : "ring-1 ring-border-dark hover:bg-background"
+                }`}
+                onClick={() => setCurrentPage(page)}
               >
-                <ChevronRight size={16} />
+                {page}
               </button>
-            </div>
+            ))}
+
+            <button
+              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
       <Drawer
         open={openDrawer}
@@ -372,14 +432,9 @@ export function VendasTable() {
             : "Simulador de preços"
         }
       >
-        <CalculadoraMargem
-          initialPreco={vendaSelecionada?.financials?.valor_nota ?? 0}
-          initialMargem={0}
-          initialCusto={0}
-        />
+        {selectedProduct && <CalculadoraMargem product={selectedProduct} />}
       </Drawer>
 
-      {/* Modal central com detalhes da venda */}
       <VendasModal
         open={showDetails}
         onClose={() => setShowDetails(false)}

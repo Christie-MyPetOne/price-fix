@@ -3,12 +3,7 @@
 import React, { useState } from "react";
 import { Filter, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "../ui/Button";
-
-export interface VendasFiltersProps {
-  onSearch: (searchTerm: string) => void;
-  onFilterChange: (filterName: string, value: string) => void;
-  onSelectAll: (checked: boolean) => void;
-}
+import { VendasFiltersProps } from "@/lib/types";
 
 const fieldBase =
   "h-10 w-full px-3 border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary";
@@ -16,19 +11,12 @@ const fieldBase =
 export function VendasFilters({
   onSearch,
   onFilterChange,
-  onSelectAll,
 }: VendasFiltersProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="bg-card p-3 md:p-4 rounded-lg shadow-md border border-border-dark">
-      {/* Header + botão toggle (somente no mobile) */}
-      
-      
       <div className="flex items-center gap-2">
-      
-
-        {/* botão abre/fecha filtros no mobile */}
         <button
           className="md:hidden flex items-center gap-1 px-2 py-1 border border-border-dark rounded-md text-sm text-text-secondary"
           onClick={() => setOpen((v) => !v)}
@@ -44,9 +32,7 @@ export function VendasFilters({
           )}
         </button>
       </div>
-      
 
-      {/* Grid de filtros: escondido no mobile quando fechado */}
       <div className={`${open ? "block" : "hidden"} md:block`}>
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           {/* Busca */}
@@ -59,7 +45,6 @@ export function VendasFilters({
             />
           </div>
 
-          {/* Data */}
           <div className="w-full">
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
@@ -71,7 +56,6 @@ export function VendasFilters({
             </div>
           </div>
 
-          {/* Empresas */}
           <div className="w-full">
             <select
               className={`${fieldBase} appearance-none`}
@@ -86,7 +70,6 @@ export function VendasFilters({
             </select>
           </div>
 
-          {/* Canais */}
           <div className="w-full">
             <select
               className={`${fieldBase} appearance-none`}
@@ -102,7 +85,6 @@ export function VendasFilters({
             </select>
           </div>
 
-          {/* Produtos */}
           <div className="w-full">
             <select
               className={`${fieldBase} appearance-none`}
@@ -117,7 +99,6 @@ export function VendasFilters({
             </select>
           </div>
 
-          {/* Botão Filtrar */}
           <div className="flex items-end w-full">
             <Button
               className="h-10 w-full flex items-center justify-center gap-2 text-white bg-[#10b97c] hover:bg-[#0d9d6b]"

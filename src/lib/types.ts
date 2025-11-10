@@ -30,9 +30,19 @@ export interface Product {
   supplier?: string;
   stockHealthStatus?: HealthStatus;
   stockHealthOptions?: string[];
-  shipping?: number;
   marketplaceFee?: number;
   coverage?: number;
+  freight?: number;
+  freightRevenue?: number;
+  shipping?: number;
+  discount?: number;
+  subsidy?: number;
+  tax?: number;
+  otherCosts?: number;
+  marketplace?: string;
+  createdAt: string;
+  commission: number;
+  saleFee: number;
 }
 
 /* --------------------------------------------------------------------------
@@ -81,7 +91,8 @@ export interface CartItem {
 /* --------------------------------------------------------------------------
   Reusable component props
 --------------------------------------------------------------------------- */
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline";
 }
 
@@ -217,10 +228,11 @@ export interface SaleItem {
   sku: string;
   name: string;
   image: string;
-
+  totalCost: number;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  userMargin?: number; // Margem em percentual definida manualmente pelo usuário
 }
 
 export interface Client {
@@ -260,13 +272,14 @@ export interface FinancialDetails {
 export interface Sale {
   id: string;
   erpId: string;
-  ecommerceId?: string | null;
+  ecommerce?: string | null;
   originERP: string;
   date: string; // ISO
   status: string;
   client: Client;
   financials: FinancialDetails;
   items: SaleItem[];
+  marketplace?: string;
 }
 
 export interface SaleState {
@@ -274,7 +287,48 @@ export interface SaleState {
   loading: boolean;
   fetchSales: () => Promise<void>;
   getSaleById: (id: string) => Sale | undefined;
-  filterSales: (opts: { q?: string; date?: string; empresa?: string; canal?: string; produto?: string }) => void;
+  filterSales: (opts: {
+    q?: string;
+    date?: string;
+    empresa?: string;
+    canal?: string;
+    produto?: string;
+  }) => void;
   clearFilters: () => void;
 }
 
+export interface Bucket {
+  id: string;
+  titulo: string;
+  orders: number;
+  percent: number;
+  lucro: number;
+  color?: string;
+  barColor?: string;
+  barHex?: string;
+}
+
+export interface MargensChartProps {
+  buckets: Bucket[];
+  legend: LegendItem[];
+  onChangeSelection?: (selectedIds: string[]) => void;
+  onEditRanges?: () => void;
+  selectedMargemIds?: string[];
+}
+
+export interface LegendItem {
+  label: string;
+  range: string;
+}
+
+export interface VendasFiltersProps {
+  onSearch: (searchTerm: string) => void;
+  onFilterChange: (filterName: string, value: string) => void;
+  onSelectAll?: (checked: boolean) => void;
+}
+
+export interface VendasModalProps {
+  open: boolean;
+  onClose: () => void;
+  sale: Sale | null;
+}

@@ -1,21 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Product } from "@/lib/types";
 
 interface CalculadoraMargemProps {
-  initialPreco?: number;
-  initialCusto?: number;
-  initialMargem?: number;
+  product?: Product | null;
 }
 
-export default function CalculadoraMargem({
-  initialPreco = 0,
-  initialCusto = 0,
-  initialMargem = 0,
-}: CalculadoraMargemProps) {
-  const [preco, setPreco] = useState(initialPreco);
-  const [margem, setMargem] = useState(initialMargem);
-  const [custoMercadoria, setCustoMercadoria] = useState(initialCusto);
+export default function CalculadoraMargem({ product }: CalculadoraMargemProps) {
+  const [preco, setPreco] = useState(0);
+  const [margem, setMargem] = useState(0);
+  const [custoMercadoria, setCustoMercadoria] = useState(0);
   const [taxaFrete, setTaxaFrete] = useState(0);
   const [receitaFrete, setReceitaFrete] = useState(0);
   const [custoEnvio, setCustoEnvio] = useState(0);
@@ -27,7 +22,17 @@ export default function CalculadoraMargem({
   const [outrosCustos, setOutrosCustos] = useState(0);
   const [ignorarReceitaFrete, setIgnorarReceitaFrete] = useState(false);
 
-  // cálculo simples da margem
+  useEffect(() => {
+    if (product) {
+      setPreco(product.price || 0);
+      setCustoMercadoria(product.cost || 0);
+      setMargem(product.margin || 0);
+      setTaxaFrete(product.shipping || 0);
+      setComissao(product.marketplaceFee || 14);
+      setOutrosCustos(product.coverage || 0);
+    }
+  }, [product]);
+
   const receitaTotal = preco + (ignorarReceitaFrete ? 0 : receitaFrete);
   const custosTotais =
     custoMercadoria +
@@ -47,9 +52,10 @@ export default function CalculadoraMargem({
 
   return (
     <div className="bg-card rounded-lg shadow-md p-6 border border-border-dark">
-      <h2 className="text-xl font-bold mb-6 text-primary">Simulador de Preços</h2>
+      <h2 className="text-xl font-bold mb-6 text-primary">
+        Simulador de Preços
+      </h2>
 
-      {/* Preço e Margem desejada (destaque) */}
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">
@@ -77,7 +83,6 @@ export default function CalculadoraMargem({
         </div>
       </div>
 
-      {/* Custos e taxas */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
           <label className="block text-sm text-text-secondary mb-1">
@@ -86,7 +91,9 @@ export default function CalculadoraMargem({
           <input
             type="number"
             value={custoMercadoria}
-            onChange={(e) => setCustoMercadoria(parseFloat(e.target.value) || 0)}
+            onChange={(e) =>
+              setCustoMercadoria(parseFloat(e.target.value) || 0)
+            }
             className={inputBase}
           />
         </div>
@@ -191,7 +198,6 @@ export default function CalculadoraMargem({
         </div>
       </div>
 
-      {/* Opção ignorar receita frete */}
       <div className="mb-6">
         <label className="flex items-center gap-2 text-sm text-text">
           <input
@@ -203,7 +209,6 @@ export default function CalculadoraMargem({
         </label>
       </div>
 
-      {/* Resultado */}
       <div className="bg-background p-4 rounded-md border border-border-dark">
         <p className="text-sm text-text-secondary mb-1">
           Margem de contribuição nominal estimada:

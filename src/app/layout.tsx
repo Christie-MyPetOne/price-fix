@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
+
 import { ThemeProvider } from "@/context/ThemeContext";
+import { Suspense } from "react";
+import Loading from "@/components/loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +24,9 @@ export default function RootLayout({
         className={`${inter.className} bg-background text-text`}
         suppressHydrationWarning
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </ThemeProvider>
       </body>
     </html>
   );
