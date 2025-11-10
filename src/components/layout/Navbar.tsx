@@ -17,15 +17,28 @@ import {
   Bell,
   Sun,
   Moon,
+  GitFork,
+  FileCog, 
 } from "lucide-react";
 import { IconsBrand } from "../svgs/IconsBrand/IconsBrand";
 
 export function Navbar() {
+  // ✅ estados separados
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
+
   const pathname = usePathname();
 
+  // ✅ toggles separados
   const toggleGerenciar = () => {
-    setIsGerenciarOpen(!isGerenciarOpen);
+    setIsGerenciarOpen((prev) => !prev);
+    // opcional: fechar o outro ao abrir este
+    setIsConfigOpen(false);
+  };
+  const toggleConfig = () => {
+    setIsConfigOpen((prev) => !prev);
+    // opcional: fechar o outro ao abrir este
+    setIsGerenciarOpen(false);
   };
 
   const NavLink: React.FC<NavLinkProps> = ({ href, children, icon: Icon }) => {
@@ -70,6 +83,7 @@ export function Navbar() {
       </button>
     );
   };
+
   const DropdownLink: React.FC<DropdownLinkProps> = ({
     href,
     children,
@@ -103,6 +117,8 @@ export function Navbar() {
           <NavLink href="/" icon={Home}>
             Dashboard
           </NavLink>
+
+          {/* === Gerenciar === */}
           <div className="relative">
             <button
               onClick={toggleGerenciar}
@@ -146,6 +162,7 @@ export function Navbar() {
               </div>
             )}
           </div>
+
           <NavLink href="/relatorios" icon={BarChart}>
             Relatórios
           </NavLink>
@@ -155,9 +172,44 @@ export function Navbar() {
           <NavLink href="#" icon={null}>
             Histórico
           </NavLink>
-          <NavLink href="/configuracao" icon={null}>
-            Configuração
-          </NavLink>
+
+          {/* === Configuração === */}
+          <div className="relative">
+            <button
+              onClick={toggleConfig}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
+                ${
+                  isConfigOpen
+                    ? "bg-card text-text font-semibold"
+                    : "text-text-secondary hover:bg-card hover:text-text"
+                } focus:outline-none`}
+            >
+              Configuração
+              <ChevronDown
+                className={`w-4 h-4 ml-1 transition-transform duration-200 ${
+                  isConfigOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {isConfigOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark">
+                <DropdownLink
+                  href="/Configuracao"
+                  icon={FileCog }
+                  onClick={toggleConfig}
+                >
+                  Configuracão Basica
+                </DropdownLink>
+                <DropdownLink
+                  href="/Integracao"
+                  icon={GitFork}
+                  onClick={toggleConfig}
+                >
+                  Integração
+                </DropdownLink>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -176,7 +228,7 @@ export function Navbar() {
           <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
             <User className="w-4 h-4 mr-1" />
             <span className="hidden md:inline text-sm text-text-secondary">
-              gustavo@mypeto...
+              dodo@mypeto...
             </span>
             <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
           </button>

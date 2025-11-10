@@ -1,7 +1,113 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 
+/* ============ Select estilizado (embutido) ============ */
+type UiSelectProps = {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  className?: string;
+  placeholder?: string;
+};
+
+function UiSelect({
+  value,
+  onChange,
+  options,
+  className = "",
+  placeholder = "Selecionar",
+}: UiSelectProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (!ref.current) return;
+      if (!ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
+
+  const buttonClasses =
+    "appearance-none w-full h-10 px-3 pr-8 rounded-md border border-[var(--color-border-dark)] bg-transparent text-sm text-[var(--color-text)] text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30";
+
+  return (
+    <div ref={ref} className={`relative inline-block w-full ${className}`}>
+      {/* Botão */}
+      <button
+        type="button"
+        className={buttonClasses}
+        onClick={() => setOpen((s) => !s)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        {value || placeholder}
+      </button>
+
+      {/* Chevron */}
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]"
+        aria-hidden="true"
+      >
+        <path
+          d="M7 10l5 5 5-5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+
+      {/* Menu */}
+      {open && (
+        <div
+          className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark min-w-full"
+          role="listbox"
+        >
+          {options.length === 0 ? (
+            <div className="px-3 py-2 text-sm text-[var(--color-text-secondary)]">
+              Sem opções
+            </div>
+          ) : (
+            options.map((opt) => {
+              const active = opt === value;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-[var(--color-primary-light)]/10 ${
+                    active ? "font-medium" : ""
+                  }`}
+                  onClick={() => {
+                    onChange(opt);
+                    setOpen(false);
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============ Página ============ */
 export default function ConfiguracaoPage() {
   const [regime, setRegime] = useState("");
   const [possuiRegimeEspecial, setPossuiRegimeEspecial] = useState("Sim");
@@ -41,6 +147,17 @@ export default function ConfiguracaoPage() {
 
   const campos = regime ? camposPorRegime[regime] : [];
 
+  // Opções dos selects
+  const regimeOptions = useMemo(
+    () => ["Lucro real", "Lucro presumido", "Simples", "MEI"],
+    []
+  );
+  const simNaoOptions = useMemo(() => ["Sim", "Não"], []);
+  const aplicaOptions = useMemo(
+    () => ["Ambos", "Não contribuintes", "Contribuintes"],
+    []
+  );
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-[var(--color-background)] to-[var(--color-primary-light)]/10 flex items-center justify-center p-6">
       <div className="w-full max-w-5xl bg-[var(--color-card)] shadow-lg rounded-2xl border border-[var(--color-border-dark)] p-8">
@@ -56,19 +173,15 @@ export default function ConfiguracaoPage() {
             <label className="text-[var(--color-text)] text-sm font-medium">
               Qual é seu regime tributário?
             </label>
-            <select
-              value={regime}
-              onChange={(e) => setRegime(e.target.value)}
-              className="mt-1 w-full border border-[var(--color-border-dark)] rounded-md h-10 px-3 text-sm bg-transparent"
-            >
-              <option value="" disabled>
-                Selecionar
-              </option>
-              <option>Lucro real</option>
-              <option>Lucro presumido</option>
-              <option>Simples</option>
-              <option>MEI</option>
-            </select>
+            <br />
+            <div className="mt-1 inline-block min-w-[220px] w-full md:w-auto">
+              <UiSelect
+                value={regime}
+                onChange={setRegime}
+                options={["", ...regimeOptions].filter(Boolean)}
+                placeholder="Selecionar"
+              />
+            </div>
           </div>
 
           {/* Campos tributários dinâmicos */}
@@ -82,10 +195,11 @@ export default function ConfiguracaoPage() {
 
                   {/* Campo especial MEI */}
                   {regime === "MEI" && item.label === "Contribuição mensal" ? (
-                    <select className="w-full border border-[var(--color-border-dark)] rounded-md h-10 px-2 text-sm bg-transparent">
-                      <option>R$ 45,00</option>
-                      <option>R$ 50,00</option>
-                    </select>
+                    <UiSelect
+                      value={"R$ 45,00"}
+                      onChange={() => {}}
+                      options={["R$ 45,00", "R$ 50,00"]}
+                    />
                   ) : (
                     <input
                       type="number"
@@ -129,43 +243,33 @@ export default function ConfiguracaoPage() {
               <label className="text-sm font-medium text-[var(--color-text)] mb-1 block">
                 Possui regime especial?
               </label>
-              <select
+              <UiSelect
                 value={possuiRegimeEspecial}
-                onChange={(e) => setPossuiRegimeEspecial(e.target.value)}
-                className="w-full border border-[var(--color-border-dark)] rounded-md h-10 px-3 text-sm bg-transparent"
-              >
-                <option>Sim</option>
-                <option>Não</option>
-              </select>
+                onChange={setPossuiRegimeEspecial}
+                options={simNaoOptions}
+              />
             </div>
 
             <div className="flex flex-col">
               <label className="text-sm font-medium text-[var(--color-text)] mb-1 block">
                 Aplica-se a vendas para
               </label>
-              <select
+              <UiSelect
                 value={aplicaVendas}
-                onChange={(e) => setAplicaVendas(e.target.value)}
-                className="w-full border border-[var(--color-border-dark)] rounded-md h-10 px-3 text-sm bg-transparent"
-              >
-                <option>Ambos</option>
-                <option>Não contribuintes</option>
-                <option>Contribuintes</option>
-              </select>
+                onChange={setAplicaVendas}
+                options={aplicaOptions}
+              />
             </div>
 
             <div className="flex flex-col">
               <label className="text-sm font-medium text-[var(--color-text)] mb-1 block leading-tight">
                 Desejo zerar crédito de ICMS quando a venda for considerada do Regime especial
               </label>
-              <select
+              <UiSelect
                 value={zeraICMS}
-                onChange={(e) => setZeraICMS(e.target.value)}
-                className="w-full border border-[var(--color-border-dark)] rounded-md h-10 px-3 text-sm bg-transparent"
-              >
-                <option>Sim</option>
-                <option>Não</option>
-              </select>
+                onChange={setZeraICMS}
+                options={simNaoOptions}
+              />
             </div>
           </div>
 
