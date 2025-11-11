@@ -172,44 +172,9 @@ export function Navbar() {
           <NavLink href="#" icon={null}>
             Histórico
           </NavLink>
-
-          {/* === Configuração === */}
-          <div className="relative">
-            <button
-              onClick={toggleConfig}
-              className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200
-                ${
-                  isConfigOpen
-                    ? "bg-card text-text font-semibold"
-                    : "text-text-secondary hover:bg-card hover:text-text"
-                } focus:outline-none`}
-            >
-              Configuração
-              <ChevronDown
-                className={`w-4 h-4 ml-1 transition-transform duration-200 ${
-                  isConfigOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {isConfigOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark">
-                <DropdownLink
-                  href="/Configuracao"
-                  icon={FileCog }
-                  onClick={toggleConfig}
-                >
-                  Configuracão Basica
-                </DropdownLink>
-                <DropdownLink
-                  href="/Integracao"
-                  icon={GitFork}
-                  onClick={toggleConfig}
-                >
-                  Integração
-                </DropdownLink>
-              </div>
-            )}
-          </div>
+          <NavLink href="/configuracao" icon={null}>
+            Configuração
+          </NavLink>
         </div>
       </div>
 
@@ -236,7 +201,7 @@ export function Navbar() {
             <DropdownLink href="/perfil" onClick={() => {}}>
               Perfil
             </DropdownLink>
-            <DropdownLink href="/configuracoes" onClick={() => {}}>
+            <DropdownLink href="@/configuracoes" onClick={() => {}}>
               Configurações
             </DropdownLink>
             <DropdownLink href="/logout" onClick={() => {}}>
