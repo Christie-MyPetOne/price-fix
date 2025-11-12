@@ -17,13 +17,12 @@ import {
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
-/* === PROPS: agora o componente aceita slug e onClose === */
+/* === PROPS === */
 export type ErpConfigProps = {
   slug: string;
   onClose: () => void;
 };
 
-/* === Renomeado para ErpConfig e tipado com props === */
 export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
   type Option = { label: string; value: string };
 
@@ -34,9 +33,9 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
   };
 
   type VinculadaTiny = {
-    id: string;          // id interno da linha
-    hubId?: string;      // qual hub/marketplace
-    code: string;        // código da loja API Tiny
+    id: string; // id interno da linha
+    hubId?: string; // qual hub/marketplace
+    code: string; // código da loja API Tiny
   };
 
   // Mocks
@@ -63,8 +62,22 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
     { id: "magalu", name: "Magalu", icon: "/icons/magalu.svg" },
   ];
 
-  const classNames = (...c: Array<string | false | null | undefined>) =>
-    c.filter(Boolean).join(" ");
+  const classNames = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(" ");
+
+  /** === helper de estilo para inputs/selects (com borda visível) === */
+  const inputBase = (hasError?: boolean) =>
+    classNames(
+      // base
+      "w-full rounded-md px-3 py-2 text-sm outline-none transition-colors",
+      // fundo e texto no padrão do tema
+      "bg-[var(--color-card)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)]",
+      // borda visível e sólida
+      "border border-solid ring-0 focus:ring-2",
+      // cores dinâmicas conforme estado
+      hasError
+        ? "border-[var(--color-error)] focus:ring-[var(--color-error)]"
+        : "border-[var(--color-border-dark)] focus:ring-[var(--color-primary-light)]"
+    );
 
   // -------- Form states --------
   const [token, setToken] = useState("");
@@ -148,41 +161,33 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
   // ----- Handlers: Hubs/Marketplaces -----
   const handleAdicionarHub = (hubId: string) => {
-    setIntegracoesAdicionadas((curr) =>
-      curr.includes(hubId) ? curr : [...curr, hubId]
-    );
+    setIntegracoesAdicionadas((curr) => (curr.includes(hubId) ? curr : [...curr, hubId]));
   };
 
   // ----- Handlers: Vinculadas à Tiny -----
   const addLinhaTiny = () => {
-    setVinculadasTiny((curr) => [
-      ...curr,
-      { id: cryptoRandomId(), hubId: undefined, code: "" },
-    ]);
+    setVinculadasTiny((curr) => [...curr, { id: cryptoRandomId(), hubId: undefined, code: "" }]);
   };
 
   const removeLinhaTiny = (id: string) => {
     setVinculadasTiny((curr) => curr.filter((l) => l.id !== id));
   };
 
-  const updateLinhaTiny = (
-    id: string,
-    patch: Partial<Pick<VinculadaTiny, "hubId" | "code">>
-  ) => {
-    setVinculadasTiny((curr) =>
-      curr.map((l) => (l.id === id ? { ...l, ...patch } : l))
-    );
+  const updateLinhaTiny = (id: string, patch: Partial<Pick<VinculadaTiny, "hubId" | "code">>) => {
+    setVinculadasTiny((curr) => curr.map((l) => (l.id === id ? { ...l, ...patch } : l)));
   };
 
   return (
-    <div className="max-w-7xl -mt-8 mx-auto w-full flex flex-col gap-6 h-full px-3 sm:px-4 md:px-6 pb-10">
+    <div className="max-w-7xl -mt-20 mx-auto w-full flex flex-col gap-6 h-full px-3 sm:px-4 md:px-6 pb-10">
       {/* Header */}
-      <div className="rounded-xl bg-gradient-to-r border border-border/60 mt-4 p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="rounded-xl mt-4 p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
-          {/* usa o slug só para contextualizar */}
-          <h1 className="text-2xl font-bold text-text">Integração: {slug.toUpperCase()}</h1>
-          <p className="text-sm text-text-secondary max-w-3xl">
-            Conecte sua conta do ERP selecionado para importação automática de vendas, indicadores em tempo real e atualização de preços.
+          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+            Integração: {slug.toUpperCase()}
+          </h1>
+          <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
+            Conecte sua conta do ERP selecionado para importação automática de vendas, indicadores
+            em tempo real e atualização de preços.
           </p>
         </div>
 
@@ -190,7 +195,6 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
           <Button onClick={handleSave} className="inline-flex items-center gap-2 text-sm px-3 py-2">
             <Save className="w-4 h-4" /> Salvar
           </Button>
-          {/* Botão voltar chamando onClose */}
           <Button onClick={onClose} className="inline-flex items-center gap-2 text-sm px-3 py-2">
             Voltar
           </Button>
@@ -198,20 +202,33 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
       </div>
 
       {!canSync && (
-        <div className="-mt-5 rounded-lg border bg-amber-50 text-amber-700 p-3 flex items-start gap-2">
-          <AlertTriangle className="w-4 h-4 mt-0.5" />
-          <p className="text-sm">
-            Para habilitar as sincronizações, preencha o <b>Token API</b> e verifique a{" "}
-            <b>URL do webhook</b>.
-          </p>
-        </div>
+      <div className="flex items-start gap-2 rounded-lg border border-solid border-[var(--color-border-dark)] bg-red-500/10 text-error p-3">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-4 h-4 mt-0.5 flex-shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.662 1.732-3L13.732 4c-.77-1.338-2.694-1.338-3.464 0L4.34 16c-.77 1.338.192 3 1.732 3z"
+          />
+        </svg>
+        <p className="text-sm">
+          Para habilitar as sincronizações, preencha o <b>Token API</b> e verifique a{" "}
+          <b>URL do webhook</b>.
+        </p>
+      </div>
       )}
 
-      {/* ===== Card Único (todo o formulário dentro) ===== */}
-      <Card className=" -mt-5 p-0">
-        <div className="-mt-4 p-4 sm:p-5 border-b border-border/60">
-          <h2 className="text-base font-semibold text-text">Configuração</h2>
-          <p className="text-xs text-text-secondary mt-1">
+      {/* ===== Card Único ===== */}
+      <Card className="p-0 bg-[var(--color-card)]">
+        <div className="p-4 sm:p-5 border-b border-[var(--color-border-dark)]">
+          <h2 className="text-base font-semibold text-[var(--color-text)]">Configuração</h2>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-1">
             Ajuste as credenciais e parâmetros de importação.
           </p>
         </div>
@@ -227,7 +244,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
                     <span>Token API</span>
                     <button
                       onClick={testConnection}
-                      className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md border border-border/60 hover:bg-muted"
+                      className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md border border-[var(--color-border-dark)] bg-[var(--color-card)] hover:bg-[var(--color-primary-light)]/5"
                     >
                       {testing ? (
                         <RefreshCcw className="w-3.5 h-3.5 animate-spin" />
@@ -243,13 +260,8 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
                 <input
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  placeholder="cole seu token da Tiny"
-                  className={classNames(
-                    "w-full rounded-md border bg-background px-3 py-2 outline-none focus:ring-2",
-                    errors.token
-                      ? "border-rose-400 focus:ring-rose-300"
-                      : "border-border/50 focus:ring-indigo-300"
-                  )}
+                  placeholder={`Cole seu token da ${slug}`}
+                  className={inputBase(!!errors.token)}
                 />
               </Field>
 
@@ -257,7 +269,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
               <Field
                 label={
                   <span className="inline-flex items-center gap-2">
-                    URL do webhook <Info className="w-4 h-4 text-text-secondary" />
+                    URL do webhook <Info className="w-4 h-4 text-[var(--color-text-secondary)]" />
                   </span>
                 }
                 help="Clique no ícone para copiar o link."
@@ -267,17 +279,12 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
                   <input
                     value={webhookUrl}
                     onChange={(e) => setWebhookUrl(e.target.value)}
-                    className={classNames(
-                      "w-full rounded-md border bg-background pl-3 pr-10 py-2 outline-none focus:ring-2",
-                      errors.webhookUrl
-                        ? "border-rose-400 focus:ring-rose-300"
-                        : "border-border/50 focus:ring-indigo-300"
-                    )}
+                    className={inputBase(!!errors.webhookUrl) + " pr-10"}
                   />
                   <button
                     type="button"
                     onClick={copyWebhook}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-md border border-border/50 hover:bg-muted"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-md border border-[var(--color-border-dark)] hover:bg-[var(--color-primary-light)]/5"
                     aria-label="Copiar webhook"
                     title="Copiar"
                   >
@@ -288,8 +295,10 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
               {/* Importar automaticamente */}
               <div className="p-0">
-                <label className="block text-sm font-medium text-text">Importar automaticamente</label>
-                <p className="text-xs text-text-secondary mt-2">
+                <label className="block text-sm font-medium text-[var(--color-text)]">
+                  Importar automaticamente
+                </label>
+                <p className="text-xs text-[var(--color-text-secondary)] mt-2">
                   Quando ativado, pedidos serão importados conforme as situações permitidas.
                 </p>
                 <div className="mt-2">
@@ -299,7 +308,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
               {/* Descontar reservado */}
               <div className="p-0">
-                <label className="block text-sm font-medium text-text">
+                <label className="block text-sm font-medium text-[var(--color-text)]">
                   Descontar estoque reservado nas vendas?
                 </label>
                 <div className="mt-2">
@@ -323,7 +332,8 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
               <MultiSelect
                 label={
                   <span className="inline-flex items-center gap-2">
-                    Situações de vendas permitidas <Info className="w-4 h-4 text-text-secondary" />
+                    Situações de vendas permitidas{" "}
+                    <Info className="w-4 h-4 text-[var(--color-text-secondary)]" />
                   </span>
                 }
                 placeholder="Adicionar situações"
@@ -334,7 +344,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
               />
 
               <div className="p-0">
-                <label className="block text-sm font-medium text-text">
+                <label className="block text-sm font-medium text-[var(--color-text)]">
                   Usar custo médio dos produtos nas sincronizações?
                 </label>
                 <div className="mt-2">
@@ -348,10 +358,12 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
       {/* ===== Fim do Card Único ===== */}
 
       {/* Status */}
-      <Card className="-mt-3 p-0 border-emerald-200/50">
-        <div className="px-3 py-2 border-b border-border/50 flex items-center gap-2">
+      <Card className="p-0 bg-[var(--color-card)]">
+        <div className="px-3 py-2 border-b border-[var(--color-border-dark)] flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          <span className="text-sm font-medium text-text">Status da última importação</span>
+          <span className="text-sm font-medium text-[var(--color-text)]">
+            Status da última importação
+          </span>
         </div>
 
         <div className="p-3 space-y-3">
@@ -361,7 +373,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-text-secondary">Importação Manual:</span>
+            <span className="text-[var(--color-text-secondary)]">Importação Manual:</span>
 
             <ActionBtn
               label="SINCRONIZAR PRODUTOS E VENDAS"
@@ -387,12 +399,11 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
         </div>
       </Card>
 
-      {/* ===== Card combinado: Vincular + Lista de adicionadas ===== */}
-      <Card className="-mt-3 p-0">
-        {/* Vincular Hubs/Marketplaces */}
-        <div className="px-4 py-3 border-b border-border/50 flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-text">Vincular Hubs/Marketplaces</h2>
-          <span className="text-xs text-text-secondary">(clique em ADICIONAR para vincular)</span>
+      {/* ===== Vincular Hubs/Marketplaces ===== */}
+      <Card className="p-0 bg-[var(--color-card)]">
+        <div className="px-4 py-3 border-b border-[var(--color-border-dark)] flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-[var(--color-text)]">Vincular Hubs/Marketplaces</h2>
+          <span className="text-xs text-[var(--color-text-secondary)]">(clique em ADICIONAR para vincular)</span>
         </div>
 
         <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -401,7 +412,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
             return (
               <div
                 key={hub.id}
-                className="flex flex-col items-center justify-between border rounded-lg p-4 bg-background"
+                className="flex flex-col items-center justify-between border border-[var(--color-border-dark)] rounded-lg p-4 bg-[var(--color-background)]"
               >
                 <img src={hub.icon} alt={hub.name} className="w-12 h-12 mb-3" />
                 <span className="text-sm font-medium mb-3">{hub.name}</span>
@@ -412,8 +423,8 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
                   className={classNames(
                     "w-full text-xs font-semibold px-3 py-2 rounded-md border transition",
                     added
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 cursor-default"
-                      : "bg-muted hover:bg-muted/80 border-border"
+                      ? "bg-white text-[var(--color-primary)] cursor-default"
+                      : "bg-[var(--color-card)] hover:bg-[var(--color-primary-light)]/5 border-[var(--color-border-dark)]"
                   )}
                 >
                   {added ? "ADICIONADO" : "ADICIONAR"}
@@ -425,84 +436,106 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
         {/* Integrações adicionadas (em lista) */}
         <div className="px-4 pt-1 pb-4">
-          <div className="h-px bg-border/60 my-2" />
-          <h3 className="text-sm font-semibold text-text mb-3">Integrações adicionadas</h3>
+          <div className="h-px border-[var(--color-border-dark)] my-2" />
+          <h3 className="text-sm font-semibold text-[var(--color-text)]">Integrações adicionadas</h3>
 
           {integracoesAdicionadas.length === 0 ? (
-            <p className="text-sm text-text-secondary">Nenhuma integração vinculada ainda.</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Nenhuma integração vinculada ainda.
+            </p>
           ) : (
-            <ul className="divide-y divide-border/60 rounded-md border border-border/60 bg-card">
+            <ul className="divide-y divide-[var(--color-border-dark)] rounded-md border border-[var(--color-border-dark)] bg-[var(--color-card)]">
               {integracoesAdicionadas.map((id) => {
                 const hub = hubsDisponiveis.find((h) => h.id === id)!;
                 return (
-                  <li key={id} className="flex items-center gap-3 px-3 py-2">
-                    <img src={hub.icon} alt={hub.name} className="w-6 h-6" />
-                    <span className="text-sm">{hub.name}</span>
+                  <li key={id}>
+                    <button
+                      onClick={() => console.log("clicou em", hub.name)} // ação que quiser
+                      className="
+                        w-full flex items-center gap-3 px-3 py-2 rounded-md
+                        text-left transition
+                        hover:bg-[var(--color-primary-light)]/10
+                        focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-light)]
+                      "
+                    >
+                      <img
+                        src={hub.icon}
+                        alt={hub.name}
+                        className="w-6 h-6 rounded-md bg-[var(--color-background)] p-0.5"
+                      />
+                      <span className="text-sm text-[var(--color-text)]">{hub.name}</span>
+                    </button>
                   </li>
                 );
               })}
             </ul>
           )}
         </div>
+
       </Card>
 
       {/* ===== Integrações Vinculadas à Tiny (lista editável) ===== */}
-      <Card className="-mt-3 p-0">
-        <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
+      <Card className="p-0 bg-[var(--color-card)]">
+        <div className="px-4 py-3 border-b border-[var(--color-border-dark)] flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-text">Integrações vinculadas à Tiny</h2>
-            <p className="text-xs text-text-secondary">Selecione a integração e informe o código da loja API Tiny.</p>
+            <h2 className="text-sm font-semibold text-[var(--color-text)]">Integrações vinculadas à {slug.charAt(0).toUpperCase() + slug.slice(1)}</h2>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              Selecione a integração e informe o código da loja API {slug.charAt(0).toUpperCase() + slug.slice(1)}.
+            </p>
           </div>
         </div>
 
         <div className="p-4 space-y-3">
-          {/* Cabeçalho da "tabela" simples */}
-          <div className="hidden md:grid grid-cols-12 gap-3 text-xs text-text-secondary px-1">
-            <div className="col-span-7">Integração</div>
-            <div className="col-span-4">Código da loja API Tiny</div>
-            <div className="col-span-1"> </div>
+          {/* Cabeçalho desktop */}
+          <div className="hidden md:grid grid-cols-[7fr_4fr_auto] gap-3 text-xs text-[var(--color-text-secondary)] px-1">
+            <div>Integração</div>
+            <div>Código da loja API {slug.charAt(0).toUpperCase() + slug.slice(1)}</div>
+            <div></div>
           </div>
 
           {vinculadasTiny.map((row) => (
             <div
               key={row.id}
-              className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border rounded-md p-3 md:p-2"
+              className="grid grid-cols-1 md:grid-cols-[7fr_4fr_auto] gap-3 items-center border border-[var(--color-border-dark)] rounded-md p-3 md:p-2"
             >
-              {/* Select Integração */}
-              <div className="md:col-span-7">
-                <select
-                  value={row.hubId ?? ""}
-                  onChange={(e) => updateLinhaTiny(row.id, { hubId: e.target.value || undefined })}
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">{row.hubId ? "Alterar integração" : "Selecione uma integração"}</option>
-                  {hubsDisponiveis.map((h) => (
-                    <option key={h.id} value={h.id}>
-                      {h.name}
-                    </option>
-                  ))}
-                </select>
+              {/* Integração - agora com SingleSelect (mesmo padrão do MultiSelect) */}
+              <div>
+                <label className="md:hidden block text-xs text-[var(--color-text-secondary)] mb-1">
+                  Integração
+                </label>
+                <SingleSelect
+                  value={row.hubId}
+                  onChange={(v) => updateLinhaTiny(row.id, { hubId: v || undefined })}
+                  options={hubsDisponiveis.map((h) => ({ label: h.name, value: h.id }))}
+                  placeholder="Selecione uma integração"
+                />
               </div>
 
               {/* Código Tiny */}
-              <div className="md:col-span-4">
+              <div>
+                <label className="md:hidden block text-xs text-[var(--color-text-secondary)] mb-1">
+                  Código da loja API {slug.charAt(0).toUpperCase() + slug.slice(1)}
+                </label>
                 <input
                   value={row.code}
                   onChange={(e) => updateLinhaTiny(row.id, { code: e.target.value })}
                   placeholder="Ex: 203690006"
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  className={inputBase(false)}
+                  inputMode="numeric"
+                  autoComplete="off"
                 />
               </div>
 
               {/* Remover */}
-              <div className="md:col-span-1 flex md:justify-end">
+              <div className="flex md:block md:justify-self-end md:self-center">
                 <button
                   onClick={() => removeLinhaTiny(row.id)}
-                  className="inline-flex items-center gap-2 text-xs px-2.5 py-2 rounded-md border border-rose-200 text-rose-700 hover:bg-rose-50"
+                  className="w-full md:w-auto shrink-0 whitespace-nowrap inline-flex items-center justify-center gap-2 text-xs px-2.5 py-2 rounded-md border border-[var(--color-error)] text-[var(--color-error)] hover:bg-rose-50"
                   title="Remover"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span className="hidden sm:inline">Remover</span>
+                  <span className="sm:hidden">Excluir</span>
                 </button>
               </div>
             </div>
@@ -510,17 +543,15 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
           <button
             onClick={addLinhaTiny}
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border/60 hover:bg-muted"
+            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-[var(--color-border-dark)] bg-[var(--color-card)] hover:bg-[var(--color-primary-light)]/5"
           >
             <Plus className="w-4 h-4" />
             Adicionar outro hub/marketplace
           </button>
 
           <div className="pt-4">
-            <h4 className="text-sm font-semibold text-text">Webhooks de depósitos</h4>
-            <p className="text-sm text-text-secondary mt-1">
-              Nenhum depósito foi selecionado ainda.
-            </p>
+            <h4 className="text-sm font-semibold text-[var(--color-text)]">Webhooks de depósitos</h4>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">Nenhum depósito foi selecionado ainda.</p>
           </div>
         </div>
       </Card>
@@ -533,16 +564,16 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 const Field = ({ label, children, help, error }: any) => (
   <div className="p-0">
     <div className="flex items-start gap-2 justify-between">
-      <label className="block text-sm font-medium text-text">{label}</label>
+      <label className="block text-sm font-medium text-[var(--color-text)]">{label}</label>
     </div>
     <div className="mt-2">{children}</div>
     {error && <p className="text-xs text-rose-600 mt-1">{error}</p>}
-    {help && <p className="text-xs text-text-secondary mt-2">{help}</p>}
+    {help && <p className="text-xs text-[var(--color-text-secondary)] mt-2">{help}</p>}
   </div>
 );
 
 const Tag = ({ children, onClear }: { children: React.ReactNode; onClear: () => void }) => (
-  <span className="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-indigo-500/10 text-indigo-700 border border-indigo-200">
+  <span className="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full bg-[var(--color-background)] text-[var(--color-text)] border border-[var(--color-border-dark)]">
     {children}
     <button onClick={onClear} className="w-4 h-4 rounded hover:bg-black/10 flex items-center justify-center">
       ×
@@ -555,7 +586,9 @@ const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
     onClick={() => onChange(!value)}
     className={
       "relative inline-flex items-center rounded-full transition px-1 py-1 text-xs font-semibold border w-20 " +
-      (value ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200")
+      (value
+        ? "bg-[var(--color-primary-dark)] text-white border-[var(--color-card)]"
+        : "bg-red-500 text-white border-[var(--color-card)]")
     }
   >
     <span
@@ -577,8 +610,8 @@ const ActionBtn = ({ label, onClick, loading, disabled }: any) => (
     className={
       "inline-flex items-center gap-2 px-3 py-2 rounded-md border text-xs sm:text-sm font-medium " +
       (disabled
-        ? "opacity-60 cursor-not-allowed border-border/50"
-        : "bg-indigo-500/10 text-indigo-700 border-indigo-200 hover:bg-indigo-500/15")
+        ? "opacity-60 cursor-not-allowed border-[var(--color-border-dark)]"
+        : "bg-[var(--color-background)] text-[var(--color-text-secondary)] border-[var(--color-border-dark)] hover:bg-[var(--color-primary-light)]/10")
     }
   >
     {loading ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
@@ -586,7 +619,7 @@ const ActionBtn = ({ label, onClick, loading, disabled }: any) => (
   </button>
 );
 
-/* ---------- MultiSelect (com fundo visível) ---------- */
+/* ---------- MultiSelect (padrão bonitinho) ---------- */
 function MultiSelect({
   label,
   placeholder,
@@ -608,13 +641,11 @@ function MultiSelect({
 
   return (
     <div className="p-0">
-      <label className="block text-sm font-medium text-text">{label}</label>
+      <label className="block text-sm font-medium text-[var(--color-text)]">{label}</label>
 
       <div className="flex flex-wrap gap-2 mt-2">
         {value.length === 0 && (
-          <span className="text-xs text-text-secondary">
-            {emptyHint ?? "Nenhum item selecionado."}
-          </span>
+          <span className="text-xs text-[var(--color-text-secondary)]">{emptyHint ?? "Nenhum depósito selecionado."}</span>
         )}
         {value.map((v: { label: string; value: string }) => (
           <Tag key={v.value} onClear={() => remove(v.value)}>
@@ -624,20 +655,21 @@ function MultiSelect({
       </div>
 
       <div className="relative mt-3" ref={ref}>
-        {/* botão do select */}
+        {/* trigger */}
         <button
           onClick={() => setOpen((s) => !s)}
-          className="w-full text-left rounded-md border border-border-dark bg-card px-3 py-2 text-sm hover:bg-muted transition inline-flex items-center justify-between shadow-sm"
+          className="w-full text-left rounded-md border border-solid border-[var(--color-border-dark)]
+                     bg-[var(--color-card)] px-3 py-2 text-sm hover:bg-[var(--color-primary-light)]/5
+                     transition inline-flex items-center justify-between shadow-sm"
         >
           {placeholder}
           <ChevronDown className="w-4 h-4 opacity-70" />
         </button>
 
-        {/* chevron/botão lateral */}
         {showSideToggle && (
           <button
             onClick={() => setOpen((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-md hover:bg-muted flex items-center justify-center"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-md hover:bg-[var(--color-primary-light)]/10 flex items-center justify-center"
             aria-label="Abrir seleção"
             title="Abrir seleção"
           >
@@ -646,20 +678,28 @@ function MultiSelect({
         )}
 
         {open && (
-          <div className="absolute z-50 mt-2 w-full rounded-lg border border-border-dark bg-card shadow-lg max-h-56 overflow-auto p-1.5">
+          <div
+            className="absolute z-50 mt-2 w-full rounded-lg border border-solid 
+                       border-[var(--color-border-dark)] bg-[var(--color-card)]
+                       shadow-lg max-h-56 overflow-auto p-1.5"
+          >
             {options.map((opt: { label: string; value: string }) => {
               const active = value.some((v: { value: string }) => v.value === opt.value);
               return (
                 <button
                   key={opt.value}
                   onClick={() => toggle(opt)}
-                  className="w-full text-left px-2.5 py-1.5 text-sm rounded hover:bg-muted flex items-center gap-2"
+                  className="w-full text-left px-2.5 py-1.5 text-sm rounded 
+                             hover:bg-[var(--color-primary-light)]/10 flex items-center gap-2
+                             text-[var(--color-text)] transition"
                 >
                   <span
-                    className={
-                      "inline-flex w-4 h-4 items-center justify-center rounded border " +
-                      (active ? "bg-indigo-600 text-white border-indigo-600" : "border-border/60")
-                    }
+                    className={`inline-flex w-4 h-4 items-center justify-center rounded border border-solid
+                      ${
+                        active
+                          ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
+                          : "border-[var(--color-border-dark)] bg-[var(--color-card)]"
+                      }`}
                   >
                     {active && <Check className="w-3 h-3" />}
                   </span>
@@ -670,6 +710,76 @@ function MultiSelect({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ---------- SingleSelect (mesmo padrão do MultiSelect) ---------- */
+function SingleSelect({
+  value,
+  onChange,
+  options,
+  placeholder = "Selecionar",
+}: {
+  value: string | undefined;
+  onChange: (v: string | undefined) => void;
+  options: { label: string; value: string }[];
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useClickOutside<HTMLDivElement>(() => setOpen(false));
+  const current = options.find((o) => o.value === value);
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="w-full text-left rounded-md border border-solid border-[var(--color-border-dark)]
+                   bg-[var(--color-card)] px-3 py-2 text-sm hover:bg-[var(--color-primary-light)]/5
+                   transition inline-flex items-center justify-between shadow-sm"
+      >
+        <span className={current ? "text-[var(--color-text)]" : "text-[var(--color-text-secondary)]"}>
+          {current?.label ?? placeholder}
+        </span>
+        <ChevronDown className="w-4 h-4 opacity-70" />
+      </button>
+
+      {open && (
+        <div
+          className="absolute z-50 mt-2 w-full rounded-lg border border-solid border-[var(--color-border-dark)]
+                     bg-[var(--color-card)] shadow-lg max-h-56 overflow-auto p-1.5"
+        >
+          {options.map((opt) => {
+            const active = opt.value === value;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className="w-full text-left px-2.5 py-1.5 text-sm rounded 
+                           hover:bg-[var(--color-primary-light)]/10
+                           flex items-center gap-2 text-[var(--color-text)] transition"
+              >
+                <span
+                  className={`inline-flex w-4 h-4 items-center justify-center rounded border border-solid
+                    ${
+                      active
+                        ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
+                        : "border-[var(--color-border-dark)] bg-[var(--color-card)]"
+                    }`}
+                >
+                  {active && <Check className="w-3 h-3" />}
+                </span>
+                <span className="truncate">{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -696,7 +806,6 @@ function useClickOutside<T extends HTMLElement>(onClose: () => void) {
 
 /* ---------- Utils ---------- */
 function cryptoRandomId() {
-  // id simples para as linhas (ok para UI)
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return (crypto as any).randomUUID();
   }

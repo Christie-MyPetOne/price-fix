@@ -134,7 +134,11 @@ export default function ConfigBasica() {
               <label className="text-sm font-medium text-text">
                 Patrimônio Líquido
               </label>
-              <input type="number" defaultValue={0} className={inputCls} />
+              <input
+                type="number"
+                defaultValue={0}
+                className={`${inputCls} bg-[var(--color-card)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)] border border-solid border-[var(--color-border-dark)] focus:ring-[var(--color-primary-light)]`}
+              />
             </section>
 
             {/* Regime especial */}
@@ -181,31 +185,26 @@ export default function ConfigBasica() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
                   { label: "Estado", value: "MG" },
-                  {
-                    label: "ICMS produtos nacionais (mesmo estado)",
-                    value: 6,
-                  },
-                  {
-                    label: "ICMS produtos importados (mesmo estado)",
-                    value: 14,
-                  },
-                  {
-                    label: "ICMS produtos nacionais (outro estado)",
-                    value: 1.3,
-                  },
-                  {
-                    label: "ICMS produtos importados (outro estado)",
-                    value: 1.3,
-                  },
+                  { label: "ICMS produtos nacionais (mesmo estado)", value: 6 },
+                  { label: "ICMS produtos importados (mesmo estado)", value: 14 },
+                  { label: "ICMS produtos nacionais (outro estado)", value: 1.3 },
+                  { label: "ICMS produtos importados (outro estado)", value: 1.3 },
                 ].map((item) => (
                   <div key={item.label}>
-                    <label className="block text-text-secondary text-sm mb-1">
+                    <label className="block text-[var(--color-text-secondary)] text-sm mb-1">
                       {item.label}
                     </label>
                     <input
                       type="text"
                       defaultValue={item.value}
-                      className={inputCls}
+                      className={`
+                        ${inputCls}
+                        bg-[var(--color-card)]
+                        text-[var(--color-text)]
+                        placeholder-[var(--color-text-secondary)]
+                        border border-solid border-[var(--color-border-dark)]
+                        rounded-md px-3 py-2 w-full transition
+                      `}
                     />
                   </div>
                 ))}
@@ -217,16 +216,27 @@ export default function ConfigBasica() {
             {/* Custos fixos */}
             <section className="grid gap-3">
               <h2 className={sectionTitle}>Custos fixos mensais</h2>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 Se preferir, insira os custos fixos da empresa.
               </p>
-              <div className="flex items-center gap-3">
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <input
                   type="number"
                   defaultValue={226261.8}
-                  className={inputCls}
+                  className={`
+                    ${inputCls}
+                    bg-[var(--color-card)]
+                    text-[var(--color-text)]
+                    placeholder-[var(--color-text-secondary)]
+                    border border-solid border-[var(--color-border-dark)]
+                    rounded-md px-3 py-2 w-full transition
+                  `}
                 />
-                <button className="bg-primary hover:bg-primary-dark text-white text-sm px-4 py-2 rounded-md">
+
+                <button
+                  className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] 
+                            text-white text-sm px-4 py-2 rounded-md transition-colors w-full sm:w-auto">
                   Editar
                 </button>
               </div>
