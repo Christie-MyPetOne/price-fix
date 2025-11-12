@@ -5,13 +5,14 @@
 :root {
   --color-background: #ebebeb;
   --color-card: #ffffff;
+  --color-hovercard: #dfdfdf;
   --color-primary: #10b981;
   --color-primary-dark: #059669;
   --color-primary-light: #34d399;
   --color-text: #1a1a1a;
   --color-text-secondary: #4a4a4a;
   --color-border-dark: #e0e0e0;
-  --color-success: #10b981;
+  --color : #10b981;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
   --color-info: #3b82f6;
@@ -20,6 +21,7 @@
 .dark {
   --color-background: #1a1a1a;
   --color-card: #2c2c2c;
+  --color-hovercard: #232323;
   --color-primary: #10b981;
   --color-primary-dark: #059669;
   --color-primary-light: #34d399;
