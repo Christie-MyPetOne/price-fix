@@ -23,7 +23,7 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-card">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-grow min-w-[200px]">
           <Input

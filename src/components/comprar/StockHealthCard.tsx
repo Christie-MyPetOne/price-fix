@@ -19,7 +19,7 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
   onConfigClick,
 }) => {
   return (
-    <Card className="md:col-span-1 p-4 h-full flex flex-col justify-between">
+    <Card className="bg-card md:col-span-1 p-4 h-full flex flex-col justify-between">
       <div>
         <h2 className="text-md font-semibold mb-3">Saúde de estoque</h2>
 
