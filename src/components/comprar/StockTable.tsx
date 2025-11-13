@@ -24,7 +24,7 @@ import {
   toggleSelectAll,
   handleShiftSelection,
 } from "@/lib/utils";
-import { getDaysLeft, getPurchaseSuggestionUnits } from "@/lib/stockUtils";
+import { getDaysLeft, getPurchaseSuggestionUnits } from "@/lib/utils";
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 

@@ -6,7 +6,7 @@ import {
   getDaysLeft,
   calculateStockHealth,
   getPurchaseStatus,
-} from "@/lib/stockUtils";
+} from "@/lib/utils";
 import { Product, StockConfig, CartItem, HealthStatus } from "@/lib/types";
 import { StockConfigModal } from "@/components/comprar/StockConfigModal";
 import { StockTable } from "@/components/comprar/StockTable";

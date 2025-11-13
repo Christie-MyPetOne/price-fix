@@ -1,48 +1,24 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-/* ================= Utils ================= */
-
-function formatBRLShort(n: number): string {
-  // R$ 50 mil / R$ 1,2 mi / R$ 350
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000) return `R$ ${(n / 1_000_000).toFixed(1)} mi`;
-  if (abs >= 1_000) return `R$ ${Math.round(n / 1000)} mil`;
-  return `R$ ${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(n)}`;
-}
-
-function defaultTooltipFormatter(value: any) {
-  return `R$ ${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(value as number)}`;
-}
-
-/* ============== Types ============== */
+import { formatBRLShort, defaultTooltipFormatter } from "@/lib/utils";
+import ChartGraficoBar from "@/components/charts/ChartGraficoBar";
 export interface SerieDef {
-  key: string;         // campo do objeto de data
-  label: string;       // nome exibido na legenda
-  color: string;       // cor da barra
-  total?: number;      // opcional: número entre parênteses na legenda
+  key: string;
+  label: string;
+  color: string;
+  total?: number;
 }
 
 export interface GraficoBarCanaisProps {
   title?: string;
   data: Array<Record<string, any>>;
-  xKey: string;                 // ex: "date"
-  series: SerieDef[];           // canais
-  legendPageSize?: number;      // quantos itens por página na legenda (default 6)
+  xKey: string;
+  series: SerieDef[];
+  legendPageSize?: number;
 }
 
-/* ============== Component ============== */
 export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
   title = "Receita por canal de venda",
   data,
@@ -51,7 +27,7 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
   legendPageSize = 6,
 }) => {
   const [visible, setVisible] = useState<Set<string>>(
-    () => new Set(series.map(s => s.key)) // tudo visível por padrão
+    () => new Set(series.map((s) => s.key))
   );
   const [page, setPage] = useState(0);
 
@@ -64,48 +40,33 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
   const totalCount = series.length;
 
   function toggleKey(k: string) {
-    setVisible(prev => {
+    setVisible((prev) => {
       const next = new Set(prev);
       if (next.has(k)) next.delete(k);
       else next.add(k);
       return next;
     });
   }
+
   function selectAll() {
-    setVisible(new Set(series.map(s => s.key)));
+    setVisible(new Set(series.map((s) => s.key)));
   }
+
   function invertSelection() {
-    setVisible(prev => {
+    setVisible((prev) => {
       const next = new Set<string>();
-      series.forEach(s => {
+      series.forEach((s) => {
         if (!prev.has(s.key)) next.add(s.key);
       });
       return next;
     });
   }
 
-  const bars = useMemo(
-    () =>
-      series.map(s => (
-        <Bar
-          key={s.key}
-          dataKey={s.key}
-          stackId="stack"
-          fill={s.color}
-          radius={[2, 2, 0, 0]}
-          hide={!visible.has(s.key)}
-        />
-      )),
-    [series, visible]
-  );
-
   return (
     <div className="rounded-xl border border-border-dark bg-card text-text shadow-lg p-4">
-      {/* Título + Legenda paginada */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
 
-        {/* Itens da legenda (paginada) */}
         <div className="flex flex-wrap items-center gap-2">
           {pageItems.map((s) => {
             const active = visible.has(s.key);
@@ -134,12 +95,11 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
             );
           })}
 
-          {/* Paginação */}
           {pages > 1 && (
             <div className="ml-2 inline-flex items-center gap-1">
               <button
                 className="h-7 w-7 inline-flex items-center justify-center rounded-full border border-border-dark hover:bg-muted"
-                onClick={() => setPage(p => Math.max(0, p - 1))}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
                 aria-label="Página anterior"
               >
@@ -150,7 +110,7 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
               </span>
               <button
                 className="h-7 w-7 inline-flex items-center justify-center rounded-full border border-border-dark hover:bg-muted"
-                onClick={() => setPage(p => Math.min(pages - 1, p + 1))}
+                onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
                 disabled={page === pages - 1}
                 aria-label="Próxima página"
               >
@@ -159,7 +119,6 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
             </div>
           )}
 
-          {/* Ações */}
           <div className="ml-2 inline-flex gap-2">
             <button
               onClick={selectAll}
@@ -179,45 +138,19 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
         </div>
       </div>
 
-      {/* Gráfico */}
-      <div style={{ width: "100%", height: 305 }}>
-        <ResponsiveContainer>
-          <BarChart
-            data={data}
-            margin={{ top: 15, right: 12, bottom: 8, left: 8 }}
-            barSize={18}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-dark)" />
-            <XAxis
-              dataKey={xKey}
-              stroke="var(--color-text-secondary)"
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="var(--color-text-secondary)"
-              tickFormatter={formatBRLShort}
-              tickLine={false}
-              axisLine={false}
-              width={70}
-            />
-            <Tooltip
-              formatter={defaultTooltipFormatter as any}
-              labelStyle={{ color: "var(--color-text)" }}
-              contentStyle={{
-                background: "var(--color-card)",
-                borderColor: "var(--color-border-dark)",
-                borderRadius: 8,
-              }}
-              cursor={{ fill: "var(--color-background)" }}
-            />
-            {bars}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      {/* Rodapé: contador selecionados */}
+      <ChartGraficoBar
+        data={data}
+        xKey={xKey}
+        series={series}
+        visibleKeys={visible}
+        formatBRLShort={formatBRLShort}
+        defaultTooltipFormatter={defaultTooltipFormatter}
+      />
+
+      {/* Rodapé */}
       <div className="text-center text-xs text-text-secondary mt-2">
-        <span className="font-semibold">{visibleCount}</span> de {totalCount} selecionados
+        <span className="font-semibold">{visibleCount}</span> de {totalCount}{" "}
+        selecionados
       </div>
     </div>
   );

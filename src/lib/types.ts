@@ -7,6 +7,7 @@ import { Dispatch, SetStateAction } from "react";
 --------------------------------------------------------------------------- */
 export type HealthStatus = "Excelente" | "Média" | "Risco" | "Parado";
 export type Tab = "calculator" | "competitors" | "history";
+export type AnyRow = Record<string, any>;
 
 /* --------------------------------------------------------------------------
   Product-related models
@@ -312,6 +313,7 @@ export interface MargensChartProps {
   buckets: Bucket[];
   legend: LegendItem[];
   onChangeSelection?: (selectedIds: string[]) => void;
+
   onEditRanges?: () => void;
   selectedMargemIds?: string[];
 }
@@ -331,4 +333,34 @@ export interface VendasModalProps {
   open: boolean;
   onClose: () => void;
   sale: Sale | null;
+}
+
+export interface KpiCardProps {
+  title: string;
+  value: string;
+  change: number;
+  sparklineData: { value: number }[];
+  comparedLabel?: string;
+  comparedValue?: string | number;
+}
+
+export interface KpiCardPlusProps {
+  title: string;
+  value: string;
+  change: number;
+  comparedLabel?: string;
+  comparedValue?: string | number;
+  className?: string;
+  onToggleLista?: () => void;
+  listaAtiva?: boolean;
+  mode: "reais" | "percentual";
+  setMode: (mode: "reais" | "percentual") => void;
+}
+
+export interface GraficoMargemProps {
+  title?: string;
+  data: AnyRow[];
+  xKey: string;
+  yKey?: string;
+  height?: number;
 }

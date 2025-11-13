@@ -1,33 +1,70 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDashboardStore } from "@/store/useDashboardStore";
+
 import { DashFilter } from "@/components/dashboard/DashFilter";
 import KpiCard from "@/components/dashboard/kpiCard";
 import KpiCardPlus from "@/components/dashboard/kpiCardPlus";
 import GraficoBar from "@/components/dashboard/GraficoBar";
 import GraficoPeR from "@/components/dashboard/GraficoPeR";
 import GraficoMargem from "@/components/dashboard/GraficoMargen";
-
 import ListaKpi from "@/components/dashboard/ListaKpi";
-import {
-  kpiData,
-  kpiData2,
-  kpiDataPlus,
-  receitaPorCanal,
-  series,
-  pedidosReceita,
-  dataMargem,
-} from "@/components/dashboard/Data";
 
 export default function DashboardPage() {
-  // Estado para mostrar lista
   const [mostrarLista, setMostrarLista] = useState(false);
-  // Estado para modo de exibição
   const [mode, setMode] = useState<"reais" | "percentual">("reais");
+
+  const dashboardData = useDashboardStore((state: any) => state.dashboardData);
+  const isLoading = useDashboardStore((state: any) => state.isLoading);
+  const error = useDashboardStore((state: any) => state.error);
+
+  const fetchDashboardData = useDashboardStore(
+    (state: any) => state.fetchDashboardData
+  );
+
+  useEffect(() => {
+    if (!dashboardData) {
+      fetchDashboardData();
+    }
+  }, [fetchDashboardData, dashboardData]);
 
   const toggleLista = () => {
     setMostrarLista((prev) => !prev);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full min-h-[calc(100vh-200px)]">
+        <p className="text-xl font-medium text-text">Carregando dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center w-full min-h-[calc(100vh-200px)] p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md text-center">
+          <strong className="font-bold">Erro ao carregar os dados!</strong>
+          <span className="block sm:inline">
+            {" "}
+            Por favor, tente novamente mais tarde.
+          </span>
+          <p className="text-sm mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex items-center justify-center w-full min-h-[calc(100vh-200px)]">
+        <p className="text-lg text-gray-500">
+          Nenhum dado encontrado para exibir.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-8xl -mt-8 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
@@ -40,26 +77,24 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {kpiData.map((kpi) => (
+        {dashboardData.kpiData.map((kpi: any) => (
           <KpiCard key={kpi.title} {...kpi} className="bg-card " />
         ))}
       </div>
 
-      {/* GRÁFICOS */}
       <GraficoBar
         title="Receita por canal"
-        data={receitaPorCanal}
+        data={dashboardData.receitaPorCanal}
         xKey="date"
-        series={series}
+        series={dashboardData.series}
       />
 
-      <div className="flex gap-4 w-full">
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
         <div className="flex-1">
           <GraficoPeR
             title="Pedidos x Receita"
-            data={pedidosReceita}
+            data={dashboardData.pedidosReceita}
             xKey="mes"
             series={[{ key: "pedidos", label: "Pedidos", color: "#413ea0" }]}
             line={{
@@ -74,15 +109,14 @@ export default function DashboardPage() {
         <div className="flex-1">
           <GraficoMargem
             title="Margem Bruta (%)"
-            data={dataMargem}
+            data={dashboardData.dataMargem}
             xKey="date"
           />
         </div>
       </div>
 
-      {/* KPI PLUS + LISTA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {kpiDataPlus.map((kpiP) => (
+        {dashboardData.kpiDataPlus.map((kpiP: any) => (
           <KpiCardPlus
             key={kpiP.title}
             {...kpiP}
@@ -93,20 +127,18 @@ export default function DashboardPage() {
           />
         ))}
 
-        {kpiData2.map((kpi) => (
+        {dashboardData.kpiData2.map((kpi: any) => (
           <KpiCard key={kpi.title} {...kpi} className="bg-card " />
         ))}
       </div>
 
-      {/* Lista visível somente quando mostrarLista for true */}
       {mostrarLista && <ListaKpi mode={mode} />}
 
-      {/* GRÁFICOS */}
       <GraficoBar
         title="Margem por canal de venda"
-        data={receitaPorCanal}
+        data={dashboardData.receitaPorCanal}
         xKey="date"
-        series={series}
+        series={dashboardData.series}
       />
     </div>
   );
