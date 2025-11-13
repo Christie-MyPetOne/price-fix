@@ -11,7 +11,7 @@ type Props = {
 export default function SidebarConfig({ active, onChange, className }: Props) {
   return (
     <aside
-      className={`w-72 shrink-0 border-r border-border-dark bg-card ${className ?? ""}`}
+      className={`w-72 max-h-full shrink-0 border-r border-border-dark bg-card ${className ?? ""}`}
       aria-label="Menu de configuração"
     >
       <div className="px-5 py-4">

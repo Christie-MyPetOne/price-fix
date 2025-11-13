@@ -203,7 +203,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
       </div>
 
       {!canSync && (
-      <div className="flex items-start gap-2 rounded-lg border border-solid border-[var(--color-border-dark)] bg-red-500/10 text-error p-3">
+      <div className="-mt-5 flex items-start gap-2 rounded-lg border border-solid border-[var(--color-border-dark)] bg-red-500/10 text-error p-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-4 h-4 mt-0.5 flex-shrink-0"

@@ -116,7 +116,7 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Perguntas */}
-            <section className="grid gap-3">
+            <section className="-mt-10 -mb-10 grid gap-3">
               <label className="flex items-center gap-2 text-sm text-text">
                 <input type="checkbox" className="accent-primary" />
                 Os custos de mercadoria em seu ERP contêm PIS, COFINS e ICMS?
@@ -180,7 +180,7 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Estado */}
-            <section className="grid gap-4">
+            <section className="-mt-10 grid gap-4">
               <h2 className={sectionTitle}>Estado de expedição</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
@@ -214,13 +214,13 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Custos fixos */}
-            <section className="grid gap-3">
+            <section className="-mt-10 grid gap-3">
               <h2 className={sectionTitle}>Custos fixos mensais</h2>
               <p className="text-sm text-[var(--color-text-secondary)]">
                 Se preferir, insira os custos fixos da empresa.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className=" flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <input
                   type="number"
                   defaultValue={226261.8}
