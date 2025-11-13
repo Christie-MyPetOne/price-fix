@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import EditCanalModal, { Canal } from "@/components/configuracao/modal";
+import EditCanalModal, { Canal } from "@/components/configuracao/modalVendas";
 
 const inicial: Canal[] = [
   { id: 9804, nome: "Amazon (9804)", comissao: 12, prazo: 20, aplicaComFrete: "Não", produtos: 353, fulfillment: "Não", ignoraImpostos: "Não" },
