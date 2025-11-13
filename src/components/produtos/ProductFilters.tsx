@@ -10,7 +10,7 @@ export function ProductFilters({
   onFilterChange,
 }: ProductFiltersProps) {
   return (
-    <div className="flex-wrap items-center mt-4 md:mt-0 bg-card p-2 rounded-lg shadow-md flex md:flex-row md:items-center justify-between gap-3 border border-border-dark">
+    <div className="flex-wrap mb-6 items-center md:mt-0 bg-card p-2 rounded-lg shadow-md flex md:flex-row md:items-center justify-between gap-3 border border-border-dark">
       <div className="relative flex-grow min-w-[12rem] max-w-xs text-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
         <input

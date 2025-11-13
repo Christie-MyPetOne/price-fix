@@ -38,7 +38,7 @@ export const VendasModal: React.FC<VendasModalProps> = ({
               <p className="font-medium">{sale.originERP ?? "—"}</p>
             </div>
             <div>
-              <p className="text-sm text-text-secondary">E-commerce ID</p>
+              <p className="text-sm text-text-secondary">E-commerce</p>
               <p className="font-medium">{sale.ecommerce ?? "—"}</p>
             </div>
           </div>

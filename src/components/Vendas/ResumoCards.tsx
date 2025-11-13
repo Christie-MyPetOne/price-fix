@@ -27,7 +27,7 @@ export default function ResumoCards({ sales }: ResumoCardsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      <Card>
+      <Card className="bg-card">
         <h1 className="font-bold text-2xl">Faturamento</h1>
         <p className="mt-4 text-xl">
           R$
@@ -36,7 +36,7 @@ export default function ResumoCards({ sales }: ResumoCardsProps) {
             .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
         </p>
       </Card>
-      <Card>
+      <Card className="bg-card">
         <h1 className="font-bold text-2xl">Margem média</h1>
         <p className="mt-4 text-xl">
           {(() => {
@@ -58,7 +58,7 @@ export default function ResumoCards({ sales }: ResumoCardsProps) {
           })()}
         </p>
       </Card>
-      <Card>
+      <Card className="bg-card">
         <h1 className="font-bold text-2xl">Pedidos Realizados</h1>
         <p className="mt-4 text-xl">{sales.length.toLocaleString("pt-BR")}</p>
       </Card>

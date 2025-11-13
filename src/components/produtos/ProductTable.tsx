@@ -210,7 +210,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-border-dark">
+          <tbody className="divide-y divide-border-dark cursor-pointer">
             {displayedProducts.length > 0 ? (
               displayedProducts.map((product, index) => (
                 <tr

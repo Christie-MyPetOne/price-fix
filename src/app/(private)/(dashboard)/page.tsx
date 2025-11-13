@@ -17,9 +17,7 @@ import {
   series,
   pedidosReceita,
   dataMargem,
-
-} from  "@/components/dashboard/Data"
-
+} from "@/components/dashboard/Data";
 
 export default function DashboardPage() {
   // Estado para mostrar lista
@@ -34,7 +32,9 @@ export default function DashboardPage() {
   return (
     <div className="max-w-8xl -mt-8 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
       <div className="flex items-center w-full mb-6">
-        <h1 className="text-3xl justify-center font-semibold text-text">Dashboard</h1>
+        <h1 className="text-3xl justify-center font-semibold text-text">
+          Dashboard
+        </h1>
         <div className=" -ml-20">
           <DashFilter />
         </div>
@@ -43,7 +43,7 @@ export default function DashboardPage() {
       {/* KPI CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {kpiData.map((kpi) => (
-          <KpiCard key={kpi.title} {...kpi} />
+          <KpiCard key={kpi.title} {...kpi} className="bg-card " />
         ))}
       </div>
 
@@ -72,13 +72,16 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex-1">
-          <GraficoMargem title="Margem Bruta (%)" data={dataMargem} xKey="date" />
+          <GraficoMargem
+            title="Margem Bruta (%)"
+            data={dataMargem}
+            xKey="date"
+          />
         </div>
       </div>
 
       {/* KPI PLUS + LISTA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
         {kpiDataPlus.map((kpiP) => (
           <KpiCardPlus
             key={kpiP.title}
@@ -91,15 +94,14 @@ export default function DashboardPage() {
         ))}
 
         {kpiData2.map((kpi) => (
-          <KpiCard key={kpi.title} {...kpi} />
+          <KpiCard key={kpi.title} {...kpi} className="bg-card " />
         ))}
       </div>
 
+      {/* Lista visível somente quando mostrarLista for true */}
+      {mostrarLista && <ListaKpi mode={mode} />}
 
-  {/* Lista visível somente quando mostrarLista for true */}
-  {mostrarLista && <ListaKpi mode={mode} />}
-
-       {/* GRÁFICOS */}
+      {/* GRÁFICOS */}
       <GraficoBar
         title="Margem por canal de venda"
         data={receitaPorCanal}
