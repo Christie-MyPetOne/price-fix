@@ -28,6 +28,12 @@ import { getDaysLeft, getPurchaseSuggestionUnits } from "@/lib/utils";
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 
+// Função para truncar texto
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + "...";
+};
+
 const StatusBadge = ({ status }: { status?: string }) => {
   const statusConfig: Record<
     string,
@@ -306,11 +312,11 @@ export const StockTable: React.FC<StockTableProps> = ({
                           <div className="w-full h-full bg-border-dark rounded" />
                         )}
                       </div>
-                      <div>
-                        <p className="text-xs font-medium text-text">
-                          {product.name}
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-medium text-text truncate max-w-[120px] sm:max-w-full">
+                          {truncateText(product.name, 20)}
                         </p>
-                        <p className="text-xs text-text-secondary">
+                        <p className="text-xs text-text-secondary truncate max-w-[120px] sm:max-w-full">
                           {product.sku}
                         </p>
                       </div>

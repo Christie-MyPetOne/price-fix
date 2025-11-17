@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { VendasModalProps } from "@/lib/types";
 import Modal from "../ui/Modal";
+import { Package, FileText, Info, Percent } from "lucide-react";
 
 export const VendasModal: React.FC<VendasModalProps> = ({
   open,
@@ -25,83 +26,75 @@ export const VendasModal: React.FC<VendasModalProps> = ({
       title={`Detalhes do Pedido ${sale.id ?? ""}`}
       size="xl"
     >
-      <div className="space-y-6">
-        <div className="bg-background p-4 rounded-lg border border-border-dark">
-          <h3 className="text-lg font-semibold mb-4">Identificadores</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-text-secondary">ERP ID</p>
-              <p className="font-medium">{sale.erpId ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">Origin ERP</p>
-              <p className="font-medium">{sale.originERP ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">E-commerce</p>
-              <p className="font-medium">{sale.ecommerce ?? "—"}</p>
-            </div>
+      <div className="space-y-8 pb-4">
+        <div className="rounded-xl border border-border-dark bg-background/60 backdrop-blur-sm shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Info size={18} className="text-primary" />
+            <h3 className="text-lg font-semibold">Identificadores</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { label: "ERP ID", value: sale.erpId },
+              { label: "Origin ERP", value: sale.originERP },
+              { label: "E-commerce", value: sale.ecommerce },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <p className="text-xs text-text-secondary uppercase tracking-wide">
+                  {item.label}
+                </p>
+                <p className="font-medium text-text mt-1">
+                  {item.value ?? "—"}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="bg-background p-4 rounded-lg border border-border-dark">
-          <h3 className="text-lg font-semibold mb-4">
-            Resumo Financeiro e Taxas
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-text-secondary">Valor Nota</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_nota)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">Valor Produtos</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_produtos)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">Valor Frete</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_frete)}
-              </p>
-            </div>
+        <div className="rounded-xl border border-border-dark bg-background/60 backdrop-blur-sm shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <FileText size={18} className="text-primary" />
+            <h3 className="text-lg font-semibold">Resumo Financeiro e Taxas</h3>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-text-secondary">ICMS</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_icms)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">IPI</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_ipi)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-text-secondary">ISSQN</p>
-              <p className="font-medium">
-                {formatBRL(sale.financials?.valor_issqn)}
-              </p>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            {[
+              { label: "Valor Nota", value: sale.financials?.valor_nota },
+              { label: "Produtos", value: sale.financials?.valor_produtos },
+              { label: "Frete", value: sale.financials?.valor_frete },
+              { label: "ICMS", value: sale.financials?.valor_icms },
+              { label: "IPI", value: sale.financials?.valor_ipi },
+              { label: "ISSQN", value: sale.financials?.valor_issqn },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="p-3 rounded-lg bg-card border border-border-dark shadow-sm hover:shadow-md transition"
+              >
+                <p className="text-xs text-text-secondary">{item.label}</p>
+                <p className="font-semibold text-sm mt-1">
+                  {formatBRL(item.value)}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-text-secondary">Outras</p>
               <p className="font-medium">
                 {formatBRL(sale.financials?.valor_outras)}
               </p>
             </div>
+
             <div>
               <p className="text-sm text-text-secondary">Valor Faturado</p>
               <p className="font-medium">
                 {formatBRL(sale.financials?.valor_faturado)}
               </p>
             </div>
+
             <div>
-              <p className="text-sm text-text-secondary">Frete por conta</p>
+              <p className="text-sm text-text-secondary">Frete por Conta</p>
               <p className="font-medium">
                 {sale.financials?.fretePorConta ?? "—"}
               </p>
@@ -109,11 +102,14 @@ export const VendasModal: React.FC<VendasModalProps> = ({
           </div>
         </div>
 
-        <div className="bg-background p-4 rounded-lg border border-border-dark">
-          <h3 className="text-lg font-semibold mb-4">Produtos</h3>
+        <div className="rounded-xl border border-border-dark bg-background/60 backdrop-blur-sm shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Package size={18} className="text-primary" />
+            <h3 className="text-lg font-semibold">Produtos</h3>
+          </div>
 
           {sale.items?.length ? (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {sale.items.map((item, idx) => {
                 const total = item.totalPrice ?? 0;
                 const custo = item.totalCost ?? 0;
@@ -123,65 +119,72 @@ export const VendasModal: React.FC<VendasModalProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="flex gap-4 p-4 bg-card rounded-lg border border-border-dark"
+                    className="p-5 rounded-xl bg-card/70 border border-border-dark shadow hover:shadow-lg transition flex flex-col sm:flex-row gap-6"
                   >
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={100}
-                        height={100}
-                        className="rounded-md object-cover border border-border-dark"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-background rounded-md flex items-center justify-center border border-border-dark text-xs text-text-secondary">
-                        Sem imagem
-                      </div>
-                    )}
+                    <div>
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={120}
+                          height={120}
+                          className="rounded-lg object-cover border border-border-dark shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-28 h-28 bg-background border border-border-dark rounded-lg flex items-center justify-center text-xs text-text-secondary">
+                          Sem imagem
+                        </div>
+                      )}
+                    </div>
 
                     <div className="flex-1">
-                      <div className="flex justify-between items-start">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
                         <div>
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-text-secondary">
+                          <p className="font-semibold text-lg">{item.name}</p>
+                          <p className="text-sm text-text-secondary mt-1">
                             SKU: {item.sku ?? "—"}
                           </p>
                           <p className="text-sm text-text-secondary">
-                            Quantidade: {item.quantity ?? 1}
+                            Quantidade: {item.quantity}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-text-secondary">
+
+                        <div className="sm:text-right">
+                          <span className="text-xs text-text-secondary">
                             Total Vendido
-                          </p>
-                          <p className="font-medium">
+                          </span>
+                          <p className="text-base font-semibold">
                             {formatBRL(item.totalPrice)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 mt-3">
-                        <div>
-                          <p className="text-sm text-text-secondary">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-5">
+                        <div className="p-3 rounded-lg bg-background border border-border-dark">
+                          <p className="text-xs text-text-secondary">
                             Preço Unitário
                           </p>
-                          <p className="font-medium">
+                          <p className="font-semibold">
                             {formatBRL(item.unitPrice)}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-sm text-text-secondary">
+
+                        <div className="p-3 rounded-lg bg-background border border-border-dark">
+                          <p className="text-xs text-text-secondary">
                             Custo Total
                           </p>
-                          <p className="font-medium">
+                          <p className="font-semibold">
                             {formatBRL(item.totalCost)}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-sm text-text-secondary">Margem</p>
+
+                        <div className="p-3 rounded-lg bg-background border border-border-dark">
+                          <p className="text-xs text-text-secondary flex items-center gap-1">
+                            <Percent size={12} /> Margem
+                          </p>
                           <p
-                            className={`font-medium ${
-                              margem >= 0 ? "text-green-600" : "text-red-600"
+                            className={`font-semibold ${
+                              margem >= 0 ? "text-green-500" : "text-red-500"
                             }`}
                           >
                             {margem.toFixed(2)}%
@@ -189,13 +192,13 @@ export const VendasModal: React.FC<VendasModalProps> = ({
                         </div>
                       </div>
 
-                      <div className="mt-3 text-right">
-                        <p className="text-sm text-text-secondary">
+                      <div className="mt-5 border-t border-border-dark pt-4 text-right">
+                        <span className="text-xs text-text-secondary">
                           Lucro Bruto
-                        </p>
+                        </span>
                         <p
-                          className={`font-medium ${
-                            lucro >= 0 ? "text-green-600" : "text-red-600"
+                          className={`text-lg font-bold ${
+                            lucro >= 0 ? "text-green-500" : "text-red-500"
                           }`}
                         >
                           {formatBRL(lucro)}
@@ -207,7 +210,9 @@ export const VendasModal: React.FC<VendasModalProps> = ({
               })}
             </div>
           ) : (
-            <p className="text-sm text-text-secondary">Nenhum produto.</p>
+            <p className="text-sm text-text-secondary">
+              Nenhum produto cadastrado.
+            </p>
           )}
         </div>
       </div>

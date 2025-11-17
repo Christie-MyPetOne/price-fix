@@ -29,8 +29,8 @@ type Props = {
 };
 
 const inputCls =
-  "h-10 w-full rounded-md border border-border-dark bg-card-light/40 px-3 text-sm " +
-  "placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
+  "h-10 w-full rounded-md border border-border-dark bg-card px-3 text-sm text-text " +
+  "placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition";
 
 export default function EditFormaRecebimentoModal({
   open,
@@ -132,35 +132,39 @@ export default function EditFormaRecebimentoModal({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
+            {/* Taxa fixa com R$ dentro do input (prefixo) */}
             <div>
               <label className="mb-1 block text-xs font-medium text-text-secondary">
                 Taxa fixa
               </label>
-              <div className="flex items-center gap-2">
-                <span className="rounded-md border border-border-dark bg-card-light/40 px-2 text-xs text-text-secondary">
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs text-text-secondary">
                   R$
                 </span>
                 <input
-                  className={inputCls}
+                  className={`${inputCls} pl-9`}
                   value={taxaFixa}
                   onChange={(e) => setTaxaFixa(e.target.value)}
                   placeholder="0,00"
+                  inputMode="decimal"
                 />
               </div>
             </div>
 
+            {/* Taxa percentual com % dentro do input (sufixo) */}
             <div>
               <label className="mb-1 block text-xs font-medium text-text-secondary">
                 Taxa percentual
               </label>
-              <div className="flex items-center gap-2">
+              <div className="relative">
                 <input
-                  className={inputCls}
+                  className={`${inputCls} pr-9`}
                   value={taxaPercentual}
                   onChange={(e) => setTaxaPercentual(e.target.value)}
                   placeholder="0,00"
+                  inputMode="decimal"
                 />
-                <span className="rounded-md border border-border-dark bg-card-light/40 px-2 py-2 text-xs text-text-secondary">
+                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-text-secondary">
                   <Percent className="h-4 w-4" />
                 </span>
               </div>

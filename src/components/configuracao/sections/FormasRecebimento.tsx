@@ -114,8 +114,6 @@ export default function FormasRecebimento() {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-         
-
           <input
             placeholder="Buscar formas de recebimento"
             value={busca}

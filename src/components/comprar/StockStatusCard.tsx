@@ -21,9 +21,9 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     const dataItem = payload[0].payload as any;
     return (
-      <div className="bg-card p-3 border border-border-dark rounded-md shadow-lg text-xs">
+      <div className="bg-card p-3 border border-border-dark rounded-md shadow-lg text-xs sm:text-sm">
         <p className="font-semibold text-text">{dataItem.name}</p>
-        <p className="text-text-secondary hidden md:block">
+        <p className="text-text-secondary">
           {dataItem.count ?? 0} produtos ({(dataItem.value ?? 0).toFixed(2)}%)
         </p>
         <p className="text-text-secondary">
@@ -141,12 +141,14 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-lg p-6 border border-border-dark shadow-sm">
-      <div className="flex justify-between items-start mb-4">
-        <h2 className="text-lg font-semibold text-text">Status de compra</h2>
-        <div className="text-right">
+    <div className="bg-card rounded-lg p-4 sm:p-6 border border-border-dark shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-text mb-2 sm:mb-0">
+          Status de compra
+        </h2>
+        <div className="text-left sm:text-right">
           <p className="text-sm text-text-secondary">Valor total em estoque</p>
-          <p className="text-2xl font-bold text-text mt-1">
+          <p className="text-2xl sm:text-3xl font-bold text-text mt-1">
             {totalStockValue.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
@@ -157,31 +159,30 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
 
       <StatusPieChart data={filteredPieData} CustomTooltip={CustomTooltip} />
 
-      <div className="grid grid-cols-4 gap-4 text-xs pt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4">
         {data.map((item) => {
           const IconComponent = item.icon ?? ShoppingCart;
           const isActive = activeStatuses.includes(item.status);
+
           return (
             <div
               key={item.status}
-              className="text-center space-y-1 flex flex-col items-center"
+              className="flex flex-col items-center text-center space-y-1 sm:space-y-2 p-2 border border-border-dark rounded-lg hover:shadow-md transition-all"
             >
-              <p
-                className={`font-semibold flex items-center justify-center gap-1 text-text ${
-                  window.innerWidth < 768 ? "hidden" : "block"
-                }`}
+              <div
+                className="flex items-center gap-1 sm:gap-2 text-base sm:text-lg font-medium"
                 style={{ color: item.color }}
               >
-                <IconComponent className="w-4 h-4" />
+                <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
                 {item.status}
-              </p>
-              <p className="text-text-secondary font-medium">
+              </div>
+              <p className="text-text-secondary font-medium text-sm sm:text-base">
                 {item.totalValue.toLocaleString("pt-BR", {
                   style: "currency",
                   currency: "BRL",
                 })}
               </p>
-              <p className="text-text-secondary text-[0.7rem]">
+              <p className="text-text-secondary text-[0.65rem] sm:text-xs">
                 Valor em estoque
               </p>
               <ToggleButton

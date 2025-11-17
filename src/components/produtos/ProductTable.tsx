@@ -27,9 +27,7 @@ const RechartsSparkline = dynamic(
   { ssr: false }
 );
 
-export const ProductTable: React.FC<ProductTableProps> = ({
-  products,
-}) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -163,12 +161,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </p>
       </div>
 
-      {/* Tabela com scroll horizontal */}
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left divide-border-dark min-w-[700px]">
+        <table className="w-full text-sm text-left divide-border-dark min-w-[900px] lg:min-w-full">
           <thead className="bg-background text-xs text-text uppercase">
             <tr>
-              <th className="px-3 py-3 w-10 text-center">
+              <th className="px-3 py-3 w-10 text-center sticky left-0 bg-background z-10">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -192,7 +189,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 <th
                   key={String(key)}
                   onClick={() => handleSort(key as keyof Product)}
-                  className="px-3 py-3 text-left font-medium text-text-secondary cursor-pointer select-none"
+                  className={`px-3 py-3 text-left font-medium text-text-secondary cursor-pointer select-none ${
+                    key === "name" ? "min-w-[200px]" : "whitespace-nowrap"
+                  }`}
                 >
                   <div className="flex items-center gap-1">
                     {label}
@@ -219,7 +218,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   className="hover:bg-background transition-colors"
                 >
                   <td
-                    className="px-3 py-2 text-center"
+                    className="px-3 py-2 text-center sticky left-0 bg-card z-10"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <input
@@ -234,7 +233,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     />
                   </td>
 
-                  <td className="px-3 py-2 flex items-center gap-2">
+                  <td className="px-3 py-2 flex items-center gap-2 min-w-[200px]">
                     <div className="w-9 h-9 relative flex-shrink-0">
                       {product.image ? (
                         <Image
@@ -257,7 +256,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     </div>
                   </td>
 
-                  <td className="px-3 py-2 text-xs font-semibold">
+                  <td className="px-3 py-2 text-xs font-semibold whitespace-nowrap">
                     <span
                       className={`px-2 py-1 rounded-full text-white text-[0.65rem] ${
                         product.status === "Precificado"
@@ -271,11 +270,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     </span>
                   </td>
 
-                  <td className="px-3 py-2 text-xs">
+                  <td className="px-3 py-2 text-xs whitespace-nowrap">
                     <StockHealthBadge status={product.stockHealthStatus} />
                   </td>
 
-                  <td className="px-3 py-2 text-xs text-right">
+                  <td className="px-3 py-2 text-xs text-right whitespace-nowrap">
                     {product.sales}
                   </td>
 

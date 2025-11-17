@@ -3,8 +3,6 @@
 import React from "react";
 import {
   Settings2,
-  ChevronLeft,
-  ChevronRight,
   CheckCircle2,
   AlertTriangle,
   XCircle,
@@ -19,11 +17,13 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
   onConfigClick,
 }) => {
   return (
-    <Card className="bg-card md:col-span-1 p-4 h-full flex flex-col justify-between">
+    <Card className="bg-card md:col-span-1 p-4 md:p-6 h-full flex flex-col justify-between">
       <div>
-        <h2 className="text-md font-semibold mb-3">Saúde de estoque</h2>
+        <h2 className="text-sm md:text-lg font-semibold mb-3">
+          Saúde de estoque
+        </h2>
 
-        <div className="text-xs text-text-secondary space-y-1 mb-4">
+        <div className="text-[0.75rem] sm:text-sm text-text-secondary space-y-1 mb-4">
           <p>
             Comprando para{" "}
             <span className="font-semibold text-text">
@@ -38,52 +38,53 @@ export const StockHealthCard: React.FC<StockHealthCardProps> = ({
           </p>
         </div>
 
-        <div className="space-y-2 text-sm border-l-2 border-border-dark pl-4">
-          <div className="flex justify-between items-center text-green-500">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-green-500" />
-              <span>Excelente</span>
-            </div>
-            <span className="flex items-center gap-1 text-text-secondary">
-              <ChevronLeft size={12} /> {stockConfig.excelente}
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center text-yellow-500">
-            <div className="flex items-center gap-2">
-              <AlertTriangle size={16} className="text-yellow-500" />
-              <span>Moderado</span>
-            </div>
-            <span className="text-text-secondary">
-              {stockConfig.excelente + 1} - {stockConfig.moderado}
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center text-red-500">
-            <div className="flex items-center gap-2">
-              <XCircle size={16} className="text-red-500" />
-              <span>Risco</span>
-            </div>
-            <span className="text-text-secondary">
-              {stockConfig.moderado + 1} - {stockConfig.risco}
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center text-blue-400">
-            <div className="flex items-center gap-2">
-              <Snowflake size={16} className="text-blue-400" />
-              <span>Parado</span>
-            </div>
-            <span className="flex items-center gap-1 text-text-secondary">
-              <ChevronRight size={12} /> {stockConfig.risco + 1}
-            </span>
-          </div>
+        <div className="space-y-3 text-sm sm:text-base border-l-2 border-border-dark pl-2 sm:pl-4">
+          {[
+            {
+              label: "Excelente",
+              icon: CheckCircle2,
+              value: stockConfig.excelente,
+              color: "text-green-500",
+            },
+            {
+              label: "Moderado",
+              icon: AlertTriangle,
+              value: `${stockConfig.excelente + 1} - ${stockConfig.moderado}`,
+              color: "text-yellow-500",
+            },
+            {
+              label: "Risco",
+              icon: XCircle,
+              value: `${stockConfig.moderado + 1} - ${stockConfig.risco}`,
+              color: "text-red-500",
+            },
+            {
+              label: "Parado",
+              icon: Snowflake,
+              value: `${stockConfig.risco + 1}`,
+              color: "text-blue-400",
+            },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${item.color}`}
+              >
+                <div className="flex items-center gap-2 mb-1 sm:mb-0">
+                  <Icon size={16} />{" "}
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                <span className="text-text-secondary">{item.value}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <Button
         variant="secondary"
-        className="mt-6 w-full flex items-center justify-center gap-2 text-sm"
+        className="mt-4 sm:mt-6 w-full flex items-center justify-center gap-2 text-xs sm:text-sm"
         onClick={onConfigClick}
       >
         <Settings2 size={16} /> Configurar Saúde de Estoque

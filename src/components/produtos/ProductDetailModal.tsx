@@ -67,7 +67,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       onClose={onClose}
       title={
         <div>
-          <h2 className="text-lg sm:text-xl font-bold truncate">
+          <h2 className="text-lg sm:text-xl font-bold ">
             {editableProduct?.name || ""}
           </h2>
           <p className="text-xs text-text-secondary truncate">
@@ -78,7 +78,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       size="xl"
     >
       <div>
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start overflow-x-auto gap-1 sm:gap-2 mb-4">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-around sm:justify-start overflow-x-auto sm:gap-2 mb-4">
           <TabButton
             label="Calculadora"
             icon={TrendingUp}

@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 :root {
   --color-background: #ebebeb;
   --color-card: #ffffff;
@@ -21,7 +23,7 @@
 .dark {
   --color-background: #1a1a1a;
   --color-card: #2c2c2c;
-  --color-hovercard: #232323;
+  --color-hovercard: #262626;
   --color-primary: #10b981;
   --color-primary-dark: #059669;
   --color-primary-light: #34d399;
@@ -83,4 +85,14 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text); /* Cor da barra de rolagem ao passar o mouse */
+}
+
+.dashboard-title {
+  display: block;
+}
+
+@media (max-width: 1040px) {
+  .dashboard-title {
+    display: none;
+  }
 }

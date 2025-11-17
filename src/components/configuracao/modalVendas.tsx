@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
-import UiSelect from "@/components/ui/UiSelect";
 import { Percent } from "lucide-react";
 
 export type Canal = {
@@ -82,7 +81,7 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
     if (!canal) return;
     setForm((prev) => ({
       ...prev,
-      canalSelecao: (canal.nome.split(" ")[0] ?? "Canal"),
+      canalSelecao: canal.nome.split(" ")[0] ?? "Canal",
       nomeCanal: canal.nome,
       comissao: typeof canal.comissao === "number" ? canal.comissao : 0,
       prazo: canal.prazo ?? 0,
@@ -108,14 +107,30 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
         </h3>
 
         {/* primeira linha */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+          <div className="w-[clamp(160px,40vw,232px)]">
             <label className={labelSm}>Canal de venda</label>
-            <UiSelect
+            <select
               value={form.canalSelecao}
-              onChange={(v) => handle("canalSelecao", v as EditData["canalSelecao"])}
-              options={canais}
-              placeholder="Selecionar"
+              onChange={(e) =>
+                handle("canalSelecao", e.target.value as EditData["canalSelecao"])
+              }
+              className={inputCls}
+            >
+              {canais.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* nome */}
+          <div>
+            <label className={labelSm}>Nome do canal</label>
+            <input
+              className={inputCls}
+              value={form.nomeCanal}
+              onChange={(e) => handle("nomeCanal", e.target.value)}
             />
           </div>
 
@@ -134,73 +149,119 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
 
           <div>
             <label className={labelSm}>Prazo de recebimento</label>
-            <div className="flex items-center gap-2">
-              <input
-                className={`${inputCls} w-28`}
-                inputMode="numeric"
-                value={form.prazo}
+            <div className="relative w-50">
+            <input
+                className={`${inputCls} pr-8`}
+                inputMode="decimal"
+                value={form.comissao}
                 onChange={(e) => handle("prazo", e.target.value)}
               />
-              <div className="flex h-10 items-center rounded-md border border-border-dark bg-card-light/40 px-3 text-sm">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">
                 DIAS
-              </div>
+              </span>
             </div>
           </div>
+
         </div>
 
-        {/* nome */}
-        <div>
-          <label className={labelSm}>Nome do canal</label>
-          <input className={inputCls} value={form.nomeCanal} onChange={(e) => handle("nomeCanal", e.target.value)} />
-        </div>
 
         {/* selects pares */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className={labelSm}>Aplicar comissão no frete?</label>
-            <UiSelect
+            <select
               value={form.aplicarFrete}
-              onChange={(v) => handle("aplicarFrete", v as EditData["aplicarFrete"])}
-              options={simNao}
-            />
+              onChange={(e) =>
+                handle("aplicarFrete", e.target.value as EditData["aplicarFrete"])
+              }
+              className={inputCls}
+            >
+              {simNao.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className={labelSm}>Fulfillment?</label>
-            <UiSelect
+            <select
               value={form.fulfillment}
-              onChange={(v) => handle("fulfillment", v as EditData["fulfillment"])}
-              options={simNao}
-            />
+              onChange={(e) =>
+                handle("fulfillment", e.target.value as EditData["fulfillment"])
+              }
+              className={inputCls}
+            >
+              {simNao.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className={labelSm}>Ignora impostos?</label>
-            <UiSelect
+            <select
               value={form.ignoraImpostos}
-              onChange={(v) => handle("ignoraImpostos", v as EditData["ignoraImpostos"])}
-              options={simNao}
-            />
+              onChange={(e) =>
+                handle("ignoraImpostos", e.target.value as EditData["ignoraImpostos"])
+              }
+              className={inputCls}
+            >
+              {simNao.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="-mt-6">
-            <label className={labelSm}>Crédito de PIS e COFINS sobre comissão e taxa de venda?</label>
-            <UiSelect
+            <label className={labelSm}>
+              Crédito de PIS e COFINS sobre comissão e taxa de venda?
+            </label>
+            <select
               value={form.creditoPisCofinsVenda}
-              onChange={(v) => handle("creditoPisCofinsVenda", v as EditData["creditoPisCofinsVenda"])}
-              options={simNao}
-            />
+              onChange={(e) =>
+                handle(
+                  "creditoPisCofinsVenda",
+                  e.target.value as EditData["creditoPisCofinsVenda"]
+                )
+              }
+              className={inputCls}
+            >
+              {simNao.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className={labelSm}>Crédito de PIS e COFINS sobre taxa de frete?</label>
-            <UiSelect
+            <label className={labelSm}>
+              Crédito de PIS e COFINS sobre taxa de frete?
+            </label>
+            <select
               value={form.creditoPisCofinsFrete}
-              onChange={(v) => handle("creditoPisCofinsFrete", v as EditData["creditoPisCofinsFrete"])}
-              options={simNao}
-            />
+              onChange={(e) =>
+                handle(
+                  "creditoPisCofinsFrete",
+                  e.target.value as EditData["creditoPisCofinsFrete"]
+                )
+              }
+              className={inputCls}
+            >
+              {simNao.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -221,12 +282,13 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelSm}>Valor absoluto de gasto fixo por pedido</label>
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 items-center rounded-md border border-border-dark bg-card-light/40 px-3 text-sm">
+            <div className="relative w-full">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary select-none">
                 R$
-              </div>
+              </span>
+
               <input
-                className={`${inputCls}`}
+                className={`${inputCls} pl-10`} // espaço para o R$
                 inputMode="decimal"
                 value={form.gastoFixoAbs}
                 onChange={(e) => handle("gastoFixoAbs", e.target.value)}
@@ -249,14 +311,16 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
         </div>
 
         <div>
-          <UiSelect
+          <select
             value={form.difalEstados}
-            onChange={(v) => handle("difalEstados", v as string)}
-            options={[
-              "Desejo ignorar ICMS Difal nas vendas para esses estados",
-              "Não ignorar ICMS Difal",
-            ]}
-          />
+            onChange={(e) => handle("difalEstados", e.target.value)}
+            className={inputCls}
+          >
+            <option value="Desejo ignorar ICMS Difal nas vendas para esses estados">
+              Desejo ignorar ICMS Difal nas vendas para esses estados
+            </option>
+            <option value="Não ignorar ICMS Difal">Não ignorar ICMS Difal</option>
+          </select>
         </div>
 
         <h3 className="text-xs font-semibold tracking-wide text-text-secondary">
@@ -266,28 +330,48 @@ export default function EditCanalModal({ open, onClose, onSave, canal }: Props) 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className={labelSm}>Tipo de entrega</label>
-            <UiSelect value={form.tipoEntrega} onChange={(v) => handle("tipoEntrega", v as string)} options={tiposEntrega} />
+            <select
+              value={form.tipoEntrega}
+              onChange={(e) => handle("tipoEntrega", e.target.value)}
+              className={inputCls}
+            >
+              {tiposEntrega.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className={labelSm}>Região de expedição (CEP)</label>
-            <input className={inputCls} value={form.regiaoCep} onChange={(e) => handle("regiaoCep", e.target.value)} />
+            <input
+              className={inputCls}
+              value={form.regiaoCep}
+              onChange={(e) => handle("regiaoCep", e.target.value)}
+            />
           </div>
 
           <div>
             <label className={labelSm}>Estado de expedição</label>
-            <UiSelect
+            <select
               value={form.estadoExpedicao}
-              onChange={(v) => handle("estadoExpedicao", v as string)}
-              options={[
+              onChange={(e) => handle("estadoExpedicao", e.target.value)}
+              className={inputCls}
+            >
+              {[
                 "Minas Gerais",
                 "São Paulo",
                 "Rio de Janeiro",
                 "Bahia",
                 "Paraná",
                 "Rio Grande do Sul",
-              ]}
-            />
+              ].map((uf) => (
+                <option key={uf} value={uf}>
+                  {uf}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

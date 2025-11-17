@@ -1,15 +1,25 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import UiSelect from "@/components/ui/UiSelect";
 
 export default function ConfigBasica() {
   const [regime, setRegime] = useState("");
   const [possuiRegimeEspecial, setPossuiRegimeEspecial] = useState("Sim");
   const [aplicaVendas, setAplicaVendas] = useState("Ambos");
   const [zeraICMS, setZeraICMS] = useState("Sim");
+  const [estadoUF, setEstadoUF] = useState("MG");
+  const [custoFixo, setCustoFixo] = useState("226.261,80");
 
-  // campos por regime
+  // largura padrão dos campos (inputs + selects)
+  const fieldWidth = "w-[clamp(160px,40vw,355px)]";
+
+  const baseInputCls =
+    "h-10 rounded-md border border-border-dark bg-[var(--color-card)] px-3 text-sm text-[var(--color-text)] placeholder-[var(--color-text-secondary)] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition";
+
+  const inputNarrow = `${fieldWidth} ${baseInputCls}`;
+
+  const sectionTitle = "text-base font-semibold text-text";
+
   const camposPorRegime: Record<string, { label: string; value?: number }[]> = {
     "Lucro real": [
       { label: "PIS", value: 1.65 },
@@ -42,22 +52,60 @@ export default function ConfigBasica() {
 
   const campos = regime ? camposPorRegime[regime] : [];
 
-  // opções
   const regimeOptions = useMemo(
     () => ["Lucro real", "Lucro presumido", "Simples", "MEI"],
     []
   );
+
   const simNaoOptions = useMemo(() => ["Sim", "Não"], []);
+
   const aplicaOptions = useMemo(
     () => ["Ambos", "Não contribuintes", "Contribuintes"],
     []
   );
 
-  // estilos reutilizáveis
-  const inputCls =
-    "w-full h-10 rounded-md border border-border-dark bg-card-light/40 px-3 text-sm " +
-    "placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
-  const sectionTitle = "text-base font-semibold text-text";
+  const estadosBrasil = useMemo(
+    () => [
+      "AC",
+      "AL",
+      "AP",
+      "AM",
+      "BA",
+      "CE",
+      "DF",
+      "ES",
+      "GO",
+      "MA",
+      "MT",
+      "MS",
+      "MG",
+      "PA",
+      "PB",
+      "PR",
+      "PE",
+      "PI",
+      "RJ",
+      "RN",
+      "RS",
+      "RO",
+      "RR",
+      "SC",
+      "SP",
+      "SE",
+      "TO",
+    ],
+    []
+  );
+
+  function formatCurrencyBR(value: string) {
+    const onlyNumbers = value.replace(/\D/g, "");
+    if (!onlyNumbers) return "";
+    const number = parseFloat(onlyNumbers) / 100;
+    return number.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
 
   return (
     <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
@@ -79,32 +127,51 @@ export default function ConfigBasica() {
             <section className="grid gap-3">
               <h2 className={sectionTitle}>Regime tributário</h2>
 
-              <UiSelect
+              {/* SELECT MENOR */}
+              <select
                 value={regime}
-                onChange={setRegime}
-                options={regimeOptions}
-                placeholder="Selecionar"
-              />
+                onChange={(e) => setRegime(e.target.value)}
+                className={inputNarrow}
+              >
+                <option value="" disabled>
+                  Selecionar
+                </option>
+                {regimeOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
 
               {regime && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                   {campos.map((item) => (
-                    <div key={item.label}>
-                      <label className="text-text-secondary text-sm mb-1 block">
+                    <div
+                      key={item.label}
+                      className="flex flex-col gap-1 min-w-0"
+                    >
+                      <label className="text-text-secondary text-sm">
                         {item.label}
                       </label>
 
-                      {regime === "MEI" && item.label === "Contribuição mensal" ? (
-                        <UiSelect
+                      {regime === "MEI" &&
+                      item.label === "Contribuição mensal" ? (
+                        <select
                           value={"R$ 45,00"}
                           onChange={() => {}}
-                          options={["R$ 45,00", "R$ 50,00"]}
-                        />
+                          className={`w-full ${baseInputCls}`}
+                        >
+                          {["R$ 45,00", "R$ 50,00"].map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
                       ) : (
                         <input
                           type="number"
                           defaultValue={item.value}
-                          className={inputCls}
+                          className={`${baseInputCls} w-full`}
                         />
                       )}
                     </div>
@@ -137,7 +204,7 @@ export default function ConfigBasica() {
               <input
                 type="number"
                 defaultValue={0}
-                className={`${inputCls} bg-[var(--color-card)] text-[var(--color-text)] placeholder-[var(--color-text-secondary)] border border-solid border-[var(--color-border-dark)] focus:ring-[var(--color-primary-light)]`}
+                className={inputNarrow}
               />
             </section>
 
@@ -147,33 +214,51 @@ export default function ConfigBasica() {
                 <label className="text-sm font-medium text-text mb-1 block">
                   Possui regime especial?
                 </label>
-                <UiSelect
+                <select
                   value={possuiRegimeEspecial}
-                  onChange={setPossuiRegimeEspecial}
-                  options={simNaoOptions}
-                />
+                  onChange={(e) => setPossuiRegimeEspecial(e.target.value)}
+                  className={inputNarrow}
+                >
+                  {simNaoOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-text mb-1 block">
                   Aplica-se a vendas para:
                 </label>
-                <UiSelect
+                <select
                   value={aplicaVendas}
-                  onChange={setAplicaVendas}
-                  options={aplicaOptions}
-                />
+                  onChange={(e) => setAplicaVendas(e.target.value)}
+                  className={inputNarrow}
+                >
+                  {aplicaOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-text mb-1 block leading-tight">
                   Zerar crédito de ICMS no Regime especial
                 </label>
-                <UiSelect
+                <select
                   value={zeraICMS}
-                  onChange={setZeraICMS}
-                  options={simNaoOptions}
-                />
+                  onChange={(e) => setZeraICMS(e.target.value)}
+                  className={inputNarrow}
+                >
+                  {simNaoOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
               </div>
             </section>
 
@@ -182,29 +267,53 @@ export default function ConfigBasica() {
             {/* Estado */}
             <section className="-mt-10 grid gap-4">
               <h2 className={sectionTitle}>Estado de expedição</h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[var(--color-text-secondary)] text-sm mb-1">
+                    Estado
+                  </label>
+
+                  {/* SELECT DE ESTADO MENOR */}
+                  <select
+                    value={estadoUF}
+                    onChange={(e) => setEstadoUF(e.target.value)}
+                    className={inputNarrow}
+                  >
+                    {estadosBrasil.map((uf) => (
+                      <option key={uf} value={uf}>
+                        {uf}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {[
-                  { label: "Estado", value: "MG" },
-                  { label: "ICMS produtos nacionais (mesmo estado)", value: 6 },
-                  { label: "ICMS produtos importados (mesmo estado)", value: 14 },
-                  { label: "ICMS produtos nacionais (outro estado)", value: 1.3 },
-                  { label: "ICMS produtos importados (outro estado)", value: 1.3 },
+                  {
+                    label: "ICMS produtos nacionais (mesmo estado)",
+                    value: 6,
+                  },
+                  {
+                    label: "ICMS produtos importados (mesmo estado)",
+                    value: 14,
+                  },
+                  {
+                    label: "ICMS produtos nacionais (outro estado)",
+                    value: 1.3,
+                  },
+                  {
+                    label: "ICMS produtos importados (outro estado)",
+                    value: 1.3,
+                  },
                 ].map((item) => (
                   <div key={item.label}>
                     <label className="block text-[var(--color-text-secondary)] text-sm mb-1">
                       {item.label}
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       defaultValue={item.value}
-                      className={`
-                        ${inputCls}
-                        bg-[var(--color-card)]
-                        text-[var(--color-text)]
-                        placeholder-[var(--color-text-secondary)]
-                        border border-solid border-[var(--color-border-dark)]
-                        rounded-md px-3 py-2 w-full transition
-                      `}
+                      className={inputNarrow}
                     />
                   </div>
                 ))}
@@ -220,23 +329,25 @@ export default function ConfigBasica() {
                 Se preferir, insira os custos fixos da empresa.
               </p>
 
-              <div className=" flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <input
-                  type="number"
-                  defaultValue={226261.8}
-                  className={`
-                    ${inputCls}
-                    bg-[var(--color-card)]
-                    text-[var(--color-text)]
-                    placeholder-[var(--color-text-secondary)]
-                    border border-solid border-[var(--color-border-dark)]
-                    rounded-md px-3 py-2 w-full transition
-                  `}
+                  type="text"
+                  value={custoFixo}
+                  onChange={(e) => {
+                    const formatted = formatCurrencyBR(e.target.value);
+                    setCustoFixo(formatted);
+                  }}
+                  className={inputNarrow}
                 />
 
                 <button
-                  className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] 
-                            text-white text-sm px-4 py-2 rounded-md transition-colors w-full sm:w-auto">
+                  className="
+                    bg-[var(--color-primary)]
+                    hover:bg-[var(--color-primary-dark)]
+                    text-white text-sm px-4 py-2 rounded-md
+                    transition-colors w-full sm:w-auto
+                  "
+                >
                   Editar
                 </button>
               </div>

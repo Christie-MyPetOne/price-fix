@@ -28,6 +28,11 @@ export interface VendasTableProps {
   selectedMargemIds: string[];
 }
 
+const abbreviateProductName = (name: string, maxLength: number = 30) => {
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength - 3) + "...";
+};
+
 export function VendasTable({ sales }: VendasTableProps) {
   const [localSort, setLocalSort] = useState<{
     key: SortKey | null;
@@ -75,7 +80,6 @@ export function VendasTable({ sales }: VendasTableProps) {
 
     const accessor = (sale: Sale) => {
       const key = localSort.key as SortKey;
-
       if (key === "margin" || key === "profit") {
         const values = calcProfitAndMargin(sale);
         return values[key];
@@ -101,6 +105,7 @@ export function VendasTable({ sales }: VendasTableProps) {
   const allSelected =
     displayedSales.length > 0 &&
     displayedSales.every((sale) => selectedIds.includes(sale.id));
+
   const isIndeterminate =
     selectedIds.length > 0 && !allSelected && displayedSales.length > 0;
 
@@ -119,9 +124,8 @@ export function VendasTable({ sales }: VendasTableProps) {
   };
 
   useEffect(() => {
-    if (selectAllRef.current) {
+    if (selectAllRef.current)
       selectAllRef.current.indeterminate = isIndeterminate;
-    }
   }, [isIndeterminate]);
 
   const handleAbrirCalculadora = (sale: Sale) => {
@@ -140,7 +144,6 @@ export function VendasTable({ sales }: VendasTableProps) {
       sales: 0,
       status: "Pendente",
       createdAt: new Date().toISOString(),
-
       freight: 0,
       freightRevenue: 0,
       shipping: 0,
@@ -150,7 +153,6 @@ export function VendasTable({ sales }: VendasTableProps) {
       commission: 14,
       saleFee: 0,
       otherCosts: 0,
-
       image: item.image ?? "",
       marketplace: sale.marketplace ?? "",
     };
@@ -174,14 +176,13 @@ export function VendasTable({ sales }: VendasTableProps) {
 
   return (
     <div className="bg-card p-4 sm:p-6 rounded-lg shadow-md mt-6 border border-border-dark w-full">
-      {/* Cabeçalho */}
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-4">
         <label className="text-sm text-text-secondary flex items-center gap-2">
           Mostrar
           <select
             value={rowsPerPage}
             onChange={handleRowsPerPageChange}
-            className="border border-border-dark rounded px-2 py-1 bg-card"
+            className="border border-border-dark rounded px-2 py-1 bg-card focus:ring-1 focus:ring-primary transition"
           >
             {[5, 10, 20, 50].map((n) => (
               <option key={n} value={n}>
@@ -191,9 +192,10 @@ export function VendasTable({ sales }: VendasTableProps) {
           </select>
           itens
         </label>
+
         <p className="text-sm text-text-secondary hidden sm:block">
           Selecionados:{" "}
-          <span className="font-medium">{selectedIds.length}</span> - Mostrando{" "}
+          <span className="font-medium">{selectedIds.length}</span> — Mostrando{" "}
           <span className="font-medium">
             {sortedSales.length ? (currentPage - 1) * rowsPerPage + 1 : 0}
           </span>{" "}
@@ -201,14 +203,13 @@ export function VendasTable({ sales }: VendasTableProps) {
           <span className="font-medium">
             {Math.min(currentPage * rowsPerPage, sortedSales.length)}
           </span>{" "}
-          de <span className="font-medium">{sortedSales.length}</span>{" "}
-          resultados
+          de <span className="font-medium">{sortedSales.length}</span>
         </p>
       </div>
 
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent">
         <table className="min-w-full divide-y divide-border-dark">
-          <thead className="bg-background">
+          <thead className="bg-background/80 backdrop-blur sticky top-0 z-20 border-b border-border-dark">
             <tr>
               <th className="px-4 py-3 w-10">
                 <input
@@ -216,77 +217,48 @@ export function VendasTable({ sales }: VendasTableProps) {
                   type="checkbox"
                   checked={allSelected}
                   onChange={handleToggleAll}
-                  className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+                  className="rounded border-border-dark text-primary cursor-pointer"
                 />
               </th>
-              <th
-                onClick={() => handleSort("orderId" as SortKey)}
-                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
-              >
-                <div className="flex items-center gap-1">
-                  Pedido
-                  <ArrowUpDown
-                    size={14}
-                    className={arrowClass("orderId" as SortKey)}
-                  />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("date")}
-                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
-              >
-                <div className="flex items-center gap-1">
-                  Data
-                  <ArrowUpDown size={14} className={arrowClass("date")} />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("marketplace")}
-                className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider cursor-pointer"
-              >
-                <div className="flex items-center gap-1">
-                  Canal de Venda
-                  <ArrowUpDown
-                    size={14}
-                    className={arrowClass("marketplace")}
-                  />
-                </div>
-              </th>
-              <th
-                onClick={() =>
-                  handleSort("financials.valor_faturado" as SortKey)
-                }
-                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Valor de Venda
-                  <ArrowUpDown
-                    size={14}
-                    className={arrowClass(
-                      "financials.valor_faturado" as SortKey
-                    )}
-                  />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("margin")}
-                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Margem
-                  <ArrowUpDown size={14} className={arrowClass("margin")} />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("profit")}
-                className="px-4 py-3 text-center text-xs font-medium text-text-secondary uppercase cursor-pointer"
-              >
-                <div className="flex items-center justify-center gap-1">
-                  Lucro
-                  <ArrowUpDown size={14} className={arrowClass("profit")} />
-                </div>
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-text-secondary uppercase">
+
+              {[
+                { key: "orderId", label: "Pedido / Produto", w: "200px" },
+                { key: "date", label: "Data", w: "100px" },
+                { key: "marketplace", label: "Canal de Venda", w: "150px" },
+                {
+                  key: "financials.valor_faturado",
+                  label: "Valor",
+                  w: "120px",
+                  center: true,
+                },
+                { key: "margin", label: "Margem", w: "90px", center: true },
+                { key: "profit", label: "Lucro", w: "120px", center: true },
+              ].map((col) => (
+                <th
+                  key={col.key}
+                  onClick={() => handleSort(col.key as SortKey)}
+                  className={`
+                    px-4 py-3 text-xs font-semibold text-text-secondary
+                    cursor-pointer select-none whitespace-nowrap
+                    min-w-[${col.w}]
+                    ${col.center ? "text-center" : "text-left"}
+                  `}
+                >
+                  <div
+                    className={`flex items-center gap-1 ${
+                      col.center ? "justify-center" : ""
+                    }`}
+                  >
+                    {col.label}
+                    <ArrowUpDown
+                      size={14}
+                      className={arrowClass(col.key as SortKey)}
+                    />
+                  </div>
+                </th>
+              ))}
+
+              <th className="px-4 py-3 text-right text-xs font-semibold text-text-secondary min-w-[80px]">
                 Ações
               </th>
             </tr>
@@ -298,13 +270,22 @@ export function VendasTable({ sales }: VendasTableProps) {
               const real = calcProfitAndMargin(sale);
               const isSelected = selectedIds.includes(id);
 
+              const productNames = sale.items.map((i) => i.name).join(", ");
+              const abbreviatedName = abbreviateProductName(productNames, 30);
+
               return (
                 <tr
                   key={id}
-                  className={`hover:bg-background transition-colors cursor-pointer ${
-                    isSelected ? "bg-background/60" : ""
-                  }`}
                   onClick={() => handleAbrirInfo(sale)}
+                  className={`
+                    transition-all cursor-pointer
+                    hover:bg-background/70
+                    ${
+                      isSelected
+                        ? "bg-primary/10 border-l-4 border-primary"
+                        : ""
+                    }
+                  `}
                 >
                   <td
                     className="px-4 py-3 w-10"
@@ -312,72 +293,91 @@ export function VendasTable({ sales }: VendasTableProps) {
                   >
                     <input
                       type="checkbox"
-                      checked={selectedIds.includes(id)}
+                      checked={isSelected}
                       readOnly
                       onClick={(e) => {
                         e.stopPropagation();
                         handleToggleOne(id, index, e.shiftKey);
                       }}
-                      className="rounded border-border-dark text-primary focus:ring-primary cursor-pointer"
+                      className="rounded border-border-dark text-primary cursor-pointer"
                     />
                   </td>
 
-                  <td className="px-4 py-3 text-sm font-medium text-text">
+                  <td className="px-4 py-3 min-w-[200px]">
                     <div className="flex items-center gap-3">
                       {sale.items[0]?.image && (
                         <Image
                           src={sale.items[0].image}
                           alt={sale.items[0].name}
-                          width={50}
-                          height={50}
+                          width={48}
+                          height={48}
                           className="rounded-md object-cover border border-border-dark"
                         />
                       )}
+
                       <div className="flex flex-col">
-                        <span className="text-xs text-text-secondary">
-                          <strong>Status:</strong> {sale.status}
+                        <span className="text-xs text-text-secondary mb-1">
+                          <strong>Pedido:</strong> {sale.ecommerce}
                         </span>
+
                         <span className="text-xs text-text-secondary">
                           <strong>Produto:</strong>{" "}
-                          {sale.items.map((i) => i.name).join(", ")}
+                          <span className="sm:hidden" title={productNames}>
+                            {abbreviatedName}
+                          </span>
+                          <span className="hidden sm:inline">
+                            {productNames}
+                          </span>
                         </span>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-text-secondary">
+                  <td className="px-4 py-3 text-sm text-text-secondary min-w-[100px]">
                     {new Date(sale.date).toLocaleDateString("pt-BR")}
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-text-secondary">
+                  <td className="px-4 py-3 text-sm text-text-secondary min-w-[150px]">
                     {sale.ecommerce ?? "Loja própria"}
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-center">
-                    {sale.financials?.valor_nota?.toLocaleString("pt-BR", {
+                  <td className="px-4 py-3 text-sm text-center min-w-[120px] font-medium">
+                    {sale.financials?.valor_faturado?.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                    })}
+                    }) ?? "R$ 0,00"}
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-center">
-                    {`${real.margin.toFixed(2)}%`}
+                  <td className="px-4 py-3 text-center min-w-[90px]">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        real.margin >= 20
+                          ? "bg-green-100 text-green-700"
+                          : real.margin >= 10
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {real.margin.toFixed(2)}%
+                    </span>
                   </td>
 
-                  <td className="px-4 py-3 text-sm text-center">
+                  {/* LUCRO */}
+                  <td className="px-4 py-3 text-center min-w-[120px] font-medium">
                     {real.profit.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     })}
                   </td>
 
+                  {/* AÇÕES */}
                   <td
-                    className="px-4 py-3 text-right"
+                    className="px-4 py-3 text-right min-w-[80px]"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       onClick={() => handleAbrirCalculadora(sale)}
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-[#10b97c] hover:bg-[#0d9d6b]"
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-primary hover:bg-primary/90 transition shadow-sm"
                     >
                       <Calculator size={16} />
                     </button>
@@ -387,39 +387,39 @@ export function VendasTable({ sales }: VendasTableProps) {
             })}
           </tbody>
         </table>
+      </div>
 
-        <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
-          <div className="flex gap-2">
+      <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-2 rounded-md ring-1 ring-border-dark hover:bg-background transition disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
-              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
+              key={page}
+              className={`px-3 py-2 rounded-md text-sm font-semibold transition ${
+                page === currentPage
+                  ? "bg-primary text-white shadow-sm"
+                  : "ring-1 ring-border-dark hover:bg-background"
+              }`}
+              onClick={() => setCurrentPage(page)}
             >
-              <ChevronLeft size={16} />
+              {page}
             </button>
+          ))}
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`p-2 rounded-md text-sm font-semibold ${
-                  page === currentPage
-                    ? "bg-primary text-white"
-                    : "ring-1 ring-border-dark hover:bg-background"
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button
-              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          <button
+            className="px-3 py-2 rounded-md ring-1 ring-border-dark hover:bg-background transition disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       </div>
 

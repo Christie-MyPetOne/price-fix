@@ -156,89 +156,93 @@ export default function VendasPage() {
   }, [sales, selectedMargemIds, margens]);
 
   return (
-    <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
-      <div className="flex-1">
-        <h1 className="text-3xl font-bold mb-4 text-color-text">Vendas</h1>
+    <>
+      <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-2xl font-bold mb-4 text-text">
+            Vendas
+          </h1>
 
-        <VendasFilters
-          onSearch={handleSearch}
-          onFilterChange={handleFilterChange}
-          onSelectAll={handleSelectAll}
-        />
+          <VendasFilters
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            onSelectAll={handleSelectAll}
+          />
 
-        <ResumoCards sales={sales} />
+          <ResumoCards sales={sales} />
 
-        <div className="mt-8">
-          <MargensChart
-            buckets={buckets}
-            legend={legend}
-            onEditRanges={() => setOpenMarginsModal(true)}
-            onChangeSelection={setSelectedMargemIds}
+          <div className="mt-8">
+            <MargensChart
+              buckets={buckets}
+              legend={legend}
+              onEditRanges={() => setOpenMarginsModal(true)}
+              onChangeSelection={setSelectedMargemIds}
+              selectedMargemIds={selectedMargemIds}
+            />
+          </div>
+
+          <Modal
+            open={openMarginsModal}
+            onClose={() => setOpenMarginsModal(false)}
+            title="Configurar margens"
+            size="sm"
+          >
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const novaAlta = parseFloat(
+                  (form.elements.namedItem("alta") as HTMLInputElement).value
+                );
+                const novaMedia = parseFloat(
+                  (form.elements.namedItem("media") as HTMLInputElement).value
+                );
+                handleSaveMargens(novaAlta, novaMedia);
+              }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Margem alta (%)
+                  </label>
+                  <input
+                    type="number"
+                    name="alta"
+                    defaultValue={margens.alta}
+                    step="0.1"
+                    className="mt-1 w-full rounded-md border border-border-dark bg-background px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">
+                    Margem média (%)
+                  </label>
+                  <input
+                    type="number"
+                    name="media"
+                    defaultValue={margens.media}
+                    step="0.1"
+                    className="mt-1 w-full rounded-md border border-border-dark bg-background px-2 py-1"
+                  />
+                </div>
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </Modal>
+
+          <VendasTable
             selectedMargemIds={selectedMargemIds}
+            sales={filteredSales}
           />
         </div>
-
-        <Modal
-          open={openMarginsModal}
-          onClose={() => setOpenMarginsModal(false)}
-          title="Configurar margens"
-          size="sm"
-        >
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
-              const novaAlta = parseFloat(
-                (form.elements.namedItem("alta") as HTMLInputElement).value
-              );
-              const novaMedia = parseFloat(
-                (form.elements.namedItem("media") as HTMLInputElement).value
-              );
-              handleSaveMargens(novaAlta, novaMedia);
-            }}
-          >
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium">
-                  Margem alta (%)
-                </label>
-                <input
-                  type="number"
-                  name="alta"
-                  defaultValue={margens.alta}
-                  step="0.1"
-                  className="mt-1 w-full rounded-md border border-border-dark bg-background px-2 py-1"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Margem média (%)
-                </label>
-                <input
-                  type="number"
-                  name="media"
-                  defaultValue={margens.media}
-                  step="0.1"
-                  className="mt-1 w-full rounded-md border border-border-dark bg-background px-2 py-1"
-                />
-              </div>
-              <div className="flex justify-end pt-2">
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
-                >
-                  Salvar
-                </button>
-              </div>
-            </div>
-          </form>
-        </Modal>
-
-        <VendasTable
-          selectedMargemIds={selectedMargemIds}
-          sales={filteredSales}
-        />
       </div>
-    </div>
+    </>
   );
 }
