@@ -2,10 +2,16 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Check, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import Modal from "@/components/ui/Modal";
+
+/* ==================================================================== */
+/* CONFIGURAÇÃO E UTILS                         */
+/* ==================================================================== */
 
 /* ========= base visual (compacta) ========= */
+// Classe base reutilizável para campos de entrada/botões de seleção
 const fieldBase =
-  "bg-card h-7 w-full px-2 border border-border-dark rounded-md bg-background text-text text-xs focus:ring-primary focus:border-primary";
+  "bg-card h-7 w-full px-2 border border-border-dark rounded-md bg-background text-text text-[11px] focus:ring-primary focus:border-primary";
 
 /* ========= opções de período ========= */
 const periodOptions: Record<string, string[]> = {
@@ -18,7 +24,7 @@ const periodOptions: Record<string, string[]> = {
   "Período personalizado": ["Período personalizado"],
 };
 
-/* ========= utils ========= */
+/* ========= utils (Datas) ========= */
 function formatDate(d?: string) {
   if (!d) return "";
   const [yyyy, mm, dd] = d.split("-");
@@ -37,12 +43,18 @@ function isWithin(d: Date, a?: string, b?: string) {
   const da = parseYMD(a)!, db = parseYMD(b)!, dx = d;
   const min = Math.min(da.getTime(), db.getTime());
   const max = Math.max(da.getTime(), db.getTime());
-  return dx.getTime() >= min && dx.getTime() <= max;
+  const dayStart = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  return dayStart(dx) >= dayStart(new Date(min)) && dayStart(dx) <= dayStart(new Date(max));
 }
 function sameDay(d: Date, ymd?: string) {
   if (!ymd) return false;
   const p = parseYMD(ymd)!;
-  return d.getFullYear() === p.getFullYear() && d.getMonth() === p.getMonth() && d.getDate() === p.getDate();
+  return (
+    d.getFullYear() === p.getFullYear() &&
+    d.getMonth() === p.getMonth() &&
+    d.getDate() === p.getDate()
+  );
 }
 
 /* ============ Hook: fechar ao clicar fora / Esc ============ */
@@ -72,6 +84,31 @@ function useOutsideClose<T extends HTMLElement>(open: boolean, onClose: () => vo
   return ref;
 }
 
+/* ============ Hook: detectar se é mobile ============ */
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+
+    const update = (e: MediaQueryList | MediaQueryListEvent) => {
+      const matches = "matches" in e ? e.matches : (e as MediaQueryList).matches;
+      setIsMobile(matches);
+    };
+
+    update(mq);
+    mq.addEventListener("change", update as any);
+    return () => mq.removeEventListener("change", update as any);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
+/* ==================================================================== */
+/* COMPONENTES                             */
+/* ==================================================================== */
+
 /* ============ Calendário de intervalo (compacto) ============ */
 function DateRangeCalendar({
   value,
@@ -81,8 +118,12 @@ function DateRangeCalendar({
   onChange: (next: { start?: string; end?: string }) => void;
 }) {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(() => (value?.start ? parseYMD(value.start)!.getFullYear() : today.getFullYear()));
-  const [viewMonth, setViewMonth] = useState(() => (value?.start ? parseYMD(value.start)!.getMonth() : today.getMonth())); // 0..11
+  const [viewYear, setViewYear] = useState(() =>
+    value?.start ? parseYMD(value.start)!.getFullYear() : today.getFullYear()
+  );
+  const [viewMonth, setViewMonth] = useState(() =>
+    value?.start ? parseYMD(value.start)!.getMonth() : today.getMonth()
+  );
   const [anchor, setAnchor] = useState<string | undefined>(value?.start);
   const [rangeEnd, setRangeEnd] = useState<string | undefined>(value?.end);
 
@@ -105,7 +146,7 @@ function DateRangeCalendar({
   }
 
   const firstDay = new Date(viewYear, viewMonth, 1);
-  const startWeekday = firstDay.getDay(); // 0=Dom
+  const startWeekday = firstDay.getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
   const grid: (Date | null)[] = [];
@@ -129,17 +170,30 @@ function DateRangeCalendar({
     }
   }
 
-  const monthLabel = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(new Date(viewYear, viewMonth, 1));
-  const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"]; // Dom..Sáb
+  const monthLabel = new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(viewYear, viewMonth, 1));
+  const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"];
 
   return (
     <div className="w-[280px]">
       <div className="flex items-center justify-between px-2 py-1">
-        <button onClick={prevMonth} className="h-7 w-7 rounded-md hover:bg-muted" type="button" aria-label="Mês anterior">
+        <button
+          onClick={prevMonth}
+          className="h-7 w-7 rounded-md hover:bg-muted"
+          type="button"
+          aria-label="Mês anterior"
+        >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div className="text-xs font-medium capitalize">{monthLabel}</div>
-        <button onClick={nextMonth} className="h-7 w-7 rounded-md hover:bg-muted" type="button" aria-label="Próximo mês">
+        <button
+          onClick={nextMonth}
+          className="h-7 w-7 rounded-md hover:bg-muted"
+          type="button"
+          aria-label="Próximo mês"
+        >
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -220,7 +274,8 @@ function DateRangePopover({
   title?: string;
   placement?: "bottom" | "right";
 }) {
-  const ref = useOutsideClose<HTMLDivElement>(open, onClose);
+  const isMobile = useIsMobile();
+  const ref = useOutsideClose<HTMLDivElement>(open && !isMobile, onClose);
   if (!open) return null;
 
   const positionClass =
@@ -259,7 +314,7 @@ function SingleSelect({
   options,
   placeholder = "Selecione...",
   className = "",
-  minWidthClass = "min-w-[160px]", // reduzido
+  minWidthClass = "min-w-[160px]",
   onOptionClick,
   renderLabel,
   placement = "bottom",
@@ -276,10 +331,40 @@ function SingleSelect({
 }) {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
-  const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
+  const isMobile = useIsMobile();
+  const panelRef = useOutsideClose<HTMLDivElement>(open && !isMobile, () => setOpen(false));
 
   const positionClass =
     placement === "right" ? "left-[calc(100%+8px)] top-0" : "left-0 top-[calc(100%+8px)]";
+
+  const handleSelect = (opt: SingleSelectOption) => {
+    const preventClose = onOptionClick?.(opt);
+    if (!preventClose) {
+      onChange(opt.value);
+      setOpen(false);
+    }
+  };
+
+  const list = (modalVersion = false) => (
+    <div className="py-1 max-h-64 overflow-auto">
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            className={`w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-[11px] flex items-center ${
+              modalVersion ? "gap-2" : "justify-between"
+            }`}
+            onClick={() => handleSelect(opt)}
+          >
+            <span className={modalVersion ? "" : "whitespace-nowrap"}>{opt.label}</span>
+            {active && <Check className="w-3 h-3 opacity-80" />}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
     <div className={`relative ${minWidthClass}`}>
@@ -291,57 +376,63 @@ function SingleSelect({
         <span className="truncate">
           {renderLabel ? renderLabel(selected) : selected ? selected.label : placeholder}
         </span>
-        <ChevronDown className="w-4 h-4 opacity-70" />
+        <ChevronDown className="w-3 h-3 opacity-70" />
       </button>
 
-      {open && (
+      {/* Desktop / tablet: popover com largura flexível conforme o texto */}
+      {open && !isMobile && (
         <div
           ref={panelRef}
-          className={`absolute ${positionClass} z-50 w-full rounded-lg border border-border-dark bg-card shadow-lg p-1.5`}
+          className={`absolute ${positionClass} z-50 inline-block rounded-lg border border-border-dark bg-card shadow-lg p-1.5`}
         >
-          <div className="py-1 max-h-64 overflow-auto">
-            {options.map((opt) => {
-              const active = value === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center justify-between"
-                  onClick={() => {
-                    const preventClose = onOptionClick?.(opt);
-                    if (!preventClose) {
-                      onChange(opt.value);
-                      setOpen(false);
-                    }
-                  }}
-                >
-                  <span className="truncate">{opt.label}</span>
-                  {active && <Check className="w-4 h-4 opacity-80" />}
-                </button>
-              );
-            })}
-          </div>
+          {list(false)}
         </div>
+      )}
+
+      {/* Mobile: abre Modal */}
+      {open && isMobile && (
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          title={selected?.label || placeholder || "Selecionar"}
+        >
+          <div className="pt-2">{list(true)}</div>
+        </Modal>
       )}
     </div>
   );
 }
 
 /* ============ Multi-select: Empresas (compacto) ============ */
-function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (next: string[]) => void }) {
+function EmpresasMultiSelect({
+  value,
+  onChange,
+  isMobile = false,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  isMobile?: boolean;
+}) {
   const [open, setOpen] = useState(false);
-  const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
+  const panelRef = useOutsideClose<HTMLDivElement>(open && !isMobile, () => setOpen(false));
 
-  const options = [
-    { id: "conta1", label: "Conta 1" },
-    { id: "conta2", label: "Conta 2" },
-    { id: "conta3", label: "Conta 3" },
-  ];
+  const options = useMemo(
+    () => [
+      { id: "conta1", label: "Conta 1" },
+      { id: "conta2", label: "Conta 2" },
+      { id: "conta3", label: "Conta 3" },
+    ],
+    []
+  );
+
   const allSelected = value.length === options.length;
   const someSelected = value.length > 0 && !allSelected;
 
-  const buttonText =
-    value.length === 0 ? "Selecione empresas" : value.length === 1 ? options.find((o) => o.id === value[0])?.label : `${value.length} selecionadas`;
+  const buttonText = useMemo(() => {
+    if (value.length === 0) return isMobile ? "Empresas" : "Selecione empresas";
+    if (value.length === 1) return options.find((o) => o.id === value[0])?.label;
+    return `${value.length} selecionadas`;
+  }, [value, options, isMobile]);
 
   function toggle(id: string) {
     onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
@@ -350,74 +441,122 @@ function EmpresasMultiSelect({ value, onChange }: { value: string[]; onChange: (
     onChange(allSelected ? [] : options.map((o) => o.id));
   }
 
-  return (
-    <div className="relative">
+  const listContent = (
+    <>
       <button
         type="button"
-        className={`${fieldBase} min-w-[180px] flex items-center justify-between`} // reduzido
+        className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-[11px] flex items-center gap-2"
+        onClick={toggleAll}
+      >
+        <input
+          type="checkbox"
+          className="accent-primary"
+          readOnly
+          checked={allSelected}
+          ref={(el) => {
+            if (el) el.indeterminate = someSelected;
+          }}
+        />
+        Selecionar todos
+      </button>
+
+      <div className="mt-1 border-t border-border-dark/50" />
+
+      <div className="py-1 max-h-64 overflow-auto">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-[11px] flex items-center gap-2"
+            onClick={() => toggle(opt.id)}
+          >
+            <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="relative min-w-0">
+      <button
+        type="button"
+        className={`${fieldBase} min-w-0 md:min-w-[120px] flex items-center justify-between`}
         onClick={() => setOpen((o) => !o)}
       >
         <span className="truncate">{buttonText}</span>
-        <ChevronDown className="w-4 h-4 opacity-70" />
+        <ChevronDown className="w-3 h-3 opacity-70" />
       </button>
 
-      {open && (
-        <div ref={panelRef} className="absolute left-0 top-[calc(100%+8px)] z-50 w-full rounded-lg border border-border-dark bg-card shadow-lg p-2">
-          <button type="button" className=" w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2" onClick={toggleAll}>
-            <input
-              type="checkbox"
-              className="accent-primary"
-              readOnly
-              checked={allSelected}
-              ref={(el) => {
-                if (el) el.indeterminate = someSelected;
-              }}
-            />
-            Selecionar todos
-          </button>
-
-          <div className="mt-1 border-t border-border-dark/50" />
-
-          <div className="py-1 max-h-64 overflow-auto">
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2"
-                onClick={() => toggle(opt.id)}
-              >
-                <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-end p-2">
-            <button className="h-7 px-3 rounded-md bg-primary text-white text-xs" onClick={() => setOpen(false)}>
+      {/* Desktop popover com largura flexível */}
+      {open && !isMobile && (
+        <div
+          ref={panelRef}
+          className="absolute left-0 top-[calc(100%+8px)] z-50 inline-block rounded-lg border border-border-dark bg-card shadow-lg px-2 py-1.5"
+        >
+          {listContent}
+          <div className="flex justify-end pt-1">
+            <button
+              className="h-7 px-3 rounded-md bg-primary text-white text-[11px]"
+              onClick={() => setOpen(false)}
+            >
               Fechar
             </button>
           </div>
         </div>
+      )}
+
+      {/* Mobile modal */}
+      {open && isMobile && (
+        <Modal open={open} onClose={() => setOpen(false)} title="Empresas">
+          <div className="pt-2 space-y-2">
+            {listContent}
+            <div className="flex justify-end pt-2">
+              <button
+                className="h-8 px-4 rounded-md bg-primary text-white text-[12px]"
+                onClick={() => setOpen(false)}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );
 }
 
 /* ============ Multi-select: Marketplaces (compacto) ============ */
-function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChange: (next: string[]) => void }) {
+function MarketplacesMultiSelect({
+  value,
+  onChange,
+  isMobile = false,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  isMobile?: boolean;
+}) {
   const [open, setOpen] = useState(false);
-  const panelRef = useOutsideClose<HTMLDivElement>(open, () => setOpen(false));
+  const panelRef = useOutsideClose<HTMLDivElement>(open && !isMobile, () => setOpen(false));
 
-  const options = [
-    { id: "shopee", label: "Shopee" },
-    { id: "mercado_livre", label: "Mercado Livre" },
-    { id: "amazon", label: "Amazon" },
-  ];
+  const options = useMemo(
+    () => [
+      { id: "shopee", label: "Shopee" },
+      { id: "mercado_livre", label: "Mercado Livre" },
+      { id: "amazon", label: "Amazon" },
+    ],
+    []
+  );
+
   const allSelected = value.length === options.length;
   const someSelected = value.length > 0 && !allSelected;
 
-  const buttonText =
-    value.length === 0 ? "Selecione marketplaces" : value.length === 1 ? options.find((o) => o.id === value[0])?.label : `${value.length} selecionados`;
+  const buttonText = useMemo(() => {
+    if (value.length === 0) return isMobile ? "Marketplaces" : "Selecione marketplaces";
+    if (value.length === 1) return options.find((o) => o.id === value[0])?.label;
+    return `${value.length} selecionados`;
+  }, [value, options, isMobile]);
 
   function toggle(id: string) {
     onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
@@ -426,66 +565,104 @@ function MarketplacesMultiSelect({ value, onChange }: { value: string[]; onChang
     onChange(allSelected ? [] : options.map((o) => o.id));
   }
 
-  return (
-    <div className="relative">
+  const listContent = (
+    <>
       <button
         type="button"
-        className={`${fieldBase} min-w-[180px] flex items-center justify-between`} // reduzido
+        className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-[11px] flex items-center gap-2"
+        onClick={toggleAll}
+      >
+        <input
+          type="checkbox"
+          className="accent-primary"
+          readOnly
+          checked={allSelected}
+          ref={(el) => {
+            if (el) el.indeterminate = someSelected;
+          }}
+        />
+        Selecionar todos
+      </button>
+
+      <div className="mt-1 border-t border-border-dark/50" />
+
+      <div className="py-1 max-h-64 overflow-auto">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-[11px] flex items-center gap-2"
+            onClick={() => toggle(opt.id)}
+          >
+            <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="relative min-w-0">
+      <button
+        type="button"
+        className={`${fieldBase} min-w-0 md:min-w-[120px] flex items-center justify-between`}
         onClick={() => setOpen((o) => !o)}
       >
         <span className="truncate">{buttonText}</span>
-        <ChevronDown className="w-4 h-4 opacity-70" />
+        <ChevronDown className="w-3 h-3 opacity-70" />
       </button>
 
-      {open && (
-        <div ref={panelRef} className="absolute left-0 top-[calc(100%+8px)] z-50 w-full rounded-lg border border-border-dark bg-card shadow-lg p-2">
-          <button type="button" className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2" onClick={toggleAll}>
-            <input
-              type="checkbox"
-              className="accent-primary"
-              readOnly
-              checked={allSelected}
-              ref={(el) => {
-                if (el) el.indeterminate = someSelected;
-              }}
-            />
-            Selecionar todos
-          </button>
-
-          <div className="mt-1 border-t border-border-dark/50" />
-
-          <div className="py-1 max-h-64 overflow-auto">
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="w-full text-left px-2.5 py-1.5 rounded hover:bg-muted text-xs flex items-center gap-2"
-                onClick={() => toggle(opt.id)}
-              >
-                <input type="checkbox" className="accent-primary" readOnly checked={value.includes(opt.id)} />
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-end p-2">
-            <button className="h-7 px-3 rounded-md bg-primary text-white text-xs" onClick={() => setOpen(false)}>
+      {/* Desktop popover com largura flexível */}
+      {open && !isMobile && (
+        <div
+          ref={panelRef}
+          className="absolute left-0 top-[calc(100%+8px)] z-50 inline-block rounded-lg border border-border-dark bg-card shadow-lg px-2 py-1.5"
+        >
+          {listContent}
+          <div className="flex justify-end pt-1">
+            <button
+              className="h-7 px-3 rounded-md bg-primary text-white text-[11px]"
+              onClick={() => setOpen(false)}
+            >
               Fechar
             </button>
           </div>
         </div>
       )}
+
+      {/* Mobile modal */}
+      {open && isMobile && (
+        <Modal open={open} onClose={() => setOpen(false)} title="Marketplaces">
+          <div className="pt-2 space-y-2">
+            {listContent}
+            <div className="flex justify-end pt-2">
+              <button
+                className="h-8 px-4 rounded-md bg-primary text-white text-[12px]"
+                onClick={() => setOpen(false)}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
 
-/* ============ Filtro Principal (compacto) ============ */
+/* ==================================================================== */
+/* FILTRO PRINCIPAL (EXPORT)                    */
+/* ==================================================================== */
+
 export function DashFilter() {
   const [resultado, setResultado] = useState<string>("Hoje");
   const [comparado, setComparado] = useState<string>("Ontem");
   const [marketplaces, setMarketplaces] = useState<string[]>([]);
   const [empresas, setEmpresas] = useState<string[]>([]);
   const [compararPor, setCompararPor] = useState<"Média" | "Somatória">("Somatória");
+
+  const isMobile = useIsMobile();
 
   const [resultadoRange, setResultadoRange] = useState<{ start?: string; end?: string }>({});
   const [comparadoRange, setComparadoRange] = useState<{ start?: string; end?: string }>({});
@@ -554,110 +731,139 @@ Marketplaces: ${marketplaces.join(", ") || "—"}`
   }
 
   return (
-    <div className="justify-center flex gap-3 p-2 rounded-lg flex-wrap">
-      {/* Comparar por */}
-      <div className="flex flex-col h-7">
-        <SingleSelect
-          value={compararPor}
-          onChange={(v) => setCompararPor(v as "Média" | "Somatória")}
-          options={[
-            { value: "Somatória", label: "Somatória" },
-            { value: "Média", label: "Média" },
-          ]}
-          minWidthClass="min-w-[160px]"
-          placement="bottom"
-        />
+    <div className="flex flex-col gap-2 p-2 rounded-lg">
+      {/* TOPO: Somatória / Empresas / Marketplaces */}
+      <div className="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:justify-center md:gap-3">
+        <div className="min-w-0">
+          <SingleSelect
+            value={compararPor}
+            onChange={(v) => setCompararPor(v as "Média" | "Somatória")}
+            options={[
+              { value: "Somatória", label: "Somatória" },
+              { value: "Média", label: "Média" },
+            ]}
+            minWidthClass="w-full min-w-0"
+            placement="bottom"
+          />
+        </div>
+
+        <div className="min-w-0">
+          <EmpresasMultiSelect value={empresas} onChange={setEmpresas} isMobile={isMobile} />
+        </div>
+
+        <div className="min-w-0">
+          <MarketplacesMultiSelect value={marketplaces} onChange={setMarketplaces} isMobile={isMobile} />
+        </div>
       </div>
 
-      {/* Empresas */}
-      <div className="flex flex-col">
-        <EmpresasMultiSelect value={empresas} onChange={setEmpresas} />
-      </div>
-
-      {/* Marketplaces */}
-      <div className="flex flex-col">
-        <MarketplacesMultiSelect value={marketplaces} onChange={setMarketplaces} />
-      </div>
-
-      {/* Linha de filtros + botões */}
-      <div className="w-full flex flex-col justify-center md:flex-row md:items-end gap-2 md:gap-3">
+      {/* SEGUNDA LINHA: Resultado / Comparado + botões (no desktop) */}
+      <div className="grid grid-cols-2 gap-2 md:flex md:flex-row md:flex-wrap md:items-end md:justify-center md:gap-3">
         {/* Resultado de */}
-        <div className="relative flex flex-col md:flex-row md:items-center w-full md:w-auto gap-1">
-          <label className="text-xs font-medium text-text-secondary md:w-28 shrink-0">Resultado de</label>
-          <SingleSelect
-            value={resultado}
-            onChange={handleResultadoChange}
-            options={Object.keys(periodOptions).map((k) => ({ value: k, label: k }))}
-            className="md:min-w-[160px]"
-            renderLabel={() => <>{resultadoLabel}</>}
-            onOptionClick={(opt) => {
-              if (opt.value === "Período personalizado") {
-                setResultado(opt.value);
-                setShowResultadoCalendar(true);
-                return true;
-              }
-            }}
-            placement="bottom"
-          />
-          <DateRangePopover
-            open={showResultadoCalendar}
-            onClose={() => setShowResultadoCalendar(false)}
-            value={resultadoRange}
-            onApply={(range) => setResultadoRange(range)}
-            title="Período personalizado (Resultado de)"
-            placement="bottom"
-          />
+        <div className="relative flex flex-col gap-1 min-w-0 md:flex-row md:items-center md:gap-2">
+          <label className="text-[11px] font-medium text-text-secondary md:whitespace-nowrap">
+            Resultado de
+          </label>
+          <div className="flex-1">
+            <SingleSelect
+              value={resultado}
+              onChange={handleResultadoChange}
+              options={Object.keys(periodOptions).map((k) => ({ value: k, label: k }))}
+              className="md:min-w-[160px]"
+              renderLabel={() => <>{resultadoLabel}</>}
+              onOptionClick={(opt) => {
+                if (opt.value === "Período personalizado") {
+                  setResultado(opt.value);
+                  setShowResultadoCalendar(true);
+                  return true;
+                }
+              }}
+              minWidthClass="w-full min-w-0"
+              placement="bottom"
+            />
+            <DateRangePopover
+              open={showResultadoCalendar}
+              onClose={() => setShowResultadoCalendar(false)}
+              value={resultadoRange}
+              onApply={(range) => setResultadoRange(range)}
+              title="Período personalizado (Resultado de)"
+              placement="bottom"
+            />
+          </div>
         </div>
 
-        {/* Comparado com */}
-        <div className="relative flex flex-col md:flex-row md:items-center w-full md:w-auto gap-1">
-          <label className="text-xs font-medium text-text-secondary md:w-28 shrink-0">Comparado com</label>
-          <SingleSelect
-            value={comparado}
-            onChange={setComparado}
-            options={(periodOptions[resultado] ?? []).map((opt) => ({ value: opt, label: opt }))}
-            className="md:min-w-[160px]"
-            renderLabel={() => <>{comparadoLabel}</>}
-            onOptionClick={(opt) => {
-              if (opt.value === "Período personalizado") {
-                setComparado(opt.value);
-                setShowComparadoCalendar(true);
-                return true;
-              }
-            }}
-            placement="bottom"
-          />
-          <DateRangePopover
-            open={showComparadoCalendar}
-            onClose={() => setShowComparadoCalendar(false)}
-            value={comparadoRange}
-            onApply={(range) => setComparadoRange(range)}
-            title="Período personalizado (Comparado com)"
-            placement="bottom"
-          />
-        </div>
+        {/* Comparado com + botões (no desktop) */}
+        <div className="relative flex flex-col gap-1 min-w-0 md:flex-row md:items-center md:gap-2">
+          <label className="text-[11px] font-medium text-text-secondary md:whitespace-nowrap">
+            Comparado com
+          </label>
 
-        {/* Botões */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={applyFilters}
-            className="px-4 py-1 rounded-md bg-[#10b97c] hover:bg-[#0d9d6b] text-white text-xs font-medium h-7"
-          >
-            Aplicar
-          </button>
-          <button
-            onClick={clearFilters}
-            className="h-7 aspect-square flex items-center justify-center rounded-md border border-border-dark hover:bg-muted"
-            aria-label="Limpar filtros"
-            title="Limpar filtros"
-            type="button"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {/* bloco do select */}
+          <div className="flex-1">
+            <SingleSelect
+              value={comparado}
+              onChange={setComparado}
+              options={(periodOptions[resultado] ?? []).map((opt) => ({ value: opt, label: opt }))}
+              className="md:min-w-[160px]"
+              renderLabel={() => <>{comparadoLabel}</>}
+              onOptionClick={(opt) => {
+                if (opt.value === "Período personalizado") {
+                  setComparado(opt.value);
+                  setShowComparadoCalendar(true);
+                  return true;
+                }
+              }}
+              minWidthClass="w-full min-w-0"
+              placement="bottom"
+            />
+            <DateRangePopover
+              open={showComparadoCalendar}
+              onClose={() => setShowComparadoCalendar(false)}
+              value={comparadoRange}
+              onApply={(range) => setComparadoRange(range)}
+              title="Período personalizado (Comparado com)"
+              placement="bottom"
+            />
+          </div>
+
+          {/* Botões AO LADO no desktop */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={applyFilters}
+              className="px-4 py-1 rounded-md bg-[#10b97c] hover:bg-[#0d9d6b] text-white text-[11px] font-medium h-7"
+            >
+              Aplicar
+            </button>
+            <button
+              onClick={clearFilters}
+              className="h-7 aspect-square flex items-center justify-center rounded-md border border-border-dark hover:bg-muted"
+              aria-label="Limpar filtros"
+              title="Limpar filtros"
+              type="button"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+      </div>
+
+      {/* Botões NO MOBILE (embaixo, como já estava) */}
+      <div className="flex items-center justify-center gap-2 md:hidden">
+        <button
+          onClick={applyFilters}
+          className="px-4 py-1 rounded-md bg-[#10b97c] hover:bg-[#0d9d6b] text-white text-[11px] font-medium h-7"
+        >
+          Aplicar
+        </button>
+        <button
+          onClick={clearFilters}
+          className="h-7 aspect-square flex items-center justify-center rounded-md border border-border-dark hover:bg-muted"
+          aria-label="Limpar filtros"
+          title="Limpar filtros"
+          type="button"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 }
-
-export default DashFilter;

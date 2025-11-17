@@ -68,13 +68,15 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-8xl -mt-8 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
-      <div className="flex items-center w-full mb-6">
-        <h1 className="text-3xl justify-center font-semibold text-text">
-          Dashboard
-        </h1>
-        <div className=" -ml-20">
+      <div className="relative flex flex-col w-full -mb-7">
+
+        {/* Filtro centralizado no desktop, full no mobile */}
+        <div className="w-full flex justify-center md:justify-center">
           <DashFilter />
         </div>
+        <h1 className="absolute mt-[40px] text-3xl font-semibold text-text dashboard-title">
+          Dashboard
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
