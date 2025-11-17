@@ -43,7 +43,7 @@ export default function UiSelect({
       <button
         type="button"
         className="
-          appearance-none w-full h-10 px-3 pr-8 rounded-md
+          appearance-none h-10 px-3 pr-8 rounded-md
           border border-border-dark bg-transparent text-sm text-text
           text-left focus:outline-none focus:ring-2 focus:ring-primary/30
         "
@@ -72,8 +72,9 @@ export default function UiSelect({
       {open && (
         <div
           className="
-            absolute top-full left-0 mt-2 min-w-full bg-card rounded-md
+            absolute top-full left-0 mt-2 w-[clamp(160px,40vw,355px)] bg-card rounded-md
             shadow-lg py-1 z-20 border border-border-dark
+            max-h-56 overflow-y-auto
           "
         >
           {options.length === 0 ? (
