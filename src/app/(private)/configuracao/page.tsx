@@ -58,9 +58,10 @@ export default function ConfiguracaoPage() {
       {/* se sua Navbar superior ocupa ~64px, ajuste como preferir */}
       <SidebarConfig active={active} onChange={setActive} />
 
-      <main className="flex-1 overflow-y-auto p-6 bg-background">
-        {Content}
-      </main>
+    <main className="flex-1 bg-background pb-24 md:pb-6 overflow-x-hidden pt-4 md:p-6 md:pt-6 md:px-6">
+      {Content}
+    </main>
+
     </div>
   );
 }

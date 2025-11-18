@@ -104,89 +104,97 @@ export default function FormasRecebimento() {
   };
 
   return (
-    <div className="w-full">
-      <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-        <div>
-          <h1 className="text-2xl font-semibold text-text">
-            Formas de recebimento
-          </h1>
-          <p className="text-sm text-text-secondary">de Outubro de 2025</p>
+    <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
+      <div className="mx-auto max-w-6xl">
+        {/* Cabeçalho */}
+        <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div>
+            <h1 className="text-2xl font-semibold text-text">
+              Formas de recebimento
+            </h1>
+            <p className="text-sm text-text-secondary">
+              de Outubro de 2025
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <input
+              placeholder="Buscar formas de recebimento"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className={`${inputCls} w-full sm:w-64 bg-card`}
+            />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input
-            placeholder="Buscar formas de recebimento"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            className={`${inputCls} w-64 bg-card`}
-          />
-        </div>
-      </div>
+        {/* Card principal (tabela) – mesmo estilo de ConfigBasica / Fornecedores */}
+        <div className="rounded-xl border border-border-dark bg-card shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-[960px] w-full">
+              <thead className="border-b border-border-dark bg-card-light/40">
+                <tr className="text-left text-sm text-text-secondary">
+                  <th className="px-4 py-3 font-medium">Título</th>
+                  <th className="px-4 py-3 font-medium">Tipo de pagamento</th>
+                  <th className="px-4 py-3 font-medium">Taxas de venda</th>
+                  <th className="px-4 py-3 font-medium">Canais de venda</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="text-sm text-text">
+                {data.map((f) => (
+                  <tr key={f.id} className="border-b border-border-dark">
+                    <td className="px-4 py-3">{f.titulo}</td>
+                    <td className="px-4 py-3">{f.tipoPagamento}</td>
+                    <td className="px-4 py-3">
+                      {`${formatCurrency(f.taxaFixa)} + ${
+                        (f.taxaPercentual ?? 0).toFixed(2)
+                      }%`}
+                    </td>
+                    <td className="px-4 py-3">{canalBadge(f.canalNome)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => {
+                          setSelecionado(f);
+                          setOpen(true);
+                        }}
+                        className="rounded-md border border-border-dark px-3 py-1.5 text-xs font-medium hover:bg-card-light/60"
+                      >
+                        EDITAR
+                      </button>
+                    </td>
+                  </tr>
+                ))}
 
-      <div className="overflow-hidden rounded-xl border border-border-dark bg-card shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-[960px] w-full">
-            <thead className="border-b border-border-dark bg-card-light/40">
-              <tr className="text-left text-sm text-text-secondary">
-                <th className="px-4 py-3 font-medium">Título</th>
-                <th className="px-4 py-3 font-medium">Tipo de pagamento</th>
-                <th className="px-4 py-3 font-medium">Taxas de venda</th>
-                <th className="px-4 py-3 font-medium">Canais de venda</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="text-sm text-text">
-              {data.map((f) => (
-                <tr key={f.id} className="border-b border-border-dark">
-                  <td className="px-4 py-3">{f.titulo}</td>
-                  <td className="px-4 py-3">{f.tipoPagamento}</td>
-                  <td className="px-4 py-3">
-                    {`${formatCurrency(f.taxaFixa)} + ${
-                      (f.taxaPercentual ?? 0).toFixed(2)
-                    }%`}
-                  </td>
-                  <td className="px-4 py-3">{canalBadge(f.canalNome)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => {
-                        setSelecionado(f);
-                        setOpen(true);
-                      }}
-                      className="rounded-md border border-border-dark px-3 py-1.5 text-xs font-medium hover:bg-card-light/60"
+                {data.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-6 text-center text-sm text-text-secondary"
                     >
-                      EDITAR
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      Nenhuma forma de recebimento encontrada.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-              {data.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-6 text-center text-sm text-text-secondary"
-                  >
-                    Nenhuma forma de recebimento encontrada.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+          <div className="flex items-center justify-between px-4 py-3 text-sm text-text-secondary">
+            <span>
+              Mostrando todos os {data.length} formas de recebimento
+            </span>
 
-        <div className="flex items-center justify-between px-4 py-3 text-sm text-text-secondary">
-          <span>Mostrando todos os {data.length} formas de recebimento</span>
-
-          <div className="flex gap-1">
-            <button className="h-8 w-8 rounded-md border border-border-dark hover:bg-card-light/60">
-              «
-            </button>
-            <button className="h-8 min-w-8 rounded-md border border-border-dark bg-primary px-2 text-white">
-              1
-            </button>
-            <button className="h-8 w-8 rounded-md border border-border-dark hover:bg-card-light/60">
-              »
-            </button>
+            <div className="flex gap-1">
+              <button className="h-8 w-8 rounded-md border border-border-dark hover:bg-card-light/60">
+                «
+              </button>
+              <button className="h-8 min-w-8 rounded-md border border-border-dark bg-primary px-2 text-white">
+                1
+              </button>
+              <button className="h-8 w-8 rounded-md border border-border-dark hover:bg-card-light/60">
+                »
+              </button>
+            </div>
           </div>
         </div>
       </div>
