@@ -176,49 +176,51 @@ export default function OtimizarComprasPage() {
   };
 
   return (
-    <>
-      <div className="container mx-auto p-6 space-y-6 max-w-6xl">
-        <StockHeader cartItems={cartItems} onOpenCart={handleOpenCart} />
+    <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 h-full">
+      <div className="text-2xl sm:text-2xl font-bold  text-text">
+        <h1>Comprar</h1>
+      </div>
+      <StockHeader cartItems={cartItems} onOpenCart={handleOpenCart} />
 
-        <div className="grid grid-cols-3 gap-6">
-          <div className="md:col-span-2 col-span-3">
-            <StockStatusCard
-              products={products}
-              getPurchaseStatus={getPurchaseStatusForProduct}
-              stockConfig={stockConfig}
-            />
-          </div>
-          <div className="md:col-span-1 col-span-3">
-            <StockHealthCard
-              stockConfig={stockConfig}
-              onConfigClick={() => setIsStockConfigModalOpen(true)}
-            />
-          </div>
+      <div className="grid grid-cols-3 gap-6 w-full">
+        <div className="md:col-span-2 col-span-3">
+          <StockStatusCard
+            products={products}
+            getPurchaseStatus={getPurchaseStatusForProduct}
+            stockConfig={stockConfig}
+          />
         </div>
 
-        <StockFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          stockHealthFilter={stockHealthFilter}
-          setStockHealthFilter={setStockHealthFilter}
-          onFilter={() => {}}
-          selectedProducts={selectedProducts}
-          onOpenConfigModal={handleOpenConfigModal}
-        />
-
-        <StockTable
-          loading={loading}
-          displayedProducts={filteredProducts}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-          searchTerm={searchTerm}
-          getPurchaseStatus={getPurchaseStatusForProduct}
-          onAddToCart={handleAddToCart}
-          onRemove={handleRemoveFromCart}
-          cartItems={cartItems}
-          onOpenConfig={handleOpenConfigForSingleProduct}
-        />
+        <div className="md:col-span-1 col-span-3">
+          <StockHealthCard
+            stockConfig={stockConfig}
+            onConfigClick={() => setIsStockConfigModalOpen(true)}
+          />
+        </div>
       </div>
+
+      <StockFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        stockHealthFilter={stockHealthFilter}
+        setStockHealthFilter={setStockHealthFilter}
+        onFilter={() => {}}
+        selectedProducts={selectedProducts}
+        onOpenConfigModal={handleOpenConfigModal}
+      />
+
+      <StockTable
+        loading={loading}
+        displayedProducts={filteredProducts}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
+        searchTerm={searchTerm}
+        getPurchaseStatus={getPurchaseStatusForProduct}
+        onAddToCart={handleAddToCart}
+        onRemove={handleRemoveFromCart}
+        cartItems={cartItems}
+        onOpenConfig={handleOpenConfigForSingleProduct}
+      />
 
       <StockConfigModal
         open={isStockConfigModalOpen}
@@ -235,6 +237,6 @@ export default function OtimizarComprasPage() {
         onRemove={handleRemoveFromCart}
         onUpdateQuantity={handleUpdateCartQuantity}
       />
-    </>
+    </div>
   );
 }

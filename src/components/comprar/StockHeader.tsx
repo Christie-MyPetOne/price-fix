@@ -15,14 +15,9 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
     cartItems?.reduce((acc, it) => acc + (it.quantity ?? 1), 0) ?? 0;
 
   return (
-    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full bg-background py-4 px-2 sm:px-4 border-b border-border">
+    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full bg-background py-4 px-2 sm:px-4">
       {/* Parte esquerda */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
-        <div className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-text">
-          <ShoppingCart className="text-orange-500 flex-shrink-0" size={22} />
-          <span>Comprar</span>
-        </div>
-
         <button className="border border-border-dark text-black bg-white text-sm rounded-md px-3 sm:px-4 py-1.5 flex items-center gap-2 hover:bg-gray-50 transition w-full sm:w-auto">
           <CalendarDays size={18} className="flex-shrink-0" />
           <span className="font-medium whitespace-nowrap">

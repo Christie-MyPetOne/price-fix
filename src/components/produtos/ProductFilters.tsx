@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Search, Filter } from "lucide-react";
-import { ProductFiltersProps } from "@/lib/types";
+import { ProductFiltersProps } from "@/lib/types"; // Certifique-se que seus types aceitam a nova chave
 import { Button } from "../ui/Button";
 
 export function ProductFilters({
@@ -11,6 +11,7 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   return (
     <div className="flex-wrap mb-6 items-center md:mt-0 bg-card p-2 rounded-lg shadow-md flex md:flex-row md:items-center justify-between gap-3 border border-border-dark">
+      {/* Input de Busca */}
       <div className="relative flex-grow min-w-[12rem] max-w-xs text-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
         <input
@@ -21,14 +22,17 @@ export function ProductFilters({
         />
       </div>
 
+      {/* Filtro 1: Canal */}
+
       <select
-        className="p-2 border text-xs border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
+        className="p-2 border text-xs min-w-[12rem] border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
         onChange={(e) => onFilterChange("channel", e.target.value)}
       >
         <option value="">Canal de Venda</option>
         <option value="ecommerce">E-commerce</option>
         <option value="fisica">Física</option>
       </select>
+
       <select
         className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
         onChange={(e) => onFilterChange("supplier", e.target.value)}
@@ -37,15 +41,26 @@ export function ProductFilters({
         <option value="forn1">Fornecedor A</option>
         <option value="forn2">Fornecedor B</option>
       </select>
+
+      <select
+        className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
+        onChange={(e) => onFilterChange("status", e.target.value)}
+      >
+        <option value="">Status</option>
+        <option value="active">Ativo</option>
+        <option value="inactive">Inativo</option>
+        <option value="out_of_stock">Sem Estoque</option>
+      </select>
       <select
         className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-primary focus:border-primary"
         onChange={(e) => onFilterChange("problems", e.target.value)}
       >
-        <option value="">Problemas</option>
-        <option value="estoque">Estoque baixo</option>
-        <option value="preco">Preço desatualizado</option>
+        <option value="">Origem</option>
+        <option value="estoque">Tiny</option>
+        <option value="preco">Base</option>
       </select>
 
+      {/* Botão de Ação */}
       <div className="flex">
         <Button
           className="h-8 w-full text-xs flex gap-2 items-center text-white bg-[#10b97c] hover:bg-[#0d9d6b]"

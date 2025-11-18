@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { StockStatusCardProps, ChartDataItem } from "@/lib/types";
 import { ToggleButton } from "../ui/ToggleButton";
-import { StatusPieChart } from "../charts/Charts";
+import { ChartStatusStock } from "../charts/ChartStatusStock";
 
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;
@@ -157,7 +157,7 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
         </div>
       </div>
 
-      <StatusPieChart data={filteredPieData} CustomTooltip={CustomTooltip} />
+      <ChartStatusStock data={filteredPieData} CustomTooltip={CustomTooltip} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4">
         {data.map((item) => {
