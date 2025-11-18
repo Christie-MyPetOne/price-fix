@@ -120,7 +120,7 @@ export default function ConfigBasica() {
 
         {/* Card principal */}
         <div className="rounded-xl border border-border-dark bg-card shadow-sm">
-          <div className="p-6 grid gap-10">
+          <div className="p-6 grid gap-2">
             
             {/* Regime */}
             <section className="grid gap-4">
