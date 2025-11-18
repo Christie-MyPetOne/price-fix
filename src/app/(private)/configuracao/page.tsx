@@ -53,14 +53,14 @@ export default function ConfiguracaoPage() {
     }
   }, [active]);
 
-  return (
-    <div className="flex h-[calc(100vh-64px)]"> 
-      {/* se sua Navbar superior ocupa ~64px, ajuste como preferir */}
-      <SidebarConfig active={active} onChange={setActive} />
+    return (
+      <div className="flex h-full w-full overflow-x-hidden">
+        <SidebarConfig active={active} onChange={setActive} />
 
-      <main className="flex-1 overflow-y-auto p-6 bg-background">
-        {Content}
-      </main>
-    </div>
-  );
+        <main className="flex-1 p-6 bg-background pb-24 md:pb-6 overflow-x-hidden">
+          {Content}
+        </main>
+      </div>
+    );
+
 }

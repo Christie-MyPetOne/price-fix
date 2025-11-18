@@ -1,40 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
+// A nova interface aceita 'value' e 'onChange'
 interface ToggleButtonProps {
-  initialActive?: boolean; // Prop para o estado inicial
-  onToggle?: (active: boolean) => void;
-} // <-- 1. A INTERFACE TERMINA AQUI
+  value: boolean; // Estado atual do toggle (controlado pelo componente pai)
+  onChange: (active: boolean) => void; // Função para alterar o estado no componente pai
+  disabled?: boolean;
+}
 
 /**
- * Componente ToggleButton que gerencia seu próprio estado (não-controlado).
- * Ele usa 'initialActive' para seu estado inicial.
+ * Componente ToggleButton (CONTROLADO).
+ * O estado é gerenciado externamente via 'value' e 'onChange'.
  */
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
-  initialActive = false, // 2. Usa initialActive, e o padrão é 'false'
-  onToggle,
+  value,
+  onChange,
+  disabled = false,
 }) => {
-  const [isActive, setIsActive] = useState(initialActive); // 3. Usa initialActive no estado
-
   const handleClick = () => {
-    const newValue = !isActive;
-    setIsActive(newValue);
-    onToggle?.(newValue);
+    if (!disabled) {
+      // Notifica o componente pai sobre a nova mudança de valor
+      onChange(!value);
+    }
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
+      disabled={disabled}
       className={`${
-        // 4. CORRIGIDO: Usa 'bg-primary' para ativo e 'bg-gray-600' para inativo
-        isActive ? "bg-primary" : "bg-gray-600"
-      } relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+        // Usa 'value' (que é o estado do componente pai) para determinar o estilo
+        value ? "bg-primary" : "bg-gray-600"
+      } relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      }`}
     >
       <span
         className={`${
-          isActive ? "translate-x-5" : "translate-x-0"
+          // Usa 'value' para determinar a posição
+          value ? "translate-x-5" : "translate-x-0"
         } inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
       />
     </button>

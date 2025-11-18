@@ -116,68 +116,74 @@ export default function Fornecedores() {
   };
 
   return (
-    <div className="w-full">
-      {/* header */}
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-text">Fornecedores</h1>
-          <p className="text-sm text-text-secondary max-w-xl">
-            Todos os seus fornecedores aparecem aqui para que você possa
-            atribuir o prazo de pagamento.
-          </p>
+    <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
+      <div className="mx-auto max-w-6xl">
+        {/* Cabeçalho da página */}
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-text">Fornecedores</h1>
+            <p className="text-sm text-text-secondary max-w-xl">
+              Todos os seus fornecedores aparecem aqui para que você possa
+              atribuir o prazo de pagamento.
+            </p>
+          </div>
+
+          <input
+            placeholder="Buscar fornecedor..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="h-10 w-full sm:w-64 rounded-md border border-border-dark bg-card-light/40 px-3 text-sm placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
-        <input
-          placeholder="Buscar fornecedor..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          className="h-10 w-64 rounded-md border border-border-dark bg-card-light/40 px-3 text-sm placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-        />
-      </div>
+        {/* Card com tabela (mesmo estilo do ConfigBasica) */}
+        <div className="rounded-xl border border-border-dark bg-card shadow-sm">
+          <div className="p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="min-w-[960px] w-full">
+                <thead className="border-b border-border-dark bg-card-light/40">
+                  <tr className="text-left text-sm text-text-secondary">
+                    <th className="px-4 py-3 font-medium">Nome</th>
+                    <th className="px-4 py-3 font-medium">
+                      Média do Prazo de Pagamento (dias)
+                    </th>
+                    <th className="px-4 py-3 font-medium">
+                      Produtos vinculados
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm text-text">
+                  {data.map((f) => (
+                    <tr key={f.id} className="border-b border-border-dark">
+                      <td className="px-4 py-3">
+                        {f.nome}
+                        {f.origem === "Tiny" && tinyBadge()}
+                      </td>
 
-      {/* tabela */}
-      <div className="overflow-hidden rounded-xl border border-border-dark bg-card shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-[960px] w-full">
-            <thead className="border-b border-border-dark bg-card-light/40">
-              <tr className="text-left text-sm text-text-secondary">
-                <th className="px-4 py-3 font-medium">Nome</th>
-                <th className="px-4 py-3 font-medium">
-                  Média do Prazo de Pagamento (dias)
-                </th>
-                <th className="px-4 py-3 font-medium">Produtos vinculados</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm text-text">
-              {data.map((f) => (
-                <tr key={f.id} className="border-b border-border-dark">
-                  <td className="px-4 py-3">
-                    {f.nome}
-                    {f.origem === "Tiny" && tinyBadge()}
-                  </td>
+                      <td className="px-4 py-3">{prazoCell(f)}</td>
 
-                  <td className="px-4 py-3">{prazoCell(f)}</td>
+                      <td className="px-4 py-3">{f.produtosVinculados}</td>
+                    </tr>
+                  ))}
 
-                  <td className="px-4 py-3">{f.produtosVinculados}</td>
-                </tr>
-              ))}
+                  {data.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-4 py-6 text-center text-sm text-text-secondary"
+                      >
+                        Nenhum fornecedor encontrado.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-              {data.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-4 py-6 text-center text-sm text-text-secondary"
-                  >
-                    Nenhum fornecedor encontrado.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex items-center justify-between px-4 py-3 text-sm text-text-secondary">
-          <span>Mostrando {data.length} fornecedores</span>
+            <div className="flex items-center justify-between px-2 pt-3 text-sm text-text-secondary">
+              <span>Mostrando {data.length} fornecedores</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
