@@ -109,12 +109,10 @@ export default function ConfigBasica() {
 
   return (
     <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl px-4">
         {/* Cabeçalho da página */}
-        <div className="mb-4">
-          <h1 className="text-2xl font-semibold text-text">
-            Configurações básicas
-          </h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-text">Configurações básicas</h1>
           <p className="text-sm text-text-secondary">
             Ajuste regras fiscais e custos da empresa.
           </p>
@@ -122,49 +120,35 @@ export default function ConfigBasica() {
 
         {/* Card principal */}
         <div className="rounded-xl border border-border-dark bg-card shadow-sm">
-          <div className="p-6 grid gap-8">
+          <div className="p-6 grid gap-10">
+            
             {/* Regime */}
-            <section className="grid gap-3">
+            <section className="grid gap-4">
               <h2 className={sectionTitle}>Regime tributário</h2>
 
-              {/* SELECT MENOR */}
               <select
                 value={regime}
                 onChange={(e) => setRegime(e.target.value)}
-                className={inputNarrow}
+                className={`${inputNarrow} `}
               >
-                <option value="" disabled>
-                  Selecionar
-                </option>
+                <option value="" disabled>Selecionar</option>
                 {regimeOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
+                  <option key={opt}>{opt}</option>
                 ))}
               </select>
 
               {regime && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                   {campos.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex flex-col gap-1 min-w-0"
-                    >
+                    <div key={item.label} className="flex flex-col gap-1">
                       <label className="text-text-secondary text-sm">
                         {item.label}
                       </label>
 
-                      {regime === "MEI" &&
-                      item.label === "Contribuição mensal" ? (
-                        <select
-                          value={"R$ 45,00"}
-                          onChange={() => {}}
-                          className={`w-full ${baseInputCls}`}
-                        >
+                      {regime === "MEI" && item.label === "Contribuição mensal" ? (
+                        <select className={`${baseInputCls} w-full`}>
                           {["R$ 45,00", "R$ 50,00"].map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
+                            <option key={opt}>{opt}</option>
                           ))}
                         </select>
                       ) : (
@@ -183,12 +167,12 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Perguntas */}
-            <section className="-mt-10 -mb-10 grid gap-3">
-              <label className="flex items-center gap-2 text-sm text-text">
+            <section className="grid gap-3">
+              <label className="flex items-start sm:items-center gap-2 text-sm text-text">
                 <input type="checkbox" className="accent-primary" />
                 Os custos de mercadoria em seu ERP contêm PIS, COFINS e ICMS?
               </label>
-              <label className="flex items-center gap-2 text-sm text-text">
+              <label className="flex items-start sm:items-center gap-2 text-sm text-text">
                 <input type="checkbox" className="accent-primary" />
                 Desconsiderar receita de frete no cálculo da margem percentual
               </label>
@@ -198,18 +182,12 @@ export default function ConfigBasica() {
 
             {/* Patrimônio */}
             <section className="grid gap-2">
-              <label className="text-sm font-medium text-text">
-                Patrimônio Líquido
-              </label>
-              <input
-                type="number"
-                defaultValue={0}
-                className={inputNarrow}
-              />
+              <label className="text-sm font-medium text-text">Patrimônio Líquido</label>
+              <input type="number" defaultValue={0} className={`${inputNarrow} `} />
             </section>
 
             {/* Regime especial */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-medium text-text mb-1 block">
                   Possui regime especial?
@@ -217,12 +195,10 @@ export default function ConfigBasica() {
                 <select
                   value={possuiRegimeEspecial}
                   onChange={(e) => setPossuiRegimeEspecial(e.target.value)}
-                  className={inputNarrow}
+                  className={`${inputNarrow} w-full`}
                 >
                   {simNaoOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
@@ -234,29 +210,25 @@ export default function ConfigBasica() {
                 <select
                   value={aplicaVendas}
                   onChange={(e) => setAplicaVendas(e.target.value)}
-                  className={inputNarrow}
+                  className={`${inputNarrow} w-full`}
                 >
                   {aplicaOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-text mb-1 block leading-tight">
-                  Zerar crédito de ICMS no Regime especial
+                <label className="text-sm font-medium text-text mb-1 block">
+                  Zerar crédito de ICMS no regime especial
                 </label>
                 <select
                   value={zeraICMS}
                   onChange={(e) => setZeraICMS(e.target.value)}
-                  className={inputNarrow}
+                  className={`${inputNarrow} w-full`}
                 >
                   {simNaoOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
@@ -265,55 +237,37 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Estado */}
-            <section className="-mt-10 grid gap-4">
+            <section className="grid gap-4">
               <h2 className={sectionTitle}>Estado de expedição</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[var(--color-text-secondary)] text-sm mb-1">
-                    Estado
-                  </label>
-
-                  {/* SELECT DE ESTADO MENOR */}
+                  <label className="block text-text-secondary text-sm mb-1">Estado</label>
                   <select
                     value={estadoUF}
                     onChange={(e) => setEstadoUF(e.target.value)}
-                    className={inputNarrow}
+                    className={`${inputNarrow} w-full`}
                   >
                     {estadosBrasil.map((uf) => (
-                      <option key={uf} value={uf}>
-                        {uf}
-                      </option>
+                      <option key={uf}>{uf}</option>
                     ))}
                   </select>
                 </div>
 
                 {[
-                  {
-                    label: "ICMS produtos nacionais (mesmo estado)",
-                    value: 6,
-                  },
-                  {
-                    label: "ICMS produtos importados (mesmo estado)",
-                    value: 14,
-                  },
-                  {
-                    label: "ICMS produtos nacionais (outro estado)",
-                    value: 1.3,
-                  },
-                  {
-                    label: "ICMS produtos importados (outro estado)",
-                    value: 1.3,
-                  },
+                  { label: "ICMS produtos nacionais (mesmo estado)", value: 6 },
+                  { label: "ICMS produtos importados (mesmo estado)", value: 14 },
+                  { label: "ICMS produtos nacionais (outro estado)", value: 1.3 },
+                  { label: "ICMS produtos importados (outro estado)", value: 1.3 },
                 ].map((item) => (
                   <div key={item.label}>
-                    <label className="block text-[var(--color-text-secondary)] text-sm mb-1">
+                    <label className="block text-text-secondary text-sm mb-1">
                       {item.label}
                     </label>
                     <input
                       type="number"
                       defaultValue={item.value}
-                      className={inputNarrow}
+                      className={`${inputNarrow} w-full`}
                     />
                   </div>
                 ))}
@@ -323,9 +277,9 @@ export default function ConfigBasica() {
             <div className="h-px bg-border-dark/60" />
 
             {/* Custos fixos */}
-            <section className="-mt-10 grid gap-3">
+            <section className="grid gap-3">
               <h2 className={sectionTitle}>Custos fixos mensais</h2>
-              <p className="text-sm text-[var(--color-text-secondary)]">
+              <p className="text-sm text-text-secondary">
                 Se preferir, insira os custos fixos da empresa.
               </p>
 
@@ -337,17 +291,16 @@ export default function ConfigBasica() {
                     const formatted = formatCurrencyBR(e.target.value);
                     setCustoFixo(formatted);
                   }}
-                  className={inputNarrow}
+                  className={`${inputNarrow} `}
                 />
 
-                <button
-                  className="
-                    bg-[var(--color-primary)]
-                    hover:bg-[var(--color-primary-dark)]
-                    text-white text-sm px-4 py-2 rounded-md
-                    transition-colors w-full sm:w-auto
-                  "
-                >
+                <button className="
+                  bg-[var(--color-primary)]
+                  hover:bg-[var(--color-primary-dark)]
+                  text-white text-sm px-4 py-2 rounded-md
+                  transition-colors
+                  w-full sm:w-auto
+                ">
                   Editar
                 </button>
               </div>
@@ -355,6 +308,7 @@ export default function ConfigBasica() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }
