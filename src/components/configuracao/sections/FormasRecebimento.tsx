@@ -109,10 +109,10 @@ export default function FormasRecebimento() {
         {/* Cabeçalho */}
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
-            <h1 className="text-2xl font-semibold text-text">
+            <h1 className="ml-4  text-2xl font-semibold text-text">
               Formas de recebimento
             </h1>
-            <p className="text-sm text-text-secondary">
+            <p className="ml-4 text-sm text-text-secondary">
               de Outubro de 2025
             </p>
           </div>
@@ -122,7 +122,7 @@ export default function FormasRecebimento() {
               placeholder="Buscar formas de recebimento"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className={`${inputCls} w-full sm:w-64 bg-card`}
+              className={`${inputCls} ml-4 w-64 bg-card`}
             />
           </div>
         </div>

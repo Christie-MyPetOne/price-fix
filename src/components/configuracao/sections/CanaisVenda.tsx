@@ -53,14 +53,14 @@ export default function CanaisDeVendaPage() {
         {/* header */}
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-text">Canais de Venda</h1>
-            <p className="text-sm text-text-secondary">de Outubro de 2025</p>
+            <h1 className="ml-4 text-2xl font-semibold text-text">Canais de Venda</h1>
+            <p className="ml-4  text-sm text-text-secondary">de Outubro de 2025</p>
           </div>
           <input
             placeholder="Buscar canal..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className={`${inputCls} w-64 bg-card`}
+            className={`${inputCls} ml-4  w-64 bg-card`}
           />
         </div>
 
