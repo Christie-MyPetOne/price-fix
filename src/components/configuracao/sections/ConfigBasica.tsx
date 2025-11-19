@@ -112,8 +112,8 @@ export default function ConfigBasica() {
       <div className="mx-auto max-w-6xl ">
         {/* Cabeçalho da página */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-text">Configurações básicas</h1>
-          <p className="text-sm text-text-secondary">
+          <h1 className="ml-4  text-2xl font-semibold text-text">Configurações básicas</h1>
+          <p className="ml-4  text-sm text-text-secondary">
             Ajuste regras fiscais e custos da empresa.
           </p>
         </div>

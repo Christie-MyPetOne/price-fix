@@ -163,10 +163,10 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
         {/* Cabeçalho da página (Igual ao ConfigBasica) */}
         <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold text-text">
+            <h1 className="ml-4 text-2xl font-semibold text-text">
               Integração: {slug.toUpperCase()}
             </h1>
-            <p className="text-sm text-text-secondary max-w-3xl">
+            <p className="ml-4 text-sm text-text-secondary max-w-3xl">
               Conecte sua conta do ERP selecionado para importação automática de vendas, indicadores
               em tempo real e atualização de preços.
             </p>
@@ -176,7 +176,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
           <div className="flex items-center gap-2 mt-3 md:mt-0">
             <Button 
               onClick={handleSave} 
-              className="inline-flex items-center gap-2 text-sm px-4 py-2" // Ajustado para px-4 py-2 para visualmente manter a altura padrão de botões maiores.
+              className="ml-4 inline-flex items-center gap-2 text-sm px-4 py-2" // Ajustado para px-4 py-2 para visualmente manter a altura padrão de botões maiores.
             >
               <Save className="w-4 h-4" /> Salvar
             </Button>

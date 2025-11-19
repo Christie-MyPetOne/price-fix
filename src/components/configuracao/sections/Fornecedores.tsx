@@ -121,8 +121,8 @@ export default function Fornecedores() {
         {/* Cabeçalho da página */}
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-text">Fornecedores</h1>
-            <p className="text-sm text-text-secondary max-w-xl">
+            <h1 className="ml-4 text-2xl font-semibold text-text">Fornecedores</h1>
+            <p className="ml-4 text-sm text-text-secondary max-w-xl">
               Todos os seus fornecedores aparecem aqui para que você possa
               atribuir o prazo de pagamento.
             </p>
@@ -132,7 +132,7 @@ export default function Fornecedores() {
             placeholder="Buscar fornecedor..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="h-10 w-full sm:w-64 rounded-md border border-border-dark bg-card-light/40 px-3 text-sm placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="h-10 ml-4 w-64 rounded-md border border-border-dark bg-card px-3 text-sm placeholder:text-text-secondary outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
