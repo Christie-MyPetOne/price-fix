@@ -32,8 +32,8 @@ export default function ProductsPage() {
     <>
       <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
         <div className="flex-1 min-w-0 ">
-          <h1 className="text-2xl sm:text-2xl font-bold mb-4 text-text">
-            Meus produtos
+          <h1 className="text-2xl sm:text-2xl font-bold my-6 text-text">
+            Produtos
           </h1>
 
           <ProductFilters

@@ -177,7 +177,7 @@ export default function OtimizarComprasPage() {
 
   return (
     <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 h-full">
-      <div className="text-2xl sm:text-2xl font-bold  text-text">
+      <div className="text-2xl sm:text-2xl font-bold my-6 text-text">
         <h1>Comprar</h1>
       </div>
       <StockHeader cartItems={cartItems} onOpenCart={handleOpenCart} />
