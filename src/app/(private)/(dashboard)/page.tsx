@@ -67,7 +67,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-8xl -mt-8 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
+    <div className="max-w-8xl -mt-2 mx-auto w-full container p-4 sm:p-6 md:p-8 space-y-8">
       <div className="relative flex flex-col w-full -mb-7">
 
         {/* Filtro centralizado no desktop, full no mobile */}

@@ -157,7 +157,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
 
   return (
     // Contêiner principal para manter a mesma margem superior e centralização
-    <div className="-mt-9 min-h-[calc(100vh-64px)] ">
+    <div className="-mt-1 min-h-[calc(100vh-64px)]">
       {/* Container de largura máxima, igual ao ConfigBasica */}
       <div className="mx-auto max-w-6xl">
         {/* Cabeçalho da página (Igual ao ConfigBasica) */}

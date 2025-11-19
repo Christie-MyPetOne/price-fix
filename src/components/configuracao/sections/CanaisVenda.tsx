@@ -48,7 +48,7 @@ export default function CanaisDeVendaPage() {
   };
 
   return (
-    <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
+    <div className="-mt-9 min-h-[calc(100vh-64px)] pt-6">
       <div className="mx-auto max-w-6xl">
         {/* header */}
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

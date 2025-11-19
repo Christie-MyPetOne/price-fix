@@ -108,8 +108,8 @@ export default function ConfigBasica() {
   }
 
   return (
-    <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
-      <div className="mx-auto max-w-6xl px-4">
+    <div className="-mt-9 min-h-[calc(100vh-64px)] pt-6">
+      <div className="mx-auto max-w-6xl ">
         {/* Cabeçalho da página */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-text">Configurações básicas</h1>
