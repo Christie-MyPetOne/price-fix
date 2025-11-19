@@ -21,19 +21,13 @@ import { IconsBrand } from "../svgs/IconsBrand/IconsBrand";
 
 export function Navbar() {
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [, setIsConfigOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // Toggles separados
   const toggleGerenciar = () => {
     setIsGerenciarOpen((prev) => !prev);
     setIsConfigOpen(false);
-  };
-
-  const toggleConfig = () => {
-    setIsConfigOpen((prev) => !prev);
-    setIsGerenciarOpen(false);
   };
 
   const toggleMenu = () => {
@@ -56,7 +50,7 @@ export function Navbar() {
         className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
           isActive
             ? "bg-primary text-white font-semibold"
-            : "text-text-secondary hover:bg-card hover:text-text"
+            : "text-text-secondary hover:bg-card hover:text-primary"
         }`}
       >
         {Icon && <Icon className="w-5 h-4 mr-1" />}
@@ -64,7 +58,6 @@ export function Navbar() {
       </Link>
     );
   };
-
   const ThemeToggleButton = () => {
     const { theme, toggleTheme } = useTheme();
     const [mounted, setMounted] = useState(false);

@@ -63,9 +63,9 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
           <option value="" disabled hidden>
             Ações
           </option>
-          <option value="config">Configuração</option>
+          <option value="config">Lista de compras</option>
           <option value="export">Exportar</option>
-          <option value="lista">Lista de compras</option>
+          <option value="lista">Configuração</option>
         </Select>
 
         <Button

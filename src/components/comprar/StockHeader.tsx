@@ -15,8 +15,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
     cartItems?.reduce((acc, it) => acc + (it.quantity ?? 1), 0) ?? 0;
 
   return (
-    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full bg-background py-4 px-2 sm:px-4">
-      {/* Parte esquerda */}
+    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full bg-background px-2 sm:px-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
         <button className="border border-border-dark text-black bg-white text-sm rounded-md px-3 sm:px-4 py-1.5 flex items-center gap-2 hover:bg-gray-50 transition w-full sm:w-auto">
           <CalendarDays size={18} className="flex-shrink-0" />
@@ -33,9 +32,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
         </div>
       </div>
 
-      {/* Parte direita */}
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-        {/* Botão da lista de compras */}
         <button
           onClick={() => onOpenCart?.()}
           className="relative flex justify-center sm:justify-normal items-center text-black gap-2 border border-border-dark bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition w-full sm:w-auto"
@@ -52,19 +49,17 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
           )}
         </button>
 
-        {/* Botão da lista de fornecedores */}
         <button
           onClick={() => setIsSupplierListOpen(true)}
           className="flex justify-center items-center text-black gap-2 border border-border-dark bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition w-full sm:w-auto"
         >
           <Truck size={18} className="text-orange-500" />
-          <span className="whitespace-nowrap font-medium">
+          <span className="whitespace-nowrap font-medium ">
             Sugestões do fornecedor
           </span>
         </button>
       </div>
 
-      {/* Modal lateral da lista de fornecedores */}
       <SupplierList
         isOpen={isSupplierListOpen}
         onClose={() => setIsSupplierListOpen(false)}

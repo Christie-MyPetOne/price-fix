@@ -6,7 +6,6 @@ import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 export const ChartStatusStock = ({
   data,
   CustomTooltip,
-  height = 256,
   outerRadius = 90,
   innerRadius = 50,
 }: {

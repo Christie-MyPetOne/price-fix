@@ -15,6 +15,7 @@ import { StockStatusCard } from "@/components/comprar/StockStatusCard";
 import { StockHealthCard } from "@/components/comprar/StockHealthCard";
 import { StockHeader } from "@/components/comprar/StockHeader";
 import { ShoppingCartModal } from "@/components/comprar/ShoppingCartModal";
+import { ShoppingCart } from "lucide-react";
 
 export default function OtimizarComprasPage() {
   const { products, fetchProducts, updateProductHealthStatus } =
@@ -177,8 +178,11 @@ export default function OtimizarComprasPage() {
 
   return (
     <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 h-full">
-      <div className="text-2xl sm:text-2xl font-bold my-6 text-text">
-        <h1>Comprar</h1>
+      <div className="text-2xl sm:text-2xl font-bold my-6 ml-3 text-text">
+        <span className="flex items-center gap-2">
+          <ShoppingCart size={20} className="text-primary" />
+          Comprar
+        </span>
       </div>
       <StockHeader cartItems={cartItems} onOpenCart={handleOpenCart} />
 

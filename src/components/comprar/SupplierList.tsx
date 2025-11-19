@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   X,
   ChevronDown,
@@ -11,10 +12,9 @@ import {
   XCircle,
   ThumbsDown,
 } from "lucide-react";
-import Image from "next/image";
+import { useProductsStore } from "@/store/useProductsStore";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { useProductsStore } from "@/store/useProductsStore";
 
 interface SupplierListProps {
   isOpen: boolean;
@@ -63,7 +63,6 @@ export const SupplierList: React.FC<SupplierListProps> = ({
 
   if (!isOpen) return null;
 
-  // Agrupa produtos por fornecedor
   const suppliers = products.reduce<Record<string, typeof products>>(
     (acc, product) => {
       const supplierName = product.supplier ?? "Desconhecido";
@@ -74,10 +73,8 @@ export const SupplierList: React.FC<SupplierListProps> = ({
     {}
   );
 
-  // Pega os 3 principais fornecedores
   const topSuppliers = Object.entries(suppliers).slice(0, 3);
 
-  // Filtra fornecedores visíveis: se houver expandido, mostra só ele
   const visibleSuppliers =
     expanded !== null
       ? topSuppliers.filter(([supplierName]) => supplierName === expanded)
@@ -327,7 +324,7 @@ export const SupplierList: React.FC<SupplierListProps> = ({
                                         Number(e.target.value)
                                       )
                                     }
-                                    onBlur={() => toggleEditing(product.id)} // sai da edição ao perder foco
+                                    onBlur={() => toggleEditing(product.id)}
                                     autoFocus
                                     className="w-14 text-center border border-border-dark rounded-md bg-white text-black text-xs"
                                   />
@@ -391,7 +388,6 @@ export const SupplierList: React.FC<SupplierListProps> = ({
         </div>
       </aside>
 
-      {/* Modais de recusa e edição de entrega */}
       {rejectModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-background rounded-md p-4 w-80">

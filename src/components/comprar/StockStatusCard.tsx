@@ -18,6 +18,7 @@ import { ChartStatusStock } from "../charts/ChartStatusStock";
 
 const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
   const { active, payload } = props as any;
+
   if (active && payload && payload.length) {
     const dataItem = payload[0].payload as any;
     return (
@@ -38,6 +39,7 @@ const CustomTooltip = (props: TooltipProps<ValueType, NameType>) => {
       </div>
     );
   }
+
   return null;
 };
 
@@ -146,6 +148,7 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
         <h2 className="text-lg sm:text-xl font-semibold text-text mb-2 sm:mb-0">
           Status de compra
         </h2>
+
         <div className="text-left sm:text-right">
           <p className="text-sm text-text-secondary">Valor total em estoque</p>
           <p className="text-2xl sm:text-3xl font-bold text-text mt-1">
@@ -176,18 +179,21 @@ export const StockStatusCard: React.FC<StockStatusCardProps> = ({
                 <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
                 {item.status}
               </div>
+
               <p className="text-text-secondary font-medium text-sm sm:text-base">
                 {item.totalValue.toLocaleString("pt-BR", {
                   style: "currency",
                   currency: "BRL",
                 })}
               </p>
+
               <p className="text-text-secondary text-[0.65rem] sm:text-xs">
                 Valor em estoque
               </p>
+
               <ToggleButton
-                initialActive={isActive}
-                onToggle={() => toggleStatus(item.status)}
+                value={isActive}
+                onChange={() => toggleStatus(item.status)}
               />
             </div>
           );

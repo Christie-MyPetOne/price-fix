@@ -7,6 +7,7 @@ import { VendasTable } from "@/components/vendas/VendasTable";
 import MargensChart from "@/components/vendas/MargensChart";
 import Modal from "@/components/ui/Modal";
 import ResumoCards from "@/components/vendas/ResumoCards";
+import { ShoppingBag } from "lucide-react";
 
 type FiltersState = {
   date: string;
@@ -159,10 +160,12 @@ export default function VendasPage() {
     <>
       <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-2xl font-bold mb-4 text-text">
-            Vendas
-          </h1>
-
+          <div className="text-2xl sm:text-2xl font-bold my-6 ml-3 text-text">
+            <span className="flex items-center gap-2">
+              <ShoppingBag size={20} className="text-primary" />
+              Vendas
+            </span>
+          </div>
           <VendasFilters
             onSearch={handleSearch}
             onFilterChange={handleFilterChange}
