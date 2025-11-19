@@ -54,10 +54,9 @@ export default function ConfiguracaoPage() {
   }, [active]);
 
     return (
-      <div className="flex h-full w-full overflow-x-hidden">
+      <div className="flex min-h-screen w-full overflow-x-hidden">
         <SidebarConfig active={active} onChange={setActive} />
-
-        <main className="flex-1 p-6 bg-background pb-24 md:pb-6 overflow-x-hidden">
+        <main className="flex-1 bg-background pb-24 md:pb-6 overflow-x-hidden pt-6">
           {Content}
         </main>
       </div>

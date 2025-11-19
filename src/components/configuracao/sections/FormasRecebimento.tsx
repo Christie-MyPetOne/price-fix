@@ -104,7 +104,7 @@ export default function FormasRecebimento() {
   };
 
   return (
-    <div className="-mt-9 min-h-[calc(100vh-64px)] p-6">
+    <div className="-mt-9 min-h-[calc(100vh-64px)] pt-6">
       <div className="mx-auto max-w-6xl">
         {/* Cabeçalho */}
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
