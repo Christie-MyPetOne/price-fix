@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-// Importações de ícones adicionadas para melhorar o formulário
 import {
   Bot,
   LogIn,
@@ -9,9 +8,9 @@ import {
   TrendingUp,
   Mail,
   Lock,
-  AlertTriangle, // Novo para o erro
-  CheckCircle, // Novo para features
-  ShoppingCart, // Novo para features
+  AlertTriangle,
+  CheckCircle,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -48,13 +47,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--color-background)]">
-      {/* ==== LEFT SIDE (Info + Branding) ==== */}
       <div className="hidden md:flex md:w-1/2 lg:w-1/2 p-8 lg:p-14 flex-col justify-between relative overflow-hidden">
-        {/* Glow Effect */}
         <div className="absolute top-1/4 -left-20 w-72 lg:w-96 h-72 lg:h-96 bg-[var(--color-primary)]/15 rounded-full blur-[120px] lg:blur-[150px] opacity-70"></div>
 
         <div>
-          {/* Logo Responsivo */}
           <div className="w-40 lg:w-60">
             <IconsBrand />
           </div>
@@ -88,7 +84,6 @@ export default function Login() {
           </ul>
         </div>
 
-        {/* Background image */}
         <div className="p-4 lg:p-6 max-w-md z-10 hidden md:flex items-center justify-center">
           <Image
             src={background}
@@ -103,7 +98,6 @@ export default function Login() {
         </p>
       </div>
 
-      {/* ==== RIGHT SIDE (Form) ==== */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md bg-[var(--color-card)] border border-[var(--color-border-dark)] shadow-2xl p-8 sm:p-10 rounded-2xl">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-center text-[var(--color-text)] tracking-tight">
@@ -115,7 +109,6 @@ export default function Login() {
           </p>
 
           <form className="mt-8 space-y-6" onSubmit={(e) => e.preventDefault()}>
-            {/* Email */}
             <div>
               <label className="text-sm font-medium text-[var(--color-text-secondary)] block mb-1">
                 Email
@@ -132,7 +125,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Senha */}
             <div>
               <label className="text-sm font-medium text-[var(--color-text-secondary)] block mb-1">
                 Senha

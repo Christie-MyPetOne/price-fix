@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-// import { useAuthStore } from "@/store/useAuthStore";
 import {
   Bot,
   UserPlus,
@@ -18,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconsBrand } from "@/components/svgs/IconsBrand/IconsBrand";
 import Image from "next/image";
-
+import register from "../../../../public/images/register.svg";
 
 const PasswordRequirement = ({ met, text }: { met: boolean; text: string }) => (
   <div
@@ -82,7 +81,7 @@ const FormSelect = ({
 );
 
 const formatPhone = (value: string) => {
-  value = value.replace(/\D/g, ""); // remove tudo que não é número
+  value = value.replace(/\D/g, "");
   if (value.length > 11) value = value.slice(0, 11);
 
   if (value.length > 10) {
@@ -97,7 +96,7 @@ const formatPhone = (value: string) => {
 };
 
 const formatCnpj = (value: string) => {
-  value = value.replace(/\D/g, ""); // remove não números
+  value = value.replace(/\D/g, "");
   if (value.length > 14) value = value.slice(0, 14);
 
   return value
@@ -107,7 +106,7 @@ const formatCnpj = (value: string) => {
     .replace(/(\d{4})(\d)/, "$1-$2");
 };
 
-// --- Componente principal ---
+// --- COMPONENTE PRINCIPAL ---
 const Register: React.FC = () => {
   const [nome, setNome] = useState("Lucas Cesar Silva Oliveira");
   const [celular, setCelular] = useState("31991134844");
@@ -130,15 +129,9 @@ const Register: React.FC = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
 
   const router = useRouter();
-  //   const { preCadastro } = useAuthStore();
 
-  useEffect(() => {
-    setCelular((prev) => formatPhone(prev));
-  }, []);
-
-  useEffect(() => {
-    setCnpj((prev) => formatCnpj(prev));
-  }, []);
+  useEffect(() => setCelular((prev) => formatPhone(prev)), []);
+  useEffect(() => setCnpj((prev) => formatCnpj(prev)), []);
 
   useEffect(() => {
     setPasswordCriteria({
@@ -151,60 +144,18 @@ const Register: React.FC = () => {
     });
   }, [senha]);
 
-  //   useEffect(() => {
-  //     const allCriteriaMet = Object.values(passwordCriteria).every(Boolean);
-  //     const doPasswordsMatch = senha && senha === confirmSenha;
-  //     setPasswordsMatch(doPasswordsMatch);
-
-  //     const allFieldsFilled = nome && celular && cnpj && tipoEmpresa && email;
-
-  //     setIsFormValid(allCriteriaMet && doPasswordsMatch && !!allFieldsFilled);
-  //   }, [
-  //     nome,
-  //     celular,
-  //     cnpj,
-  //     tipoEmpresa,
-  //     email,
-  //     senha,
-  //     confirmSenha,
-  //     passwordCriteria,
-  //   ]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return;
-
-    setLoading(true);
-
-    const cnpjNumeros = cnpj.replace(/\D/g, "");
-    const celularNumeros = celular.replace(/\D/g, "");
-
-    // const resultadoCadastro = await preCadastro({
-    //   nome,
-    //   email,
-    //   senha,
-    //   celular: celularNumeros,
-    //   cnpj: cnpjNumeros,
-    //   tipoEmpresa,
-    // });
-
-    // setLoading(false);
-
-    // if (resultadoCadastro === "erro") {
-    //   return setError(useAuthStore.getState().error as string);
-    // }
-
-    // setError("");
-    // router.push("/verificar-email");
   };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--color-background)]">
       {/* LEFT SIDE */}
-      <div className="hidden md:flex md:w-1/2 lg:w-1/2 p-8 lg:p-14 flex-col justify-between relative overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-72 lg:w-96 h-72 lg:h-96 bg-[var(--color-primary)]/15 rounded-full blur-[150px] opacity-70"></div>
+      <div className="hidden md:flex md:w-1/2 p-0 lg:p-0 flex-col justify-between relative overflow-hidden">
+        {/* bg glow */}
+        <div className="absolute top-1/4 -left-20 w-full lg:w-96 h-full lg:h-96 bg-[var(--color-primary)]/15 rounded-full blur-[150px] opacity-70"></div>
 
-        <div>
+        <div className="px-14 pt-14">
           <div className="w-40 lg:w-60">
             <IconsBrand />
           </div>
@@ -231,16 +182,16 @@ const Register: React.FC = () => {
           </ul>
         </div>
 
-        <div className="p-4 lg:p-6 max-w-md z-10 hidden md:flex items-center justify-center">
-          {/* <Image
-            src={background}
+        <div className="flex items-center justify-center w-full">
+          <Image
+            src={register}
             alt="Dashboard Preview"
-            className="w-full h-auto rounded-xl"
+            className="w-full h-auto max-w-[30rem]"
             priority
-          /> */}
+          />
         </div>
 
-        <p className="text-xs text-[var(--color-text-secondary)] text-center z-10 hidden md:block">
+        <p className="text-xs text-[var(--color-text-secondary)] text-center z-10 mb-6">
           © 2025 PriceFix — Inteligência aplicada ao seu negócio.
         </p>
       </div>
@@ -355,7 +306,6 @@ const Register: React.FC = () => {
               <p className="text-red-500 text-xs text-center">{error}</p>
             )}
 
-            {/* SUBMIT */}
             <button
               type="submit"
               disabled={!isFormValid || loading}
