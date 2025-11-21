@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -29,11 +29,29 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
   formatBRLShort,
   defaultTooltipFormatter,
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // 👉 Mobile → limitar para 6 barras
+  const dataMobile = isMobile ? data.slice(-6) : data;
+
+  // 👉 Mobile → ticks somente da primeira e última barra
+  const ticksMobile =
+    dataMobile.length > 1
+      ? [dataMobile[0][xKey], dataMobile[dataMobile.length - 1][xKey]]
+      : [];
+
   return (
-    <div style={{ width: "100%", height: 305 }}>
+    <div className="w-full h-[250px] md:h-[307px]">
       <ResponsiveContainer>
         <BarChart
-          data={data}
+          data={dataMobile}
           margin={{ top: 15, right: 12, bottom: 8, left: 8 }}
           barSize={18}
         >
@@ -41,12 +59,16 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
             strokeDasharray="3 3"
             stroke="var(--color-border-dark)"
           />
+
           <XAxis
             dataKey={xKey}
             stroke="var(--color-text-secondary)"
             tickLine={false}
             axisLine={false}
+            // 👉 se for mobile, só mostra primeiro e último label
+            ticks={isMobile ? ticksMobile : undefined}
           />
+
           <YAxis
             stroke="var(--color-text-secondary)"
             tickFormatter={formatBRLShort}
@@ -54,6 +76,7 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
             axisLine={false}
             width={70}
           />
+
           <Tooltip
             formatter={defaultTooltipFormatter as any}
             labelStyle={{ color: "var(--color-text)" }}

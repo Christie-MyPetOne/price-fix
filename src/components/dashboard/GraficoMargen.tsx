@@ -23,7 +23,7 @@ const GraficoMargem: React.FC<GraficoMargemProps> = ({
         <h2 className="text-lg font-semibold">{title}</h2>
       </div>
 
-      <div style={{ width: "100%", height }}>
+      <div className="w-full h-[250px] md:h-[307px]">
         <ChartGraficoMargem
           data={data}
           xKey={xKey}
