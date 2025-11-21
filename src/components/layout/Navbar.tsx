@@ -204,7 +204,7 @@ export function Navbar() {
               <DropdownLink href="@/configuracoes" onClick={() => {}}>
                 Configurações
               </DropdownLink>
-              <DropdownLink href="/logout" onClick={() => {}}>
+              <DropdownLink href="/login" onClick={() => {}}>
                 Sair
               </DropdownLink>
             </div>

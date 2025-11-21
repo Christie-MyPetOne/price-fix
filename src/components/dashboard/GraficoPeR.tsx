@@ -181,7 +181,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
         </div>
       </div>
 
-      <div style={{ width: "100%", height: 305 }}>
+      <div className="w-full h-[220px] sm:h-[310px]">
         <ChartGraficoPeR
           data={data}
           xKey={xKey}
