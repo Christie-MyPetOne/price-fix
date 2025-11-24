@@ -10,9 +10,11 @@ import ConfigBasica from "@/components/configuracao/sections/ConfigBasica";
 import CanaisVenda from "@/components/configuracao/sections/CanaisVenda";
 import FormasRecebimento from "@/components/configuracao/sections/FormasRecebimento";
 import Fornecedores from "@/components/configuracao/sections/Fornecedores";
-import LinhasProdutos from "@/components/configuracao/sections/LinhasProdutos";
 import Depositos from "@/components/configuracao/sections/Depositos";
 import Integracoes from "@/components/configuracao/sections/Integracoes";
+import TabEmpresas from "@/components/configuracao/sections/TabEmpresas";
+import TabGeral from "@/components/configuracao/sections/TabGeral";
+import TabTiposCustos from "@/components/configuracao/sections/TabTiposCustos";
 
 const DEFAULT_TAB: ConfigSectionId = "config-basica";
 
@@ -42,24 +44,28 @@ export default function ConfiguracaoPage() {
         return <FormasRecebimento />;
       case "fornecedores":
         return <Fornecedores />;
-      case "linhas-produtos":
-        return <LinhasProdutos />;
+
       case "depositos":
         return <Depositos />;
       case "integracoes":
         return <Integracoes />;
+      case "empresas":
+        return <TabEmpresas />;
+      case "geral":
+        return <TabGeral />;
+      case "custos":
+        return <TabTiposCustos />;
       default:
         return <ConfigBasica />;
     }
   }, [active]);
 
-    return (
-      <div className="flex min-h-screen w-full overflow-x-hidden">
-        <SidebarConfig active={active} onChange={setActive} />
-        <main className="flex-1 bg-background pb-24 md:pb-6 overflow-x-hidden pt-6">
-          {Content}
-        </main>
-      </div>
-    );
-
+  return (
+    <div className="flex min-h-screen w-full overflow-x-hidden">
+      <SidebarConfig active={active} onChange={setActive} />
+      <main className="flex-1 bg-background pb-24 md:pb-6 overflow-x-hidden pt-6">
+        {Content}
+      </main>
+    </div>
+  );
 }

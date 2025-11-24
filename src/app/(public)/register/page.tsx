@@ -186,7 +186,7 @@ const Register: React.FC = () => {
           <Image
             src={register}
             alt="Dashboard Preview"
-            className="w-full h-auto max-w-[30rem]"
+            className="w-full h-auto max-w-[26rem]"
             priority
           />
         </div>

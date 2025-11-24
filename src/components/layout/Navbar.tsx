@@ -168,9 +168,6 @@ export function Navbar() {
             <NavLink href="#" icon={null}>
               Histórico
             </NavLink>
-            <NavLink href="/configuracao" icon={null}>
-              Configuração
-            </NavLink>
           </div>
         </div>
 
@@ -198,10 +195,10 @@ export function Navbar() {
               <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
             </button>
             <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-20 border border-border-dark lg:w-56">
-              <DropdownLink href="/perfil" onClick={() => {}}>
+              <DropdownLink href="/user/perfil" onClick={() => {}}>
                 Perfil
               </DropdownLink>
-              <DropdownLink href="@/configuracoes" onClick={() => {}}>
+              <DropdownLink href="/user/configuracao" onClick={() => {}}>
                 Configurações
               </DropdownLink>
               <DropdownLink href="/login" onClick={() => {}}>
