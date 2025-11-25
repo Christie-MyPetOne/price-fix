@@ -201,7 +201,7 @@ export const StockConfigModal = ({
                           [key]: +e.target.value,
                         })
                       }
-                      className="w-20 bg-card border border-border-dark rounded-md px-2 py-1.5 text-sm text-text text-right focus:ring-2 focus:ring-primary focus:outline-none"
+                      className=" w-20 bg-card border border-border-dark rounded-md px-2 py-1.5 text-sm text-text text-right focus:ring-2 focus:ring-primary focus:outline-none"
                     />
                     <span className="text-sm text-text-secondary w-8">
                       dias
