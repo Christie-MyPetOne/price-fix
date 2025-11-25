@@ -7,6 +7,7 @@ import {
   ShoppingCartIcon,
   ChevronLeft,
   ChevronRight,
+  ArrowUp,
   ArrowUpDown,
   Pencil,
   ArrowDown,
@@ -362,15 +363,15 @@ export const StockTable: React.FC<StockTableProps> = ({
                       >
                         <Pencil size={16} />
                       </button>
-                      <button
-                        className="p-1 hover:bg-background rounded"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExpand(product.id);
-                        }}
-                      >
-                        <ArrowDown size={16} />
-                      </button>
+                    <button
+                      className="p-1 hover:bg-background rounded"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleExpand(product.id);
+                      }}
+                    >
+                      {isExpanded ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+                    </button>
                     </td>
                   </tr>
 
