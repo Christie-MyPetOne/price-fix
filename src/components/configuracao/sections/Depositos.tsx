@@ -206,7 +206,7 @@ export default function ConfigDepositos() {
         {/* Card principal */}
         <div className="relative rounded-xl border border-border-dark bg-card shadow-sm">
           {/* Cabeçalho da tabela */}
-          <div className="grid grid-cols-[minmax(240px,1.2fr)_120px_140px_minmax(260px,1.5fr)] items-center gap-2 bg-border-dark px-5 py-3 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+          <div className="grid grid-cols-[minmax(240px,1.2fr)_120px_140px_minmax(260px,1.5fr)] items-center gap-2 bg-border-dark/60 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-text-secondary">
             <div>Depósitos</div>
             <div className="text-center">Ignorar</div>
             <div className="text-center">Fulfillment</div>
