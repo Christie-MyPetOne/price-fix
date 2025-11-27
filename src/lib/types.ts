@@ -44,6 +44,8 @@ export interface Product {
   createdAt: string;
   commission: number;
   saleFee: number;
+  salesPerDay?: number;
+  purchaseForDays?: number;
 }
 
 /* --------------------------------------------------------------------------

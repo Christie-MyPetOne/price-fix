@@ -38,7 +38,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
           className="relative flex justify-center sm:justify-normal items-center text-black gap-2 border border-border-dark bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition w-full sm:w-auto"
           aria-haspopup="dialog"
         >
-          <ShoppingCart size={18} className="text-orange-500" />
+          <ShoppingCart size={18} className="text-primary" />
           <span className="whitespace-nowrap font-medium">
             Lista de compras
           </span>
@@ -53,7 +53,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
           onClick={() => setIsSupplierListOpen(true)}
           className="flex justify-center items-center text-black gap-2 border border-border-dark bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition w-full sm:w-auto"
         >
-          <Truck size={18} className="text-orange-500" />
+          <Truck size={18} className="text-primary" />
           <span className="whitespace-nowrap font-medium ">
             Sugestões do fornecedor
           </span>

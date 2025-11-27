@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar";
-// import { Footer } from "@/components/layout/Footer";
+import { Footer } from "@/components/layout/Footer";
 
 export default function LayoutPrivate({
   children,
@@ -12,7 +12,7 @@ export default function LayoutPrivate({
       <main className="flex-1">
         <div>{children}</div>
       </main>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }
