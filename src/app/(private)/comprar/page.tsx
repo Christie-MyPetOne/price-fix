@@ -20,12 +20,34 @@ import { ShoppingCart } from "lucide-react";
 export default function OtimizarComprasPage() {
   const { products, fetchProducts, updateProductHealthStatus } =
     useProductsStore();
+
   const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [stockHealthFilter, setStockHealthFilter] = useState<HealthStatus | "">(
     ""
   );
-
+  const [supplierFilter, setSupplierFilter] = useState("");
+  const [purchaseStatusFilter, setPurchaseStatusFilter] = useState("");
+  const [stockLevelRange, setStockLevelRange] = useState({ min: "", max: "" });
+  const [salesPerDayRange, setSalesPerDayRange] = useState({
+    min: "",
+    max: "",
+  });
+  const [daysLeftRange, setDaysLeftRange] = useState({ min: "", max: "" });
+  const [purchaseForDaysRange, setPurchaseForDaysRange] = useState({
+    min: "",
+    max: "",
+  });
+  const [stockAlertFilter, setStockAlertFilter] = useState("");
+  const [zeroStockOnly, setZeroStockOnly] = useState(false);
+  const [abcFilter, setAbcFilter] = useState("");
+  const [productTypeFilter, setProductTypeFilter] = useState("");
+  const [profitMarginRange, setProfitMarginRange] = useState({
+    min: "",
+    max: "",
+  });
+  const [onlySelected, setOnlySelected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isStockConfigModalOpen, setIsStockConfigModalOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -50,18 +72,15 @@ export default function OtimizarComprasPage() {
 
   useEffect(() => {
     if (products.length > 0 && stockConfig) {
-      const updatedHealthStatus = new Map();
-
+      const updated = new Map();
       products.forEach((product) => {
         const daysLeft = getDaysLeft(product);
         const healthStatus = calculateStockHealth(daysLeft, stockConfig);
-
         if (product.stockHealthStatus !== healthStatus) {
-          updatedHealthStatus.set(product.id, healthStatus);
+          updated.set(product.id, healthStatus);
         }
       });
-
-      updatedHealthStatus.forEach((status, id) => {
+      updated.forEach((status, id) => {
         updateProductHealthStatus(id, status);
       });
     }
@@ -83,20 +102,46 @@ export default function OtimizarComprasPage() {
     });
   }, [products]);
 
+  const inRange = (value: number, min: string, max: string) => {
+    if (min && value < Number(min)) return false;
+    if (max && value > Number(max)) return false;
+    return true;
+  };
+
   const filteredProducts = useMemo(() => {
-    let prods = processedProducts;
-    if (searchTerm) {
-      prods = prods.filter(
-        (p) =>
+    return processedProducts.filter(
+      (p) =>
+        (!searchTerm ||
           p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-    if (stockHealthFilter) {
-      prods = prods.filter((p) => p.stockHealthStatus === stockHealthFilter);
-    }
-    return prods;
-  }, [processedProducts, searchTerm, stockHealthFilter]);
+          (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+        (!supplierFilter ||
+          p.supplier?.toLowerCase().includes(supplierFilter.toLowerCase())) &&
+        (!stockHealthFilter || p.stockHealthStatus === stockHealthFilter) &&
+        (!purchaseStatusFilter || p.purchaseStatus === purchaseStatusFilter) &&
+        inRange(p.stockLevel ?? 0, stockLevelRange.min, stockLevelRange.max) &&
+        inRange(
+          p.salesPerDay ?? 0,
+          salesPerDayRange.min,
+          salesPerDayRange.max
+        ) &&
+        inRange(getDaysLeft(p), daysLeftRange.min, daysLeftRange.max) &&
+        inRange(
+          p.purchaseForDays ?? 0,
+          purchaseForDaysRange.min,
+          purchaseForDaysRange.max
+        )
+    );
+  }, [
+    processedProducts,
+    searchTerm,
+    supplierFilter,
+    stockHealthFilter,
+    purchaseStatusFilter,
+    stockLevelRange,
+    salesPerDayRange,
+    daysLeftRange,
+    purchaseForDaysRange,
+  ]);
 
   const getPurchaseStatusForProduct = (product: Product): string => {
     return getPurchaseStatus(product, product.stockHealthStatus || "Parado");
@@ -107,16 +152,17 @@ export default function OtimizarComprasPage() {
   );
 
   const handleAddToCart = (product: Product) => {
-    setSelectedItems((prev) => {
-      if (prev.includes(product.id)) return prev;
-      return [...prev, product.id];
-    });
+    setSelectedItems((prev) =>
+      prev.includes(product.id) ? prev : [...prev, product.id]
+    );
 
     setCartItems((prev) => {
       if (prev.find((p) => p.id === product.id)) return prev;
+
       const unitCost = product.cost ?? 0;
       const unitPrice = product.price ?? 0;
       const profit = unitPrice - unitCost;
+
       return [
         ...prev,
         {
@@ -145,8 +191,10 @@ export default function OtimizarComprasPage() {
     setCartItems((prev) =>
       prev.map((item) => {
         if (item.id !== id) return item;
+
         const unitCost = item.cost ?? 0;
         const unitPrice = item.price ?? 0;
+
         return {
           ...item,
           quantity: newQuantity,
@@ -184,6 +232,7 @@ export default function OtimizarComprasPage() {
           Comprar
         </span>
       </div>
+
       <StockHeader cartItems={cartItems} onOpenCart={handleOpenCart} />
 
       <div className="grid grid-cols-3 gap-6 w-full">
@@ -206,9 +255,32 @@ export default function OtimizarComprasPage() {
       <StockFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        supplierFilter={supplierFilter}
+        setSupplierFilter={setSupplierFilter}
+        purchaseStatusFilter={purchaseStatusFilter}
+        setPurchaseStatusFilter={setPurchaseStatusFilter}
         stockHealthFilter={stockHealthFilter}
         setStockHealthFilter={setStockHealthFilter}
-        onFilter={() => {}}
+        stockLevelRange={stockLevelRange}
+        setStockLevelRange={setStockLevelRange}
+        salesPerDayRange={salesPerDayRange}
+        setSalesPerDayRange={setSalesPerDayRange}
+        daysLeftRange={daysLeftRange}
+        setDaysLeftRange={setDaysLeftRange}
+        purchaseForDaysRange={purchaseForDaysRange}
+        setPurchaseForDaysRange={setPurchaseForDaysRange}
+        stockAlertFilter={stockAlertFilter}
+        setStockAlertFilter={setStockAlertFilter}
+        zeroStockOnly={zeroStockOnly}
+        setZeroStockOnly={setZeroStockOnly}
+        abcFilter={abcFilter}
+        setAbcFilter={setAbcFilter}
+        productTypeFilter={productTypeFilter}
+        setProductTypeFilter={setProductTypeFilter}
+        profitMarginRange={profitMarginRange}
+        setProfitMarginRange={setProfitMarginRange}
+        onlySelected={onlySelected}
+        setOnlySelected={setOnlySelected}
         selectedProducts={selectedProducts}
         onOpenConfigModal={handleOpenConfigModal}
       />
