@@ -84,7 +84,6 @@ export function ProductFilters({
         </div>
       </div>
 
-      {/* ----------- BOTÃO FILTROS AVANÇADOS ----------- */}
       <button
         className="flex items-center gap-2 text-xs text-primary w-fit"
         onClick={() => setOpenAdvanced(!openAdvanced)}
