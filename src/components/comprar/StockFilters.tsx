@@ -14,7 +14,6 @@ export function StockFilters(props) {
     setPurchaseStatusFilter,
     stockHealthFilter,
     setStockHealthFilter,
-
     stockLevelRange,
     setStockLevelRange,
     salesPerDayRange,
@@ -23,19 +22,16 @@ export function StockFilters(props) {
     setDaysLeftRange,
     purchaseForDaysRange,
     setPurchaseForDaysRange,
-
     stockAlertFilter,
     setStockAlertFilter,
     zeroStockOnly,
     setZeroStockOnly,
     abcFilter,
     setAbcFilter,
-
     profitMarginRange,
     setProfitMarginRange,
     onlySelected,
     setOnlySelected,
-
     selectedProducts,
     onOpenConfigModal,
   } = props;
@@ -131,8 +127,6 @@ export function StockFilters(props) {
             onChange={(e) => setSupplierFilter(e.target.value)}
           />
         </div>
-
-      
 
         <div className="flex flex-col gap-1">
           <label className="text-xs text-text-secondary">Saúde</label>
