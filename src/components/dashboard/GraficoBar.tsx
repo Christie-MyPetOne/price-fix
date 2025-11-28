@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { formatBRLShort, defaultTooltipFormatter } from "@/lib/utils";
 import ChartGraficoBar from "@/components/charts/ChartGraficoBar";
+
 export interface SerieDef {
   key: string;
   label: string;
@@ -26,8 +27,10 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
   series,
   legendPageSize = 6,
 }) => {
-  const [visible, setVisible] = useState<Set<string>>(
-    () => new Set(series.map((s) => s.key))
+  // 👉 Set com as séries selecionadas
+  // regra: tamanho 0 = todas visíveis
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(
+    () => new Set()
   );
   const [page, setPage] = useState(0);
 
@@ -36,30 +39,27 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
   const end = start + legendPageSize;
   const pageItems = series.slice(start, end);
 
-  const visibleCount = visible.size;
-  const totalCount = series.length;
+  const hasSelection = selectedKeys.size > 0;
 
   function toggleKey(k: string) {
-    setVisible((prev) => {
+    setSelectedKeys((prev) => {
       const next = new Set(prev);
-      if (next.has(k)) next.delete(k);
-      else next.add(k);
+      if (next.has(k)) {
+        next.delete(k);
+      } else {
+        next.add(k);
+      }
       return next;
     });
+  }
+
+  function clearSelection() {
+    setSelectedKeys(new Set());
   }
 
   function selectAll() {
-    setVisible(new Set(series.map((s) => s.key)));
-  }
-
-  function invertSelection() {
-    setVisible((prev) => {
-      const next = new Set<string>();
-      series.forEach((s) => {
-        if (!prev.has(s.key)) next.add(s.key);
-      });
-      return next;
-    });
+    // opcional: marcar todas como selecionadas
+    setSelectedKeys(new Set(series.map((s) => s.key)));
   }
 
   return (
@@ -69,18 +69,21 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
 
         <div className="flex flex-wrap items-center gap-2">
           {pageItems.map((s) => {
-            const active = visible.has(s.key);
+            const isSelected = selectedKeys.has(s.key);
+            const active = hasSelection ? isSelected : true; // quando não tem seleção, todas parecem “ativas”
+
+            const baseClasses =
+              "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs border transition-all";
+            const stateClasses = active
+              ? "bg-background border-border-dark"
+              : "opacity-40 bg-background border-border-dark";
+
             return (
               <button
                 key={s.key}
                 type="button"
                 onClick={() => toggleKey(s.key)}
-                className={[
-                  "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs border",
-                  active
-                    ? "bg-background border-border-dark"
-                    : "opacity-50 hover:opacity-70 bg-background border-border-dark",
-                ].join(" ")}
+                className={[baseClasses, stateClasses].join(" ")}
                 title={s.label}
               >
                 <span
@@ -125,14 +128,7 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
               className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
               type="button"
             >
-              Todos
-            </button>
-            <button
-              onClick={invertSelection}
-              className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
-              type="button"
-            >
-              Inverter
+              Selecionar todos
             </button>
           </div>
         </div>
@@ -142,15 +138,22 @@ export const GraficoBar: React.FC<GraficoBarCanaisProps> = ({
         data={data}
         xKey={xKey}
         series={series}
-        visibleKeys={visible}
+        selectedKeys={selectedKeys} // 👈 aqui vai o Set de selecionados
         formatBRLShort={formatBRLShort}
         defaultTooltipFormatter={defaultTooltipFormatter}
       />
 
-      {/* Rodapé */}
       <div className="text-center text-xs text-text-secondary mt-2">
-        <span className="font-semibold">{visibleCount}</span> de {totalCount}{" "}
-        selecionados
+        {hasSelection ? (
+          <>
+            <span className="font-semibold">
+              {selectedKeys.size}
+            </span>{" "}
+            série(s) selecionada(s)
+          </>
+        ) : (
+          <>Nenhuma série selecionada — exibindo todas</>
+        )}
       </div>
     </div>
   );

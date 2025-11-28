@@ -176,7 +176,7 @@ export default function ErpConfig({ slug, onClose }: ErpConfigProps) {
           <div className="flex items-center gap-2 mt-3 md:mt-0">
             <Button 
               onClick={handleSave} 
-              className="ml-4 inline-flex items-center gap-2 text-sm px-4 py-2" // Ajustado para px-4 py-2 para visualmente manter a altura padrão de botões maiores.
+              className="ml-4    inline-flex items-center gap-2 text-sm px-4 py-2" // Ajustado para px-4 py-2 para visualmente manter a altura padrão de botões maiores.
             >
               <Save className="w-4 h-4" /> Salvar
             </Button>
