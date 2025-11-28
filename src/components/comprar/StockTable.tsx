@@ -11,6 +11,8 @@ import {
   ArrowUp,
   ArrowDown,
   MoreVertical,
+  ClipboardList,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import {
@@ -25,6 +27,7 @@ import {
 
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
+import { useOutsideClose } from "@/hooks/useOutsideClose";
 import { StockHealthBadge } from "./ui/StockHealthBadge";
 import { StatusBadge } from "./ui/StatusBadge";
 import { ContextualActionBar } from "./ui/ContextualActionBar";
@@ -117,6 +120,9 @@ export const StockTable: React.FC<StockTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [openActions, setOpenActions] = useState(false);
   const { getConfigProduto } = useStockConfigStore();
+  const actionsMenuRef = useOutsideClose<HTMLDivElement>(openActions, () =>
+    setOpenActions(false)
+  );
 
   const headers: { key: SortKey; label: string }[] = [
     { key: "name", label: "Produto" },
@@ -287,7 +293,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                       ${
                         selectedItems.includes(product.id)
                           ? "bg-primary/10"
-                          : "even:bg-background-light/50 hover:bg-primary/5"
+                          : "even:bg-background-light/50 hover:bg-background dark:hover:bg-background"
                       }`}
                   >
                     <td className="px-2 py-2 text-center">
@@ -511,41 +517,47 @@ export const StockTable: React.FC<StockTableProps> = ({
         selectedCount={selectedItems.length}
         onClearSelection={() => setSelectedItems([])}
       >
-        <div className="relative">
+        <div className="relative" ref={actionsMenuRef}>
           <button
             onClick={() => setOpenActions(!openActions)}
             className={`
-                flex items-center gap-2 text-xs
-                border border-border-dark 
-                px-3 py-2 rounded-md
-                bg-background hover:bg-muted 
-                transition-all duration-200
-                ${openActions ? "bg-muted" : ""}
-              `}
+        flex items-center gap-2 text-sm font-medium
+        border border-primary bg-primary text-white
+        px-4 py-2 rounded-lg shadow-sm 
+        hover:bg-primary-dark hover:border-primary-dark
+        focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-opacity-50
+        transition-all duration-200
+        ${openActions ? "bg-primary-dark" : ""}
+      `}
           >
-            <MoreVertical
-              size={16}
-              className={`transition-transform duration-200 ${
-                openActions ? "rotate-90 text-primary" : "text-text"
-              }`}
-            />
-            <span>Mais Ações</span>
+            <MoreVertical size={16} />
+            <span>Ações</span>
           </button>
 
           {openActions && (
-            <div className="absolute bottom-12 left-0 w-56 bg-popover border border-border-dark shadow-lg rounded-lg z-20 animate-fade-slide">
-              <button
-                onClick={() => onBulkAddToCart && onBulkAddToCart()}
-                className="w-full text-left px-3 py-2 text-xs rounded-t-md bg-background text-text hover:text-primary transition"
-              >
-                Listar Compras em Massa
-              </button>
-              <button
-                onClick={() => onOpenConfigModal && onOpenConfigModal()}
-                className="w-full text-left px-3 py-2 text-xs rounded-b-md bg-background text-text hover:text-primary transition"
-              >
-                Configurar Estoque em Massa
-              </button>
+            <div className="absolute bottom-full mb-2 right-0 w-64 origin-bottom-right bg-card dark:bg-card-800 border border-border-200 dark:border-gray-700 rounded-xl shadow-lg z-20 overflow-hidden animate-fade-slide-up">
+              <div className="p-2">
+                <button
+                  onClick={() => {
+                    if (onBulkAddToCart) onBulkAddToCart();
+                    setOpenActions(false);
+                  }}
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200  hover:bg-background dark:hover:bg-background  rounded-md transition-colors duration-150"
+                >
+                  <ClipboardList size={16} className="text-gray-500" />
+                  <span>Listar Compras em Massa</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (onOpenConfigModal) onOpenConfigModal();
+                    setOpenActions(false);
+                  }}
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200  hover:bg-background dark:hover:bg-background rounded-md transition-colors duration-150"
+                >
+                  <SlidersHorizontal size={16} className="text-gray-500" />
+                  <span>Configurar Estoque em Massa</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
