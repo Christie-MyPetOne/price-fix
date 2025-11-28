@@ -16,7 +16,7 @@ import TabEmpresas from "@/components/configuracao/sections/TabEmpresas";
 import TabGeral from "@/components/configuracao/sections/TabGeral";
 import TabTiposCustos from "@/components/configuracao/sections/TabTiposCustos";
 
-const DEFAULT_TAB: ConfigSectionId = "config-basica";
+const DEFAULT_TAB: ConfigSectionId = "geral";
 
 export default function ConfiguracaoPage() {
   const router = useRouter();
@@ -36,6 +36,8 @@ export default function ConfiguracaoPage() {
 
   const Content = useMemo(() => {
     switch (active) {
+      case "geral":
+        return <TabGeral />;
       case "config-basica":
         return <ConfigBasica />;
       case "canais-venda":
@@ -51,8 +53,6 @@ export default function ConfiguracaoPage() {
         return <Integracoes />;
       case "empresas":
         return <TabEmpresas />;
-      case "geral":
-        return <TabGeral />;
       case "custos":
         return <TabTiposCustos />;
       default:

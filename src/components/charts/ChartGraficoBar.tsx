@@ -16,7 +16,7 @@ export interface ChartGraficoBarProps {
   data: Array<Record<string, any>>;
   xKey: string;
   series: SerieDef[];
-  visibleKeys: Set<string>;
+  selectedKeys?: Set<string>; // 👈 séries selecionadas
   formatBRLShort: (n: number) => string;
   defaultTooltipFormatter: (value: any) => string;
 }
@@ -25,7 +25,7 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
   data,
   xKey,
   series,
-  visibleKeys,
+  selectedKeys,
   formatBRLShort,
   defaultTooltipFormatter,
 }) => {
@@ -38,14 +38,14 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // 👉 Mobile → limitar para 6 barras
   const dataMobile = isMobile ? data.slice(-6) : data;
 
-  // 👉 Mobile → ticks somente da primeira e última barra
   const ticksMobile =
     dataMobile.length > 1
       ? [dataMobile[0][xKey], dataMobile[dataMobile.length - 1][xKey]]
       : [];
+
+  const hasSelection = !!selectedKeys && selectedKeys.size > 0;
 
   return (
     <div className="w-full h-[250px] md:h-[307px]">
@@ -65,7 +65,6 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
             stroke="var(--color-text-secondary)"
             tickLine={false}
             axisLine={false}
-            // 👉 se for mobile, só mostra primeiro e último label
             ticks={isMobile ? ticksMobile : undefined}
           />
 
@@ -88,16 +87,23 @@ export const ChartGraficoBar: React.FC<ChartGraficoBarProps> = ({
             cursor={{ fill: "var(--color-background)" }}
           />
 
-          {series.map((s) => (
-            <Bar
-              key={s.key}
-              dataKey={s.key}
-              stackId="stack"
-              fill={s.color}
-              radius={[2, 2, 0, 0]}
-              hide={!visibleKeys.has(s.key)}
-            />
-          ))}
+          {series.map((s) => {
+            const isSelected = hasSelection && selectedKeys!.has(s.key);
+
+            return (
+              <Bar
+                key={s.key}
+                dataKey={s.key}
+                stackId="stack"
+                fill={s.color}
+                radius={[2, 2, 0, 0]}
+                // 👇 regra principal:
+                // se NÃO tiver seleção -> mostra tudo
+                // se tiver seleção -> só mostra as selecionadas
+                hide={hasSelection && !isSelected}
+              />
+            );
+          })}
         </BarChart>
       </ResponsiveContainer>
     </div>
