@@ -120,7 +120,6 @@ export interface StockTableProps {
   loading: boolean;
   displayedProducts: Product[];
   selectedItems: string[];
-  setSelectedItems: Dispatch<SetStateAction<string[]>>;
   searchTerm: string;
   getPurchaseStatus: (product: Product) => string;
   onAddToCart: (product: Product) => void;
@@ -129,6 +128,11 @@ export interface StockTableProps {
   onOpenConfig: (product: Product) => void;
   onOpenConfigModal?: () => void;
   onBulkAddToCart?: () => void;
+  isBulkMode?: boolean;
+  onClearSelection?: () => void;
+  onExportList?: () => void;
+  onSelectItem: (id: string, index: number, shiftKey?: boolean) => void;
+  onSelectAll: () => void;
 }
 
 export interface StockStatusCardProps {

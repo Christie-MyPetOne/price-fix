@@ -87,7 +87,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
   const lineStroke = String(lineColor ?? line?.color ?? "#2563EB");
 
   return (
-    <div className="grafico-per rounded-xl border border-border-dark bg-card text-text shadow-lg p-4">
+    <div className="grafico-per rounded-xl border border-border-dark bg-card text-text shadow-lg p-4 focus:outline-none">
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
 

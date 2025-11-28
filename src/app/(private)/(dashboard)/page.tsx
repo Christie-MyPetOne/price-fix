@@ -126,11 +126,12 @@ export default function DashboardPage() {
             listaAtiva={mostrarLista}
             mode={mode}
             setMode={setMode}
+            className="order-1"
           />
         ))}
 
         {dashboardData.kpiData2.map((kpi: any) => (
-          <KpiCard key={kpi.title} {...kpi} className="bg-card " />
+          <KpiCard key={kpi.title} {...kpi} />
         ))}
       </div>
 

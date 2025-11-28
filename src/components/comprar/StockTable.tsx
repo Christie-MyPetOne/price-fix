@@ -13,14 +13,12 @@ import {
   MoreVertical,
   ClipboardList,
   SlidersHorizontal,
+  FileDown,
 } from "lucide-react";
 
 import {
   paginate,
   sortData,
-  toggleSelection,
-  toggleSelectAll,
-  handleShiftSelection,
   getDaysLeft,
   getPurchaseSuggestionUnits,
 } from "@/lib/utils";
@@ -97,7 +95,6 @@ export const StockTable: React.FC<StockTableProps> = ({
   loading,
   displayedProducts,
   selectedItems,
-  setSelectedItems,
   searchTerm,
   getPurchaseStatus,
   onAddToCart,
@@ -106,11 +103,13 @@ export const StockTable: React.FC<StockTableProps> = ({
   onOpenConfig,
   onBulkAddToCart,
   onOpenConfigModal,
+  isBulkMode,
+  onClearSelection,
+  onExportList,
+  onSelectItem,
+  onSelectAll,
 }) => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(
-    null
-  );
-  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
 
@@ -161,21 +160,6 @@ export const StockTable: React.FC<StockTableProps> = ({
     selectedItems.length === paginatedProducts.length;
 
   const isIndeterminate = selectedItems.length > 0 && !allFilteredSelected;
-
-  const handleSelectAll = () => {
-    setSelectedItems((prev) => toggleSelectAll(paginatedProducts, prev));
-  };
-
-  const handleSelectItem = (id: string, index: number, shiftKey?: boolean) => {
-    setSelectedItems((prev) => {
-      const updated = shiftKey
-        ? handleShiftSelection(id, paginatedProducts, prev, lastSelectedIndex)
-        : toggleSelection(prev, id);
-      return updated;
-    });
-
-    setLastSelectedIndex(index);
-  };
 
   const toggleExpand = (id: string) => {
     setExpandedProductId((prev) => (prev === id ? null : id));
@@ -249,7 +233,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                   ref={(input) => {
                     if (input) input.indeterminate = isIndeterminate;
                   }}
-                  onChange={handleSelectAll}
+                  onChange={onSelectAll}
                   className="h-3.5 w-3.5 cursor-pointer"
                 />
               </th>
@@ -303,7 +287,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                         readOnly
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleSelectItem(product.id, index, e.shiftKey);
+                          onSelectItem(product.id, index, e.shiftKey);
                         }}
                         className="h-3.5 w-3.5 cursor-pointer"
                       />
@@ -515,7 +499,7 @@ export const StockTable: React.FC<StockTableProps> = ({
       )}
       <ContextualActionBar
         selectedCount={selectedItems.length}
-        onClearSelection={() => setSelectedItems([])}
+        onClearSelection={onClearSelection || (() => {})}
       >
         <div className="relative" ref={actionsMenuRef}>
           <button
@@ -537,26 +521,43 @@ export const StockTable: React.FC<StockTableProps> = ({
           {openActions && (
             <div className="absolute bottom-full mb-2 right-0 w-64 origin-bottom-right bg-card dark:bg-card-800 border border-border-200 dark:border-gray-700 rounded-xl shadow-lg z-20 overflow-hidden animate-fade-slide-up">
               <div className="p-2">
+                {/* 1. Opção: Listar Compras em Massa */}
                 <button
                   onClick={() => {
                     if (onBulkAddToCart) onBulkAddToCart();
                     setOpenActions(false);
                   }}
-                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200  hover:bg-background dark:hover:bg-background  rounded-md transition-colors duration-150"
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150"
                 >
                   <ClipboardList size={16} className="text-gray-500" />
                   <span>Listar Compras em Massa</span>
                 </button>
+
+                {/* 2. Opção: Exportar Lista de Compras */}
                 <button
                   onClick={() => {
-                    if (onOpenConfigModal) onOpenConfigModal();
+                    if (onExportList) onExportList();
                     setOpenActions(false);
                   }}
-                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200  hover:bg-background dark:hover:bg-background rounded-md transition-colors duration-150"
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150"
                 >
-                  <SlidersHorizontal size={16} className="text-gray-500" />
-                  <span>Configurar Estoque em Massa</span>
+                  <FileDown size={16} className="text-gray-500" />
+                  <span>Exportar Lista de Compras</span>
                 </button>
+
+                {/* 3. Opção: Configurar Estoque em Massa (condicional) */}
+                {!isBulkMode && (
+                  <button
+                    onClick={() => {
+                      if (onOpenConfigModal) onOpenConfigModal();
+                      setOpenActions(false);
+                    }}
+                    className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150 border-t border-border-dark mt-2 pt-3"
+                  >
+                    <SlidersHorizontal size={16} className="text-gray-500" />
+                    <span>Configurar Estoque em Massa</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
