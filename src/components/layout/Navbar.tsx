@@ -116,41 +116,44 @@ export function Navbar() {
               Dashboard
             </NavLink>
 
-            <div className="relative">
+            <div className="relative group">
               <button
-                onClick={toggleGerenciar}
-                className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
-                  isGerenciarOpen
-                    ? "bg-card text-text font-semibold"
-                    : "text-text-secondary hover:bg-card hover:text-text"
-                } focus:outline-none`}
+                className="flex items-center px-3 py-2 rounded-md transition-colors duration-200 
+                          text-text-secondary group-hover:bg-card group-hover:text-text 
+                          focus:outline-none"
               >
                 Gerenciar
                 <ChevronDown
-                  className={`w-4 h-4 ml-1 transition-transform duration-200 ${
-                    isGerenciarOpen ? "rotate-180" : ""
-                  }`}
+                  className="w-4 h-4 ml-1 transition-transform duration-200 
+                            group-hover:rotate-180"
                 />
               </button>
-              {isGerenciarOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark">
-                  <DropdownLink
-                    href="/produtos"
-                    icon={Package}
-                    onClick={toggleGerenciar}
-                  >
-                    Meus Produtos
-                  </DropdownLink>
-                  <DropdownLink
-                    href="/vendas"
-                    icon={ShoppingCart}
-                    onClick={toggleGerenciar}
-                  >
-                    Pedidos de venda
-                  </DropdownLink>
-                </div>
-              )}
+
+              <div
+                className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 
+                          border border-border-dark opacity-0 invisible 
+                          group-hover:opacity-100 group-hover:visible 
+                          transition-all duration-200"
+              >
+                <DropdownLink
+                  href="/produtos"
+                  icon={Package}
+                  onClick={() => {}}   // <- só pra satisfazer o tipo
+                >
+                  Meus Produtos
+                </DropdownLink>
+
+                <DropdownLink
+                  href="/vendas"
+                  icon={ShoppingCart}
+                  onClick={() => {}}   // <- idem
+                >
+                  Pedidos de venda
+                </DropdownLink>
+              </div>
             </div>
+
+
             <NavLink href="/comprar" icon={null}>
               Comprar
             </NavLink>
@@ -246,14 +249,14 @@ export function Navbar() {
               Dashboard
             </NavLink>
 
-            <div className="relative">
+            <div className="relative group">
               <button
                 onClick={toggleGerenciar}
                 className={`flex items-center w-full px-3 py-2 rounded-md transition-colors duration-200 justify-between ${
                   isGerenciarOpen
                     ? "bg-card text-text font-semibold"
                     : "text-text-secondary hover:bg-card hover:text-text"
-                } focus:outline-none`}
+                }`}
               >
                 Gerenciar
                 <ChevronDown
@@ -261,9 +264,8 @@ export function Navbar() {
                     isGerenciarOpen ? "rotate-180" : ""
                   }`}
                 />
-
-
               </button>
+
               {isGerenciarOpen && (
                 <div className="mt-2 w-full bg-card-light rounded-md shadow-inner py-1 z-20">
                   <DropdownLink
@@ -276,6 +278,7 @@ export function Navbar() {
                   >
                     Meus Produtos
                   </DropdownLink>
+
                   <DropdownLink
                     href="/vendas"
                     icon={ShoppingCart}
@@ -286,7 +289,6 @@ export function Navbar() {
                   >
                     Pedidos de venda
                   </DropdownLink>
-                    
                 </div>
               )}
             </div>
@@ -296,11 +298,7 @@ export function Navbar() {
             </NavLink>
             <NavLink href="#" icon={null} onClick={toggleMenu}>
               Histórico
-            </NavLink>
-            
-     
-
-            
+            </NavLink>           
           </div>
         </div>
       )}
