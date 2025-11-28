@@ -18,7 +18,7 @@ const GraficoMargem: React.FC<GraficoMargemProps> = ({
   );
 
   return (
-    <div className="rounded-xl border border-border-dark bg-card text-text shadow-lg p-4">
+    <div className="rounded-xl border border-border-dark bg-card text-text shadow-lg p-4 focus:outline-none">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold">{title}</h2>
       </div>
