@@ -24,7 +24,7 @@ export function Navbar() {
   const [, setIsConfigOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const toggleGerenciar = () => {
     setIsGerenciarOpen((prev) => !prev);
     setIsConfigOpen(false);
@@ -35,7 +35,7 @@ export function Navbar() {
     setIsGerenciarOpen(false);
     setIsConfigOpen(false);
   };
-
+  
   const NavLink: React.FC<NavLinkProps & { onClick?: () => void }> = ({
     href,
     children,
@@ -116,52 +116,44 @@ export function Navbar() {
               Dashboard
             </NavLink>
 
-            <div className="relative">
+            <div className="relative group">
               <button
-                onClick={toggleGerenciar}
-                className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
-                  isGerenciarOpen
-                    ? "bg-card text-text font-semibold"
-                    : "text-text-secondary hover:bg-card hover:text-text"
-                } focus:outline-none`}
+                className="flex items-center px-3 py-2 rounded-md transition-colors duration-200 
+                          text-text-secondary group-hover:bg-card group-hover:text-text 
+                          focus:outline-none"
               >
                 Gerenciar
                 <ChevronDown
-                  className={`w-4 h-4 ml-1 transition-transform duration-200 ${
-                    isGerenciarOpen ? "rotate-180" : ""
-                  }`}
+                  className="w-4 h-4 ml-1 transition-transform duration-200 
+                            group-hover:rotate-180"
                 />
               </button>
-              {isGerenciarOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 border border-border-dark">
-                  <DropdownLink
-                    href="/produtos"
-                    icon={Package}
-                    onClick={toggleGerenciar}
-                  >
-                    Meus Produtos
-                  </DropdownLink>
-                  <DropdownLink
-                    href="/vendas"
-                    icon={ShoppingCart}
-                    onClick={toggleGerenciar}
-                  >
-                    Pedidos de venda
-                  </DropdownLink>
-                  <DropdownLink
-                    href="/custos"
-                    icon={DollarSign}
-                    onClick={toggleGerenciar}
-                  >
-                    Custos
-                  </DropdownLink>
-                </div>
-              )}
+
+              <div
+                className="absolute top-full left-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 z-20 
+                          border border-border-dark opacity-0 invisible 
+                          group-hover:opacity-100 group-hover:visible 
+                          transition-all duration-200"
+              >
+                <DropdownLink
+                  href="/produtos"
+                  icon={Package}
+                  onClick={() => {}}   // <- só pra satisfazer o tipo
+                >
+                  Meus Produtos
+                </DropdownLink>
+
+                <DropdownLink
+                  href="/vendas"
+                  icon={ShoppingCart}
+                  onClick={() => {}}   // <- idem
+                >
+                  Pedidos de venda
+                </DropdownLink>
+              </div>
             </div>
 
-            <NavLink href="/relatorios" icon={BarChart}>
-              Relatórios
-            </NavLink>
+
             <NavLink href="/comprar" icon={null}>
               Comprar
             </NavLink>
@@ -186,29 +178,70 @@ export function Navbar() {
 
           <ThemeToggleButton />
 
-          <div className="relative group hidden lg:block">
-            <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
-              <User className="w-4 h-4 mr-1" />
-              <span className="hidden lg:inline text-sm text-text-secondary">
-                dodo@mypeto...
-              </span>
-              <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
-            </button>
-            <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-20 border border-border-dark lg:w-56">
-              <DropdownLink href="/user/perfil" onClick={() => {}}>
-                Perfil
-              </DropdownLink>
-              <DropdownLink href="/user/configuracao" onClick={() => {}}>
-                Configurações
-              </DropdownLink>
-              <DropdownLink href="/login" onClick={() => {}}>
-                Sair
-              </DropdownLink>
-            </div>
+      {/* PERFIL — aparece no desktop e mobile */}
+      <div className="relative group hidden lg:block">
+        <button className="flex items-center text-text hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors">
+          <User className="w-4 h-4 mr-1" />
+          <span className="hidden lg:inline text-sm text-text-secondary">
+            dodo@mypeto...
+          </span>
+          <ChevronDown className="w-4 h-4 ml-1 text-text-secondary" />
+        </button>
+
+        <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 opacity-0 
+                        group-hover:opacity-100 invisible group-hover:visible 
+                        transition-all duration-200 z-20 border border-border-dark lg:w-56">
+          <DropdownLink 
+            href="/user/perfil" 
+            onClick={() => setIsProfileOpen(false)}
+          >
+            Perfil
+          </DropdownLink>
+          <DropdownLink 
+            href="/user/configuracao" 
+            onClick={() => setIsProfileOpen(false)}
+          >
+            Configurações
+          </DropdownLink>
+          <DropdownLink 
+            href="/login" 
+            onClick={() => setIsProfileOpen(false)}
+          >
+            Sair
+          </DropdownLink>
+        </div>
+      </div>
+
+      
+      <div className="relative lg:hidden">
+        <button
+          onClick={() => setIsProfileOpen((prev) => !prev)}
+          className="flex items-center text-text-secondary hover:text-primary p-2 rounded-full hover:bg-card-light transition-colors"
+        >
+          <User className="w-5 h-5" />
+        </button>
+
+        {isProfileOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-lg py-1 border border-border-dark z-20">
+            <DropdownLink href="/user/perfil" onClick={() => setIsProfileOpen(false)}>
+              Perfil
+            </DropdownLink>
+            <DropdownLink
+              href="/user/configuracao"
+              onClick={() => setIsProfileOpen(false)}
+            >
+              Configurações
+            </DropdownLink>
+            <DropdownLink href="/login" onClick={() => setIsProfileOpen(false)}>
+              Sair
+            </DropdownLink>
           </div>
+        )}
+      </div>
+
         </div>
       </nav>
-
+            
       {isMenuOpen && (
         <div className="lg:hidden absolute top-16 left-0 w-full bg-card shadow-xl z-10 p-4 border-b border-border-dark">
           <div className="flex flex-col space-y-2 text-sm">
@@ -216,14 +249,14 @@ export function Navbar() {
               Dashboard
             </NavLink>
 
-            <div className="relative">
+            <div className="relative group">
               <button
                 onClick={toggleGerenciar}
                 className={`flex items-center w-full px-3 py-2 rounded-md transition-colors duration-200 justify-between ${
                   isGerenciarOpen
                     ? "bg-card text-text font-semibold"
                     : "text-text-secondary hover:bg-card hover:text-text"
-                } focus:outline-none`}
+                }`}
               >
                 Gerenciar
                 <ChevronDown
@@ -232,6 +265,7 @@ export function Navbar() {
                   }`}
                 />
               </button>
+
               {isGerenciarOpen && (
                 <div className="mt-2 w-full bg-card-light rounded-md shadow-inner py-1 z-20">
                   <DropdownLink
@@ -244,6 +278,7 @@ export function Navbar() {
                   >
                     Meus Produtos
                   </DropdownLink>
+
                   <DropdownLink
                     href="/vendas"
                     icon={ShoppingCart}
@@ -254,32 +289,16 @@ export function Navbar() {
                   >
                     Pedidos de venda
                   </DropdownLink>
-                  <DropdownLink
-                    href="/custos"
-                    icon={DollarSign}
-                    onClick={() => {
-                      toggleGerenciar();
-                      toggleMenu();
-                    }}
-                  >
-                    Custos
-                  </DropdownLink>
                 </div>
               )}
             </div>
 
-            <NavLink href="/relatorios" icon={BarChart} onClick={toggleMenu}>
-              Relatórios
-            </NavLink>
             <NavLink href="/comprar" icon={null} onClick={toggleMenu}>
               Comprar
             </NavLink>
             <NavLink href="#" icon={null} onClick={toggleMenu}>
               Histórico
-            </NavLink>
-            <NavLink href="/configuracao" icon={null} onClick={toggleMenu}>
-              Configuração
-            </NavLink>
+            </NavLink>           
           </div>
         </div>
       )}

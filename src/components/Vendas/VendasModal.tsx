@@ -26,7 +26,7 @@ export const VendasModal: React.FC<VendasModalProps> = ({
       title={`Detalhes do Pedido ${sale.id ?? ""}`}
       size="xl"
     >
-      <div className="space-y-8 pb-4">
+      <div className="space-y-4 ">
         <div className="rounded-xl border border-border-dark bg-background/60 backdrop-blur-sm shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <Info size={18} className="text-primary" />
@@ -119,7 +119,7 @@ export const VendasModal: React.FC<VendasModalProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="p-5 rounded-xl bg-card/70 border border-border-dark shadow hover:shadow-lg transition flex flex-col sm:flex-row gap-6"
+                    className="p-3 rounded-xl bg-card/70 border border-border-dark shadow hover:shadow-lg transition flex flex-col sm:flex-row gap-6"
                   >
                     <div>
                       {item.image ? (
@@ -192,7 +192,7 @@ export const VendasModal: React.FC<VendasModalProps> = ({
                         </div>
                       </div>
 
-                      <div className="mt-5 border-t border-border-dark pt-4 text-right">
+                      <div className="mt-3 border-t border-border-dark pt-1 text-right">
                         <span className="text-xs text-text-secondary">
                           Lucro Bruto
                         </span>
