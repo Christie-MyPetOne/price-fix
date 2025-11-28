@@ -32,12 +32,9 @@ export function StockFilters(props) {
     setProfitMarginRange,
     onlySelected,
     setOnlySelected,
-    selectedProducts,
-    onOpenConfigModal,
   } = props;
 
   const [openAdvanced, setOpenAdvanced] = useState(false);
-  const [openActions, setOpenActions] = useState(false);
 
   const clearAllFilters = () => {
     setSearchTerm("");
@@ -64,39 +61,6 @@ export function StockFilters(props) {
         </h2>
 
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <button
-              onClick={() => setOpenActions(!openActions)}
-              className={`
-                flex items-center gap-2 text-xs
-                border border-border-dark 
-                px-3 py-2 rounded-md
-                bg-background hover:bg-muted 
-                transition-all duration-200
-                ${openActions ? "bg-muted" : ""}
-              `}
-            >
-              <MoreVertical
-                size={16}
-                className={`transition-transform duration-200 ${
-                  openActions ? "rotate-90 text-primary" : "text-text"
-                }`}
-              />
-              <span>Ações</span>
-            </button>
-
-            {openActions && (
-              <div className="absolute right-0 mt-2 w-44 bg-popover border border-border-dark shadow-lg rounded-lg z-20 animate-fade-slide">
-                <button
-                  onClick={() => onOpenConfigModal(selectedProducts)}
-                  className="w-full text-left px-3 py-2 text-xs rounded-md bg-background text-text hover:text-primary transition"
-                >
-                  Listar em Massa
-                </button>
-              </div>
-            )}
-          </div>
-
           <button
             onClick={clearAllFilters}
             className="flex items-center gap-1 text-xs text-primary hover:underline"

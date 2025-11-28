@@ -127,6 +127,7 @@ export interface StockTableProps {
   onRemove: (id: string) => void;
   cartItems: CartItem[];
   onOpenConfig: (product: Product) => void;
+  onOpenConfigModal?: () => void;
 }
 
 export interface StockStatusCardProps {

@@ -281,8 +281,6 @@ export default function OtimizarComprasPage() {
         setProfitMarginRange={setProfitMarginRange}
         onlySelected={onlySelected}
         setOnlySelected={setOnlySelected}
-        selectedProducts={selectedProducts}
-        onOpenConfigModal={handleOpenConfigModal}
       />
 
       <StockTable
@@ -296,6 +294,7 @@ export default function OtimizarComprasPage() {
         onRemove={handleRemoveFromCart}
         cartItems={cartItems}
         onOpenConfig={handleOpenConfigForSingleProduct}
+        onOpenConfigModal={handleOpenConfigModal}
       />
 
       <StockConfigModal

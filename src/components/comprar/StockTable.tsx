@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import {
-  RefreshCcw,
   ShoppingCartIcon,
   ChevronLeft,
   ChevronRight,
@@ -11,12 +10,7 @@ import {
   Pencil,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Snowflake,
-  ShoppingCart,
-  PackageCheck,
+  MoreVertical,
 } from "lucide-react";
 
 import {
@@ -31,6 +25,8 @@ import {
 
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
+import { StockHealthBadge } from "./ui/StockHealthBadge";
+import { StatusBadge } from "./ui/StatusBadge";
 
 type SortKey =
   | "name"
@@ -41,63 +37,57 @@ type SortKey =
   | "stockHealthStatus"
   | "supplier";
 
-const StatusBadge = ({ status }: { status?: string }) => {
-  const statusConfig: Record<
-    string,
-    { color: string; icon: React.ElementType }
-  > = {
-    Acabou: { color: "#ef4444", icon: XCircle },
-    Comprar: { color: "#f59e0b", icon: ShoppingCart },
-    Bom: { color: "#22c55e", icon: CheckCircle2 },
-    Pedido: { color: "#3b82f6", icon: PackageCheck },
-  };
-
-  const config = statusConfig[status ?? ""];
-  if (!config) return <span className="text-xs text-text-secondary">-</span>;
-
-  const Icon = config.icon;
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded font-medium text-[10px] text-white"
-      style={{ backgroundColor: config.color }}
-    >
-      <Icon size={11} />
-      {status}
-    </span>
-  );
-};
-
-const StockHealthBadge = ({ status }: { status?: string }) => {
-  const healthConfig: Record<
-    string,
-    { color: string; icon: React.ElementType; label: string }
-  > = {
-    Excelente: {
-      color: "text-green-500",
-      icon: CheckCircle2,
-      label: "Excelente",
-    },
-    Moderado: {
-      color: "text-yellow-500",
-      icon: AlertTriangle,
-      label: "Moderado",
-    },
-    Risco: { color: "text-red-500", icon: XCircle, label: "Risco" },
-    Parado: { color: "text-blue-400", icon: Snowflake, label: "Parado" },
-  };
-
-  const config = healthConfig[status ?? "Moderado"];
-  const Icon = config.icon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded bg-background-light text-xs ${config.color}`}
-    >
-      <Icon size={11} /> {config.label}
-    </span>
-  );
-};
+const StockTableSkeleton = () => (
+  <div className="bg-card rounded-xl border border-border-dark shadow-lg p-4 w-full animate-pulse">
+    <div className="flex justify-between items-center pb-3">
+      <div className="h-8 w-48 bg-background-light rounded-md"></div>
+      <div className="h-4 w-24 bg-background-light rounded-md"></div>
+    </div>
+    <div className="border border-border-dark rounded-lg bg-background overflow-x-auto">
+      <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
+        <thead className="bg-background-light border-b border-border-dark">
+          <tr>
+            <th className="w-6 px-2 py-2.5">
+              <div className="h-3.5 w-3.5 bg-background rounded-sm"></div>
+            </th>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <th key={i} className="px-3 py-4">
+                <div className="h-4 bg-background rounded-md"></div>
+              </th>
+            ))}
+            <th className="w-20 px-2 py-2.5"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <tr key={i} className="border-b border-border-dark">
+              <td className="px-2 py-2 text-center">
+                <div className="h-3.5 w-3.5 bg-background-light rounded-sm"></div>
+              </td>
+              <td className="px-2 py-3 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-md bg-background-light"></div>
+                <div className="space-y-1">
+                  <div className="h-4 w-32 bg-background-light rounded-md"></div>
+                  <div className="h-3 w-16 bg-background-light rounded-md"></div>
+                </div>
+              </td>
+              {Array.from({ length: 6 }).map((_, j) => (
+                <td key={j} className="px-2 py-3">
+                  <div className="h-5 bg-background-light rounded-md"></div>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div className="flex justify-end items-center gap-1 mt-3">
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+    </div>
+  </div>
+);
 
 export const StockTable: React.FC<StockTableProps> = ({
   loading,
@@ -110,6 +100,7 @@ export const StockTable: React.FC<StockTableProps> = ({
   onRemove,
   cartItems = [],
   onOpenConfig,
+  onOpenConfigModal,
 }) => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(
     null
@@ -120,8 +111,9 @@ export const StockTable: React.FC<StockTableProps> = ({
 
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [openActions, setOpenActions] = useState(false);
   const { getConfigProduto } = useStockConfigStore();
 
   const headers: { key: SortKey; label: string }[] = [
@@ -137,13 +129,10 @@ export const StockTable: React.FC<StockTableProps> = ({
   const sortedProducts = useMemo(() => {
     const enriched = displayedProducts.map((p) => ({
       ...p,
-
       salesPerDay:
         (p.salesHistory?.reduce((a, b) => a + b, 0) || 0) /
         (p.salesHistory?.length || 7),
-
       daysLeft: getDaysLeft(p),
-
       purchaseSuggestionUnits: getPurchaseSuggestionUnits(
         p,
         getConfigProduto(p.id)
@@ -209,33 +198,29 @@ export const StockTable: React.FC<StockTableProps> = ({
     } ${sortKey === key && sortDirection === "asc" ? "rotate-180" : ""}`;
 
   if (loading) {
-    return (
-      <div className="bg-card border border-border-dark rounded-lg shadow-sm p-6 flex justify-center items-center h-64">
-        <span className="text-text-secondary flex items-center gap-2">
-          <RefreshCcw className="animate-spin" /> Carregando produtos...
-        </span>
-      </div>
-    );
+    return <StockTableSkeleton />;
   }
 
   return (
     <div className="bg-card rounded-xl border border-border-dark shadow-lg p-4 w-full">
       <div className="flex justify-between items-center pb-3 ">
-        <label className="text-xs font-semibold text-text-secondary flex items-center gap-2">
-          Itens por página:
-          <select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="border border-border-dark text-xs rounded-md px-2 py-1 bg-background text-text-primary cursor-pointer"
-          >
-            {[5, 10, 15, 20].map((n) => (
-              <option key={n}>{n}</option>
-            ))}
-          </select>
-        </label>
+        <div className="flex items-center gap-4">
+          <label className="text-xs font-semibold text-text-secondary flex items-center gap-2">
+            Itens por página:
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-border-dark text-xs rounded-md px-2 py-1 bg-background text-text-primary cursor-pointer"
+            >
+              {[5, 10, 15, 20].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <p className="text-[11px] text-text-secondary">
           Selecionados:{" "}
@@ -245,7 +230,7 @@ export const StockTable: React.FC<StockTableProps> = ({
         </p>
       </div>
 
-      <div className="border border-border-dark rounded-lg bg-background overflow-x-auto">
+      <div className="border border-border-dark rounded-lg bg-card overflow-x-auto">
         <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
           <thead className="bg-background-light border-b border-border-dark">
             <tr>
@@ -296,11 +281,12 @@ export const StockTable: React.FC<StockTableProps> = ({
               return (
                 <React.Fragment key={product.id}>
                   <tr
-                    className={`transition-colors border-b border-border-dark ${
-                      selectedItems.includes(product.id)
-                        ? "bg-background-light"
-                        : "hover:bg-background-light/70"
-                    }`}
+                    className={`border-b border-border-dark transition-colors
+                      ${
+                        selectedItems.includes(product.id)
+                          ? "bg-primary/10"
+                          : "even:bg-background-light/50 hover:bg-primary/5"
+                      }`}
                   >
                     <td className="px-2 py-2 text-center">
                       <input
@@ -375,6 +361,7 @@ export const StockTable: React.FC<StockTableProps> = ({
 
                     <td className="px-2 py-2 flex justify-center gap-1">
                       <button
+                        title="Adicionar ao Carrinho"
                         className={`p-1.5 rounded border border-border-dark text-[10px] ${
                           isInCart
                             ? "bg-green-100 text-primary"
@@ -389,6 +376,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                       </button>
 
                       <button
+                        title="Configurar Produto"
                         className="p-1.5 rounded border border-border-dark bg-background-light hover:bg-background"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -399,6 +387,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                       </button>
 
                       <button
+                        title="Ver Detalhes"
                         className={`p-1.5 rounded border border-border-dark text-[10px] ${
                           isExpanded
                             ? "bg-green-100 text-primary"
@@ -481,39 +470,80 @@ export const StockTable: React.FC<StockTableProps> = ({
         </table>
       </div>
 
-      {computedTotalPages > 1 && (
-        <div className="flex justify-end items-center gap-1 mt-3">
-          <button
-            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            <ChevronLeft size={13} />
-          </button>
+      {(computedTotalPages > 1 || selectedItems.length > 0) && (
+        <div className="flex justify-between items-center gap-1 mt-3">
+          <div>
+            {selectedItems.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setOpenActions(!openActions)}
+                  className={`
+                flex items-center gap-2 text-xs
+                border border-border-dark 
+                px-3 py-2 rounded-md
+                bg-background hover:bg-muted 
+                transition-all duration-200
+                ${openActions ? "bg-muted" : ""}
+              `}
+                >
+                  <MoreVertical
+                    size={16}
+                    className={`transition-transform duration-200 ${
+                      openActions ? "rotate-90 text-primary" : "text-text"
+                    }`}
+                  />
+                  <span>Mais Ações</span>
+                </button>
 
-          {Array.from({ length: computedTotalPages }, (_, i) => i + 1).map(
-            (page) => (
+                {openActions && (
+                  <div className="absolute bottom-10 left-0 mt-2 w-44 bg-popover border border-border-dark shadow-lg rounded-lg z-20 animate-fade-slide">
+                    <button
+                      onClick={() => onOpenConfigModal()}
+                      className="w-full text-left px-3 py-2 text-xs rounded-md bg-background text-text hover:text-primary transition"
+                    >
+                      Listar em Massa
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {computedTotalPages > 1 && (
+            <div className="flex justify-end items-center gap-1">
               <button
-                key={page}
-                className={`px-2 py-1 rounded text-[11px] border border-border-dark ${
-                  page === currentPage
-                    ? "bg-primary text-white"
-                    : "hover:bg-background-light"
-                }`}
-                onClick={() => setCurrentPage(page)}
+                className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
               >
-                {page}
+                <ChevronLeft size={13} />
               </button>
-            )
-          )}
 
-          <button
-            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
-            disabled={currentPage === computedTotalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            <ChevronRight size={13} />
-          </button>
+              {Array.from({ length: computedTotalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`px-2 py-1 rounded text-[11px] border border-border-dark ${
+                      page === currentPage
+                        ? "bg-primary text-white"
+                        : "hover:bg-background-light"
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+                disabled={currentPage === computedTotalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                <ChevronRight size={13} />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
