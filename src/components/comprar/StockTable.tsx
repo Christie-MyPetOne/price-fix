@@ -27,6 +27,7 @@ import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 import { StockHealthBadge } from "./ui/StockHealthBadge";
 import { StatusBadge } from "./ui/StatusBadge";
+import { ContextualActionBar } from "./ui/ContextualActionBar";
 
 type SortKey =
   | "name"
@@ -100,6 +101,7 @@ export const StockTable: React.FC<StockTableProps> = ({
   onRemove,
   cartItems = [],
   onOpenConfig,
+  onBulkAddToCart,
   onOpenConfigModal,
 }) => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(
@@ -470,14 +472,49 @@ export const StockTable: React.FC<StockTableProps> = ({
         </table>
       </div>
 
-      {(computedTotalPages > 1 || selectedItems.length > 0) && (
-        <div className="flex justify-between items-center gap-1 mt-3">
-          <div>
-            {selectedItems.length > 0 && (
-              <div className="relative">
-                <button
-                  onClick={() => setOpenActions(!openActions)}
-                  className={`
+      {computedTotalPages > 1 && (
+        <div className="flex justify-end items-center gap-1 mt-3">
+          <button
+            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            <ChevronLeft size={13} />
+          </button>
+
+          {Array.from({ length: computedTotalPages }, (_, i) => i + 1).map(
+            (page) => (
+              <button
+                key={page}
+                className={`px-2 py-1 rounded text-[11px] border border-border-dark ${
+                  page === currentPage
+                    ? "bg-primary text-white"
+                    : "hover:bg-background-light"
+                }`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+            disabled={currentPage === computedTotalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            <ChevronRight size={13} />
+          </button>
+        </div>
+      )}
+      <ContextualActionBar
+        selectedCount={selectedItems.length}
+        onClearSelection={() => setSelectedItems([])}
+      >
+        <div className="relative">
+          <button
+            onClick={() => setOpenActions(!openActions)}
+            className={`
                 flex items-center gap-2 text-xs
                 border border-border-dark 
                 px-3 py-2 rounded-md
@@ -485,67 +522,34 @@ export const StockTable: React.FC<StockTableProps> = ({
                 transition-all duration-200
                 ${openActions ? "bg-muted" : ""}
               `}
-                >
-                  <MoreVertical
-                    size={16}
-                    className={`transition-transform duration-200 ${
-                      openActions ? "rotate-90 text-primary" : "text-text"
-                    }`}
-                  />
-                  <span>Mais Ações</span>
-                </button>
+          >
+            <MoreVertical
+              size={16}
+              className={`transition-transform duration-200 ${
+                openActions ? "rotate-90 text-primary" : "text-text"
+              }`}
+            />
+            <span>Mais Ações</span>
+          </button>
 
-                {openActions && (
-                  <div className="absolute bottom-10 left-0 mt-2 w-44 bg-popover border border-border-dark shadow-lg rounded-lg z-20 animate-fade-slide">
-                    <button
-                      onClick={() => onOpenConfigModal()}
-                      className="w-full text-left px-3 py-2 text-xs rounded-md bg-background text-text hover:text-primary transition"
-                    >
-                      Listar em Massa
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {computedTotalPages > 1 && (
-            <div className="flex justify-end items-center gap-1">
+          {openActions && (
+            <div className="absolute bottom-12 left-0 w-56 bg-popover border border-border-dark shadow-lg rounded-lg z-20 animate-fade-slide">
               <button
-                className="p-1.5 border border-border-dark rounded disabled:opacity-40"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
+                onClick={() => onBulkAddToCart && onBulkAddToCart()}
+                className="w-full text-left px-3 py-2 text-xs rounded-t-md bg-background text-text hover:text-primary transition"
               >
-                <ChevronLeft size={13} />
+                Listar Compras em Massa
               </button>
-
-              {Array.from({ length: computedTotalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    className={`px-2 py-1 rounded text-[11px] border border-border-dark ${
-                      page === currentPage
-                        ? "bg-primary text-white"
-                        : "hover:bg-background-light"
-                    }`}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-
               <button
-                className="p-1.5 border border-border-dark rounded disabled:opacity-40"
-                disabled={currentPage === computedTotalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={() => onOpenConfigModal && onOpenConfigModal()}
+                className="w-full text-left px-3 py-2 text-xs rounded-b-md bg-background text-text hover:text-primary transition"
               >
-                <ChevronRight size={13} />
+                Configurar Estoque em Massa
               </button>
             </div>
           )}
         </div>
-      )}
+      </ContextualActionBar>
     </div>
   );
 };

@@ -224,6 +224,13 @@ export default function OtimizarComprasPage() {
     setIsStockConfigModalOpen(true);
   };
 
+  const handleBulkAddToCart = () => {
+    selectedProducts.forEach((product) => {
+      handleAddToCart(product);
+    });
+    setIsCartModalOpen(true);
+  };
+
   return (
     <div className="max-w-5xl mx-auto w-full flex flex-col gap-6 h-full">
       <div className="text-2xl sm:text-2xl font-bold my-6 ml-3 text-text">
@@ -294,6 +301,7 @@ export default function OtimizarComprasPage() {
         onRemove={handleRemoveFromCart}
         cartItems={cartItems}
         onOpenConfig={handleOpenConfigForSingleProduct}
+        onBulkAddToCart={handleBulkAddToCart}
         onOpenConfigModal={handleOpenConfigModal}
       />
 

@@ -128,6 +128,7 @@ export interface StockTableProps {
   cartItems: CartItem[];
   onOpenConfig: (product: Product) => void;
   onOpenConfigModal?: () => void;
+  onBulkAddToCart?: () => void;
 }
 
 export interface StockStatusCardProps {
