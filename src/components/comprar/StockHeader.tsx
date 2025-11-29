@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, ShoppingCart, Truck } from "lucide-react";
+import { ShoppingCart, Truck } from "lucide-react";
 import { StockHeaderProps } from "@/lib/types";
 import { SupplierList } from "@/components/comprar/SupplierList";
+import { DateRangeStock } from "./DateRangeStock";
 
 export const StockHeader: React.FC<StockHeaderProps> = ({
   cartItems,
@@ -17,19 +18,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
   return (
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full bg-background px-2 sm:px-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
-        <button className="border border-border-dark text-black bg-white text-sm rounded-md px-3 sm:px-4 py-1.5 flex items-center gap-2 hover:bg-gray-50 transition w-full sm:w-auto">
-          <CalendarDays size={18} className="flex-shrink-0" />
-          <span className="font-medium whitespace-nowrap">
-            Período de análise
-          </span>
-        </button>
-
-        <div className="flex flex-col text-sm leading-tight text-left sm:text-right">
-          <span className="font-semibold text-text">Jul 2025 - Out 2025</span>
-          <span className="text-text-secondary text-xs">
-            31/07/2025 - 28/10/2025
-          </span>
-        </div>
+        <DateRangeStock />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
