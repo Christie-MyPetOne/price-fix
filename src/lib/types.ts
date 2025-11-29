@@ -1,11 +1,10 @@
 // React e utilitários
-import { Dispatch, SetStateAction } from "react";
 
 /* --------------------------------------------------------------------------
   Tipos básicos
   - Pequenos aliases e unions usados pelo app
 --------------------------------------------------------------------------- */
-export type HealthStatus = "Excelente" | "Média" | "Risco" | "Parado";
+export type HealthStatus = "Excelente" | "Moderado" | "Risco" | "Parado";
 export type Tab = "calculator" | "competitors" | "history";
 export type AnyRow = Record<string, any>;
 
