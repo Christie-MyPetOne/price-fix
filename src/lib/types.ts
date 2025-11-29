@@ -65,33 +65,6 @@ export interface ProductState {
 }
 
 /* --------------------------------------------------------------------------
-  Stock / cart models
---------------------------------------------------------------------------- */
-export interface StockConfig {
-  comprarPara: number;
-  entregaEstimada: number;
-  excelente: number;
-  moderado: number;
-  risco: number;
-  parado: number;
-}
-
-export interface CartItem {
-  id: string;
-  name: string;
-  sku: string;
-  image: string;
-  price?: number;
-  cost: number;
-  quantity: number;
-  supplier: string;
-  description?: string;
-  estimatedRevenue: number;
-  estimatedProfit: number;
-  coverage?: number;
-}
-
-/* --------------------------------------------------------------------------
   Reusable component props
 --------------------------------------------------------------------------- */
 export interface ButtonProps
@@ -99,81 +72,9 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "outline";
 }
 
-export interface StockFiltersProps {
-  searchTerm: string;
-  setSearchTerm: Dispatch<SetStateAction<string>>;
-  stockHealthFilter: HealthStatus | "";
-  setStockHealthFilter: Dispatch<SetStateAction<HealthStatus | "">>;
-  onFilter: () => void;
-  onOpenConfigModal: (selectedProducts: Product[]) => void;
-  selectedProducts: Product[];
-}
-
-export interface StockHeaderProps {
-  cartItems: CartItem[];
-  onRemove?: (id: string) => void;
-  onAddToCart?: (product: Product) => void;
-  onOpenCart?: () => void;
-}
-
-export interface StockTableProps {
-  loading: boolean;
-  displayedProducts: Product[];
-  selectedItems: string[];
-  searchTerm: string;
-  getPurchaseStatus: (product: Product) => string;
-  onAddToCart: (product: Product) => void;
-  onRemove: (id: string) => void;
-  cartItems: CartItem[];
-  onOpenConfig: (product: Product) => void;
-  onOpenConfigModal?: () => void;
-  onBulkAddToCart?: () => void;
-  isBulkMode?: boolean;
-  onClearSelection?: () => void;
-  onExportList?: () => void;
-  onSelectItem: (id: string, index: number, shiftKey?: boolean) => void;
-  onSelectAll: () => void;
-}
-
-export interface StockStatusCardProps {
-  products: Product[];
-  getPurchaseStatus: (product: Product) => string;
-  stockConfig: StockConfig;
-}
-
-export interface StockHealthCardProps {
-  stockConfig: StockConfig;
-  onConfigClick: () => void;
-}
-
-export interface StockConfigModalProps {
-  open: boolean;
-  onClose: () => void;
-  products?: Product[];
-  config: StockConfig;
-  onSave?: (config: StockConfig) => void;
-}
-
-export interface ShoppingCartModalProps {
-  open: boolean;
-  cartItems: CartItem[];
-  onRemove: (id: string) => void;
-  onClose: () => void;
-  onUpdateQuantity: (id: string, newQuantity: number) => void;
-}
-
 /* --------------------------------------------------------------------------
   Chart component props
 --------------------------------------------------------------------------- */
-export interface ChartDataItem {
-  status: string;
-  count: number;
-  totalValue: number;
-  percentage: number;
-  color: string;
-  icon: React.ElementType;
-}
-
 export interface SparklineProps {
   data: { value: number }[];
   color?: string;

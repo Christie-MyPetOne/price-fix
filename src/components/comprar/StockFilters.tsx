@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { HealthStatus } from "@/lib/types";
+import { StockFiltersProps } from "./lib/types";
 import { ChevronDown, Filter, MoreVertical, RotateCcw } from "lucide-react";
 import { Button } from "../ui/Button";
 
-export function StockFilters(props) {
+export function StockFilters(props: StockFiltersProps) {
   const {
     searchTerm,
     setSearchTerm,

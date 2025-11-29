@@ -16,14 +16,13 @@ import {
   FileDown,
 } from "lucide-react";
 
+import { paginate, sortData } from "@/lib/utils";
 import {
-  paginate,
-  sortData,
   getDaysLeft,
   getPurchaseSuggestionUnits,
-} from "@/lib/utils";
-
-import { StockTableProps, Product } from "@/lib/types";
+} from "./lib/utils";
+import { Product } from "@/lib/types";
+import { StockTableProps } from "./lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 import { useOutsideClose } from "@/hooks/useOutsideClose";
 import { StockHealthBadge } from "./ui/StockHealthBadge";

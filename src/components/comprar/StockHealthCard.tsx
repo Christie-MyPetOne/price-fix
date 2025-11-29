@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
-import { StockHealthCardProps } from "@/lib/types";
+import { StockHealthCardProps } from "./lib/types";
 
 export const StockHealthCard: React.FC<StockHealthCardProps> = ({
   stockConfig,

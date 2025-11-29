@@ -3,16 +3,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useProductsStore } from "@/store/useProductsStore";
 import {
-  getDaysLeft,
-  calculateStockHealth,
-  getPurchaseStatus,
-} from "@/lib/utils";
-import {
   toggleSelection,
   toggleSelectAll,
   handleShiftSelection,
 } from "@/lib/utils";
-import { Product, StockConfig, CartItem, HealthStatus } from "@/lib/types";
+import { Product, HealthStatus } from "@/lib/types";
+import {
+  getDaysLeft,
+  calculateStockHealth,
+  getPurchaseStatus,
+} from "@/components/comprar/lib/utils";
+import {
+  StockConfig,
+  CartItem,
+} from "@/components/comprar/lib/types";
 import { StockConfigModal } from "@/components/comprar/StockConfigModal";
 import { StockTable } from "@/components/comprar/StockTable";
 import { StockFilters } from "@/components/comprar/StockFilters";

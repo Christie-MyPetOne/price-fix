@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingCart, Truck } from "lucide-react";
-import { StockHeaderProps } from "@/lib/types";
+import { StockHeaderProps } from "./lib/types";
 import { SupplierList } from "@/components/comprar/SupplierList";
 import { DateRangeStock } from "./DateRangeStock";
 

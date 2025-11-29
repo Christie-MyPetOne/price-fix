@@ -7,7 +7,7 @@ import {
   XCircle,
   Snowflake,
 } from "lucide-react";
-import { StockConfigModalProps, StockConfig } from "@/lib/types";
+import { StockConfigModalProps, StockConfig } from "./lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
 
 export const StockConfigModal = ({
