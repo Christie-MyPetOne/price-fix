@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IconsBrand } from "@/components/svgs/IconsBrand/IconsBrand";
+import { IconsBrand } from "@/components/ui/svgs/IconsBrand";
 import Image from "next/image";
 import register from "../../../../public/images/register.svg";
 

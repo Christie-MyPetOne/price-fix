@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { X, Trash2, ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
-import { ShoppingCartModalProps } from "@/lib/types";
+import { ShoppingCartModalProps } from "./lib/types";
 
 export const ShoppingCartModal: React.FC<ShoppingCartModalProps> = ({
   open,

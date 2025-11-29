@@ -31,7 +31,7 @@ export default function ProductsPage() {
   return (
     <>
       <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-6 h-full">
-        <div className="flex-1 min-w-0 ">
+        <div className="flex-1 min-w-0 gap ">
           <div className="text-2xl sm:text-2xl font-bold my-6 ml-3 text-text">
             <span className="flex items-center gap-2">
               <PackageCheck size={20} className="text-primary" />
@@ -39,11 +39,13 @@ export default function ProductsPage() {
             </span>
           </div>
 
-          <ProductFilters
-            onSearch={handleSearch}
-            onFilterChange={() => {}}
-            onSelectAll={() => {}}
-          />
+          <div className="mb-6">
+            <ProductFilters
+              onSearch={handleSearch}
+              onFilterChange={() => {}}
+              onSelectAll={() => {}}
+            />
+          </div>
 
           {loading ? (
             <div className="flex justify-center items-center h-48 bg-card mt-6 rounded-lg shadow-md">

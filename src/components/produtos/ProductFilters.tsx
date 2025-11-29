@@ -1,89 +1,125 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, ChevronDown } from "lucide-react";
-import { ProductFiltersProps } from "@/lib/types";
+import { Filter, RotateCcw, Search, ChevronDown } from "lucide-react";
 import { Button } from "../ui/Button";
+
+interface ProductFiltersProps {
+  onSearch: (searchTerm: string) => void;
+  onFilterChange: (filterName: string, value: string) => void;
+  onSelectAll: () => void;
+}
+
+const statusOptions = [
+  { value: "Precificado", label: "Precificado" },
+  { value: "Pendente", label: "Pendente" },
+  { value: "Erro", label: "Erro" },
+];
+
+const healthOptions = [
+  { value: "Excelente", label: "Excelente" },
+  { value: "Moderado", label: "Moderado" },
+  { value: "Risco", label: "Risco" },
+  { value: "Parado", label: "Parado" },
+];
+
+const abcOptions = ["A", "B", "C"];
+const productTypeOptions = ["Simples", "Kit", "Combo"];
 
 export function ProductFilters({
   onSearch,
   onFilterChange,
 }: ProductFiltersProps) {
   const [openAdvanced, setOpenAdvanced] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [healthFilter, setHealthFilter] = useState("");
+  const [abcCurveFilter, setAbcCurveFilter] = useState("");
+  const [productTypeFilter, setProductTypeFilter] = useState("");
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("");
+    setHealthFilter("");
+    setAbcCurveFilter("");
+    setProductTypeFilter("");
+    onSearch("");
+    onFilterChange("status", "");
+    onFilterChange("health", "");
+    onFilterChange("abcCurve", "");
+    onFilterChange("productType", "");
+  };
 
   return (
     <div className="flex flex-col gap-4 bg-card p-4 rounded-lg shadow-md border border-border-dark">
-      {/* ----------- LINHA SUPERIOR ----------- */}
-      <div className="flex flex-wrap gap-3 items-center justify-between">
-        {/* Input de Busca */}
-        <div className="relative flex-grow min-w-[12rem] max-w-xs text-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-          <input
-            type="text"
-            placeholder="Buscar produtos"
-            className="w-full pl-10 pr-4 py-2 border border-border-dark rounded-md 
-                       focus:ring-primary focus:border-primary bg-background text-text"
-            onChange={(e) => onSearch(e.target.value)}
-          />
+      {/* HEADER */}
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-text">
+          <Filter className="w-4 h-4 text-primary" />
+          Filtros
+        </h2>
+        <button
+          onClick={handleClearFilters}
+          className="flex items-center gap-1 text-xs text-primary hover:underline"
+        >
+          <RotateCcw size={14} />
+          Limpar
+        </button>
+      </div>
+
+      {/* BASIC FILTERS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-text-secondary">Buscar</label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+            <input
+              className="w-full p-2 pl-10 border border-border-dark text-sm rounded-md bg-background text-text focus:ring-green-700 focus:border-green-700 outline-none"
+              placeholder="Nome, SKU..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        {/* Canal */}
-        <select
-          className="p-2 text-xs min-w-[12rem] border border-border-dark rounded-md 
-                     bg-background text-text focus:ring-primary focus:border-primary"
-          onChange={(e) => onFilterChange("channel", e.target.value)}
-        >
-          <option value="">Canal de Venda</option>
-          <option value="ecommerce">E-commerce</option>
-          <option value="fisica">Física</option>
-        </select>
-
-        {/* Fornecedor */}
-        <select
-          className="p-2 text-xs border border-border-dark rounded-md bg-background text-text 
-                     focus:ring-primary focus:border-primary"
-          onChange={(e) => onFilterChange("supplier", e.target.value)}
-        >
-          <option value="">Fornecedor</option>
-          <option value="forn1">Fornecedor A</option>
-          <option value="forn2">Fornecedor B</option>
-        </select>
-
-        {/* Status */}
-        <select
-          className="p-2 text-xs border border-border-dark rounded-md bg-background text-text 
-                     focus:ring-primary focus:border-primary"
-          onChange={(e) => onFilterChange("status", e.target.value)}
-        >
-          <option value="">Status</option>
-          <option value="active">Ativo</option>
-          <option value="inactive">Inativo</option>
-          <option value="out_of_stock">Sem Estoque</option>
-        </select>
-
-        {/* Origem */}
-        <select
-          className="p-2 text-xs border border-border-dark rounded-md bg-background text-text 
-                     focus:ring-primary focus:border-primary"
-          onChange={(e) => onFilterChange("problems", e.target.value)}
-        >
-          <option value="">Origem</option>
-          <option value="estoque">Tiny</option>
-          <option value="preco">Base</option>
-        </select>
-
-        {/* Botão Filtrar */}
-        <div className="flex">
-          <Button
-            className="h-8 w-full text-xs flex gap-2 items-center text-white bg-[#10b97c] hover:bg-[#0d9d6b]"
-            onClick={() => onFilterChange("apply", "true")}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-text-secondary">
+            Status da Precificação
+          </label>
+          <select
+            className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-green-700 focus:border-green-700 outline-none"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <Filter className="w-4 h-4" />
-            FILTRAR
-          </Button>
+            <option value="">Todos</option>
+            {statusOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-text-secondary">
+            Saúde do Estoque
+          </label>
+          <select
+            className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-green-700 focus:border-green-700 outline-none"
+            value={healthFilter}
+            onChange={(e) => setHealthFilter(e.target.value)}
+          >
+            <option value="">Todos</option>
+            {healthOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
+      {/* ADVANCED FILTERS TOGGLE */}
       <button
         className="flex items-center gap-2 text-xs text-primary w-fit"
         onClick={() => setOpenAdvanced(!openAdvanced)}
@@ -95,43 +131,56 @@ export function ProductFilters({
         Filtros avançados
       </button>
 
-      {/* ----------- CONTEÚDO AVANÇADO ----------- */}
+      {/* ADVANCED FILTERS CONTENT */}
       {openAdvanced && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted rounded-lg border border-border-dark">
-          {/* Ranking ABC */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-background/50 rounded-lg border border-border-dark">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-text-secondary">Ranking ABC</label>
+            <label className="text-xs text-text-secondary">Curva ABC</label>
             <select
-              className="p-2 text-xs border border-border-dark rounded-md 
-                         bg-background text-text focus:ring-primary focus:border-primary"
-              onChange={(e) => onFilterChange("abc", e.target.value)}
+              className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-green-700 focus:border-green-700 outline-none"
+              value={abcCurveFilter}
+              onChange={(e) => setAbcCurveFilter(e.target.value)}
             >
               <option value="">Todos</option>
-              <option value="A">A — Alta rotatividade</option>
-              <option value="B">B — Média</option>
-              <option value="C">C — Baixa</option>
+              {abcOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Tipo de Produto */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-text-secondary">
               Tipo de Produto
             </label>
             <select
-              className="p-2 text-xs border border-border-dark rounded-md 
-                         bg-background text-text focus:ring-primary focus:border-primary"
-              onChange={(e) => onFilterChange("productType", e.target.value)}
+              className="p-2 text-xs border border-border-dark rounded-md bg-background text-text focus:ring-green-700 focus:border-green-700 outline-none"
+              value={productTypeFilter}
+              onChange={(e) => setProductTypeFilter(e.target.value)}
             >
               <option value="">Todos</option>
-              <option value="normal">Normal</option>
-              <option value="kit">Kit</option>
-              <option value="variacao">Variação</option>
-              <option value="servico">Serviço</option>
+              {productTypeOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
         </div>
       )}
+
+      {/* FOOTER */}
+      <div className="w-full flex justify-end mt-2">
+        <Button
+          className="h-8 text-xs flex gap-2 items-center text-white bg-primary hover:bg-primary/90"
+          disabled={true}
+          aria-disabled={true}
+        >
+          <Filter size={14} />
+          APLICAR
+        </Button>
+      </div>
     </div>
   );
 }
