@@ -112,14 +112,15 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
     setIsModalOpen(true);
   };
 
-  const headers: { key: keyof Product; label: string }[] = [
-    { key: "name", label: "Produto" },
-    { key: "status", label: "Status" },
-    { key: "stockHealthStatus", label: "Saúde" },
-    { key: "sales", label: "Vendas" },
-    { key: "price", label: "Preço" },
-    { key: "margin", label: "Margem" },
-    { key: "totalProfit", label: "Lucro Total" },
+  const headers: { key: keyof Product; label: string; width: string }[] = [
+    { key: "name", label: "Produto", width: "w-[35%]" },
+    { key: "status", label: "Status", width: "w-[10%]" },
+    { key: "stockHealthStatus", label: "Saúde", width: "w-[10%]" },
+    { key: "abcCurve", label: "Curva", width: "w-[8%]" },
+    { key: "sales", label: "Vendas", width: "w-[7%]" },
+    { key: "price", label: "Preço", width: "w-[10%]" },
+    { key: "margin", label: "Margem", width: "w-[7%]" },
+    { key: "totalProfit", label: "Lucro Total", width: "w-[10%]" },
   ];
 
   return (
@@ -159,11 +160,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         </p>
       </div>
 
-      <div className="border border-border-dark rounded-lg bg-card overflow-x-auto">
-        <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
+      <div className="border border-border-dark rounded-lg bg-card">
+        <table className="w-full table-fixed text-xs">
           <thead className="bg-background-light border-b border-border-dark">
             <tr>
-              <th className="w-6 px-2 py-2 text-center">
+              <th className="w-[3%] px-2 py-2 text-center">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -175,11 +176,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                 />
               </th>
 
-              {headers.map(({ key, label }) => (
+              {headers.map(({ key, label, width }) => (
                 <th
                   key={String(key)}
                   onClick={() => handleSort(key as keyof Product)}
-                  className="px-3 py-3 text-sm font-semibold text-text-secondary cursor-pointer select-none whitespace-nowrap"
+                  className={`${width} px-3 py-3 text-sm font-semibold text-text-secondary cursor-pointer select-none`}
                 >
                   <div className="flex items-center gap-1">
                     {label}
@@ -192,89 +193,97 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
           <tbody className="cursor-pointer">
             {displayedProducts.length > 0 ? (
-              displayedProducts.map((product, index) => (
-                <tr
-                  key={product.id}
-                  onClick={() => handleRowClick(product)}
-                  className={`border-b border-border-dark transition-colors
+              displayedProducts.map((product, index) => {
+                const abcCurves = ["A", "B", "C"];
+                const staticAbcCurve = product.abcCurve || abcCurves[Math.floor(Math.random() * abcCurves.length)];
+
+                return (
+                  <tr
+                    key={product.id}
+                    onClick={() => handleRowClick(product)}
+                    className={`border-b border-border-dark transition-colors
                       ${
                         selectedIds.includes(product.id)
                           ? "bg-primary/10"
                           : "even:bg-background-light/50 hover:bg-background dark:hover:bg-background"
                       }`}
-                >
-                  <td
-                    className="px-2 py-2 text-center"
-                    onClick={(e) => e.stopPropagation()}
                   >
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(product.id)}
-                      readOnly
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleOne(product.id, index, e.shiftKey);
-                      }}
-                      className="h-3.5 w-3.5 cursor-pointer"
-                    />
-                  </td>
+                    <td
+                      className="px-2 py-2 text-center"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(product.id)}
+                        readOnly
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleOne(product.id, index, e.shiftKey);
+                        }}
+                        className="h-3.5 w-3.5 cursor-pointer"
+                      />
+                    </td>
 
-                  <td className="px-2 py-2 flex items-center gap-2 truncate">
-                    <div className="w-8 h-8 rounded-md overflow-hidden border border-border-dark bg-background-light">
-                      {product.image ? (
-                        <Image
-                          src={product.image}
-                          width={32}
-                          height={32}
-                          alt=""
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full text-[10px] flex items-center justify-center text-text-secondary">
-                          IMG
-                        </div>
-                      )}
-                    </div>
+                    <td className="px-2 py-2 flex items-center gap-2 truncate">
+                      <div style={{ width: '32px', height: '32px' }} className="relative rounded-md overflow-hidden border border-border-dark bg-background-light flex-shrink-0">
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            layout="fill"
+                            objectFit="cover"
+                            alt=""
+                          />
+                        ) : (
+                          <div className="w-full h-full text-[10px] flex items-center justify-center text-text-secondary">
+                            IMG
+                          </div>
+                        )}
+                      </div>
 
-                    <div>
-                      <p className="text-sm font-semibold max-w-[200px] ">
-                        {product.name}
-                      </p>
-                      <p className="text-[10px] text-xs text-text-secondary truncate max-w-[90px]">
-                        {product.sku}
-                      </p>
-                    </div>
-                  </td>
+                      <div className="truncate">
+                        <p className="text-sm font-semibold truncate">
+                          {product.name}
+                        </p>
+                        <p className="text-[10px] text-xs text-text-secondary truncate">
+                          {product.sku}
+                        </p>
+                      </div>
+                    </td>
 
-                  <td className="px-2 py-2 text-xs font-semibold whitespace-nowrap">
-                    <StatusBadge status={product.status} />
-                  </td>
+                    <td className="px-2 py-2 text-xs font-semibold whitespace-nowrap">
+                      <StatusBadge status={product.status} />
+                    </td>
 
-                  <td className="px-2 py-2 text-center">
-                    <StockHealthBadge status={product.stockHealthStatus} />
-                  </td>
+                    <td className="px-2 py-2 text-center">
+                      <StockHealthBadge status={product.stockHealthStatus} />
+                    </td>
 
-                  <td className="px-2 py-2 text-right font-mono text-base">
-                    {product.sales}
-                  </td>
+                    <td className="px-2 py-2 text-center font-mono text-base">
+                      {staticAbcCurve}
+                    </td>
+                    
+                    <td className="px-2 py-2 text-right font-mono text-base">
+                      {product.sales}
+                    </td>
 
-                  <td className="px-2 py-2 text-right font-mono text-base">
-                    R$ {product.price.toFixed(2)}
-                  </td>
+                    <td className="px-2 py-2 text-right font-mono text-base whitespace-nowrap">
+                      R$ {product.price.toFixed(2)}
+                    </td>
 
-                  <td className="px-2 py-2 text-right font-mono text-base">
-                    {product.margin.toFixed(2)}%
-                  </td>
+                    <td className="px-2 py-2 text-right font-mono text-base">
+                      {product.margin.toFixed(2)}%
+                    </td>
 
-                  <td className="px-2 py-2 text-right font-mono text-base">
-                    R$ {product.totalProfit.toFixed(2)}
-                  </td>
-                </tr>
-              ))
+                    <td className="px-2 py-2 text-right font-mono text-base whitespace-nowrap">
+                      R$ {product.totalProfit.toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="text-center py-8 text-text-secondary"
                 >
                   Nenhum produto encontrado.

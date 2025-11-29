@@ -45,6 +45,7 @@ export interface Product {
   saleFee: number;
   salesPerDay?: number;
   purchaseForDays?: number;
+  abcCurve?: "A" | "B" | "C";
 }
 
 /* --------------------------------------------------------------------------
