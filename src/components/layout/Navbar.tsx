@@ -17,7 +17,7 @@ import {
   X,
   Menu,
 } from "lucide-react";
-import { IconsBrand } from "../svgs/IconsBrand/IconsBrand";
+import { IconsBrand } from "../ui/svgs/IconsBrand";
 
 export function Navbar() {
   const [isGerenciarOpen, setIsGerenciarOpen] = useState(false);

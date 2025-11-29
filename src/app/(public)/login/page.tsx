@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 // import { setCookie } from "@/utils/cookies.utils";
 import background from "../../../../public/images/background.svg";
 import Image from "next/image";
-import { IconsBrand } from "@/components/svgs/IconsBrand/IconsBrand";
+import { IconsBrand } from "@/components/ui/svgs/IconsBrand";
 
 export default function Login() {
   const [email, setEmail] = useState("lucascesardev2023@outlook.com");

@@ -12,7 +12,7 @@ import {
   XCircle,
   PackageCheck,
 } from "lucide-react";
-import { StockStatusCardProps, ChartDataItem } from "@/lib/types";
+import { StockStatusCardProps, ChartDataItem } from "./lib/types";
 import { ToggleButton } from "../ui/ToggleButton";
 import { ChartStatusStock } from "../charts/ChartStatusStock";
 

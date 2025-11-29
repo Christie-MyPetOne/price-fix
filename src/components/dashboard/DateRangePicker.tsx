@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Range = {
@@ -52,10 +52,6 @@ function sameDay(d: Date, ymd?: string) {
   );
 }
 
-/**
- * Componente de calendário de intervalo de datas (range picker)
- * Controlado via props `value` e `onChange`.
- */
 export default function DateRangePicker({
   value,
   onChange,
@@ -64,20 +60,15 @@ export default function DateRangePicker({
   onChange: (next: Range) => void;
 }) {
   const today = new Date();
+  const anchor = value?.start;
+  const rangeEnd = value?.end;
 
   const [viewYear, setViewYear] = useState(() =>
-    value?.start ? parseYMD(value.start)!.getFullYear() : today.getFullYear()
+    anchor ? parseYMD(anchor)!.getFullYear() : today.getFullYear()
   );
   const [viewMonth, setViewMonth] = useState(() =>
-    value?.start ? parseYMD(value.start)!.getMonth() : today.getMonth()
+    anchor ? parseYMD(anchor)!.getMonth() : today.getMonth()
   );
-  const [anchor, setAnchor] = useState<string | undefined>(value?.start);
-  const [rangeEnd, setRangeEnd] = useState<string | undefined>(value?.end);
-
-  useEffect(() => {
-    setAnchor(value?.start);
-    setRangeEnd(value?.end);
-  }, [value?.start, value?.end]);
 
   function prevMonth() {
     const d = new Date(viewYear, viewMonth, 1);
@@ -106,22 +97,16 @@ export default function DateRangePicker({
   function clickDay(d: Date) {
     const key = toKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
 
-    // 1º clique: ancora / 3º clique: reinicia
     if (!anchor || (anchor && rangeEnd)) {
-      setAnchor(key);
-      setRangeEnd(undefined);
       onChange({ start: key, end: undefined });
       return;
     }
 
-    // 2º clique: define o fim do range
     const a = parseYMD(anchor)!.getTime();
     const b = d.getTime();
     const start = a <= b ? anchor : key;
     const end = a <= b ? key : anchor;
 
-    setAnchor(start);
-    setRangeEnd(end);
     onChange({ start, end });
   }
 
@@ -134,7 +119,6 @@ export default function DateRangePicker({
 
   return (
     <div className="w-[280px]">
-      {/* Cabeçalho do mês */}
       <div className="flex items-center justify-between px-2 py-1">
         <button
           onClick={prevMonth}
@@ -155,11 +139,10 @@ export default function DateRangePicker({
         </button>
       </div>
 
-      {/* Dias da semana + grid de dias */}
       <div className="grid grid-cols-7 gap-1 px-2 pb-2">
-        {weekDays.map((d) => (
+        {weekDays.map((d, i) => (
           <div
-            key={d}
+            key={i}
             className="text-[10px] text-text-secondary text-center py-1"
           >
             {d}
@@ -196,7 +179,6 @@ export default function DateRangePicker({
         })}
       </div>
 
-      {/* Resumo do range + limpar */}
       <div className="flex items-center justify-between text-[11px] px-2 pb-2">
         <div className="truncate">
           {anchor && !rangeEnd && <span>Início: {formatDate(anchor)}</span>}
@@ -209,11 +191,7 @@ export default function DateRangePicker({
         <button
           type="button"
           className="px-2 h-7 rounded border border-border-dark hover:bg-muted text-xs"
-          onClick={() => {
-            setAnchor(undefined);
-            setRangeEnd(undefined);
-            onChange({ start: undefined, end: undefined });
-          }}
+          onClick={() => onChange({ start: undefined, end: undefined })}
         >
           Limpar seleção
         </button>

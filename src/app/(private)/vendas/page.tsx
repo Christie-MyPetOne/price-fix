@@ -174,7 +174,7 @@ export default function VendasPage() {
 
           <ResumoCards sales={sales} />
 
-          <div className="mt-8">
+          <div className="my-8">
             <MargensChart
               buckets={buckets}
               legend={legend}
