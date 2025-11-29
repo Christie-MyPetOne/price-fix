@@ -7,6 +7,11 @@ import {
   calculateStockHealth,
   getPurchaseStatus,
 } from "@/lib/utils";
+import {
+  toggleSelection,
+  toggleSelectAll,
+  handleShiftSelection,
+} from "@/lib/utils";
 import { Product, StockConfig, CartItem, HealthStatus } from "@/lib/types";
 import { StockConfigModal } from "@/components/comprar/StockConfigModal";
 import { StockTable } from "@/components/comprar/StockTable";
@@ -49,9 +54,13 @@ export default function OtimizarComprasPage() {
   });
   const [onlySelected, setOnlySelected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
+  );
   const [isStockConfigModalOpen, setIsStockConfigModalOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isBulkMode, setIsBulkMode] = useState(false);
   const [stockConfig, setStockConfig] = useState<StockConfig>({
     comprarPara: 30,
     entregaEstimada: 7,
@@ -151,10 +160,27 @@ export default function OtimizarComprasPage() {
     selectedItems.includes(p.id)
   );
 
+  const handleSelectItem = (id: string, index: number, shiftKey?: boolean) => {
+    setIsBulkMode(false);
+    setSelectedItems((prev) => {
+      const updated = shiftKey
+        ? handleShiftSelection(id, filteredProducts, prev, lastSelectedIndex)
+        : toggleSelection(prev, id);
+      return updated;
+    });
+    setLastSelectedIndex(index);
+  };
+
+  const handleSelectAll = () => {
+    setIsBulkMode(false);
+    setSelectedItems((prev) => toggleSelectAll(filteredProducts, prev));
+  };
+
   const handleAddToCart = (product: Product) => {
-    setSelectedItems((prev) =>
-      prev.includes(product.id) ? prev : [...prev, product.id]
-    );
+    setIsBulkMode(true);
+    if (!selectedItems.includes(product.id)) {
+      setSelectedItems((prev) => [...prev, product.id]);
+    }
 
     setCartItems((prev) => {
       if (prev.find((p) => p.id === product.id)) return prev;
@@ -205,7 +231,13 @@ export default function OtimizarComprasPage() {
     );
   };
 
-  const handleOpenCart = () => setIsCartModalOpen(true);
+  const handleOpenCart = () => {
+    setIsBulkMode(true);
+    const itemsToSelect = filteredProducts
+      .filter((p) => getPurchaseStatusForProduct(p) === "Comprar")
+      .map((p) => p.id);
+    setSelectedItems(itemsToSelect);
+  };
   const handleCloseCart = () => setIsCartModalOpen(false);
 
   const handleSaveConfig = (newConfig: StockConfig) => {
@@ -222,6 +254,23 @@ export default function OtimizarComprasPage() {
 
   const handleOpenConfigModal = () => {
     setIsStockConfigModalOpen(true);
+  };
+
+  const handleBulkAddToCart = () => {
+    selectedProducts.forEach((product) => {
+      handleAddToCart(product);
+    });
+    setIsCartModalOpen(true);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedItems([]);
+    setIsBulkMode(false);
+  };
+
+  const handleExportList = () => {
+    console.log("Exporting selected products:", selectedProducts);
+    // Future export logic here
   };
 
   return (
@@ -281,21 +330,25 @@ export default function OtimizarComprasPage() {
         setProfitMarginRange={setProfitMarginRange}
         onlySelected={onlySelected}
         setOnlySelected={setOnlySelected}
-        selectedProducts={selectedProducts}
-        onOpenConfigModal={handleOpenConfigModal}
       />
 
       <StockTable
         loading={loading}
         displayedProducts={filteredProducts}
         selectedItems={selectedItems}
-        setSelectedItems={setSelectedItems}
+        onSelectItem={handleSelectItem}
+        onSelectAll={handleSelectAll}
         searchTerm={searchTerm}
         getPurchaseStatus={getPurchaseStatusForProduct}
         onAddToCart={handleAddToCart}
         onRemove={handleRemoveFromCart}
         cartItems={cartItems}
         onOpenConfig={handleOpenConfigForSingleProduct}
+        onBulkAddToCart={handleBulkAddToCart}
+        onOpenConfigModal={handleOpenConfigModal}
+        onClearSelection={handleClearSelection}
+        isBulkMode={isBulkMode}
+        onExportList={handleExportList}
       />
 
       <StockConfigModal

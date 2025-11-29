@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import {
-  RefreshCcw,
   ShoppingCartIcon,
   ChevronLeft,
   ChevronRight,
@@ -11,26 +10,25 @@ import {
   Pencil,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Snowflake,
-  ShoppingCart,
-  PackageCheck,
+  MoreVertical,
+  ClipboardList,
+  SlidersHorizontal,
+  FileDown,
 } from "lucide-react";
 
 import {
   paginate,
   sortData,
-  toggleSelection,
-  toggleSelectAll,
-  handleShiftSelection,
   getDaysLeft,
   getPurchaseSuggestionUnits,
 } from "@/lib/utils";
 
 import { StockTableProps, Product } from "@/lib/types";
 import { useStockConfigStore } from "@/store/useStockConfigStore";
+import { useOutsideClose } from "@/hooks/useOutsideClose";
+import { StockHealthBadge } from "./ui/StockHealthBadge";
+import { StatusBadge } from "./ui/StatusBadge";
+import { ContextualActionBar } from "./ui/ContextualActionBar";
 
 type SortKey =
   | "name"
@@ -41,88 +39,89 @@ type SortKey =
   | "stockHealthStatus"
   | "supplier";
 
-const StatusBadge = ({ status }: { status?: string }) => {
-  const statusConfig: Record<
-    string,
-    { color: string; icon: React.ElementType }
-  > = {
-    Acabou: { color: "#ef4444", icon: XCircle },
-    Comprar: { color: "#f59e0b", icon: ShoppingCart },
-    Bom: { color: "#22c55e", icon: CheckCircle2 },
-    Pedido: { color: "#3b82f6", icon: PackageCheck },
-  };
-
-  const config = statusConfig[status ?? ""];
-  if (!config) return <span className="text-xs text-text-secondary">-</span>;
-
-  const Icon = config.icon;
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded font-medium text-[10px] text-white"
-      style={{ backgroundColor: config.color }}
-    >
-      <Icon size={11} />
-      {status}
-    </span>
-  );
-};
-
-const StockHealthBadge = ({ status }: { status?: string }) => {
-  const healthConfig: Record<
-    string,
-    { color: string; icon: React.ElementType; label: string }
-  > = {
-    Excelente: {
-      color: "text-green-500",
-      icon: CheckCircle2,
-      label: "Excelente",
-    },
-    Moderado: {
-      color: "text-yellow-500",
-      icon: AlertTriangle,
-      label: "Moderado",
-    },
-    Risco: { color: "text-red-500", icon: XCircle, label: "Risco" },
-    Parado: { color: "text-blue-400", icon: Snowflake, label: "Parado" },
-  };
-
-  const config = healthConfig[status ?? "Moderado"];
-  const Icon = config.icon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded bg-background-light text-xs ${config.color}`}
-    >
-      <Icon size={11} /> {config.label}
-    </span>
-  );
-};
+const StockTableSkeleton = () => (
+  <div className="bg-card rounded-xl border border-border-dark shadow-lg p-4 w-full animate-pulse">
+    <div className="flex justify-between items-center pb-3">
+      <div className="h-8 w-48 bg-background-light rounded-md"></div>
+      <div className="h-4 w-24 bg-background-light rounded-md"></div>
+    </div>
+    <div className="border border-border-dark rounded-lg bg-background overflow-x-auto">
+      <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
+        <thead className="bg-background-light border-b border-border-dark">
+          <tr>
+            <th className="w-6 px-2 py-2.5">
+              <div className="h-3.5 w-3.5 bg-background rounded-sm"></div>
+            </th>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <th key={i} className="px-3 py-4">
+                <div className="h-4 bg-background rounded-md"></div>
+              </th>
+            ))}
+            <th className="w-20 px-2 py-2.5"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <tr key={i} className="border-b border-border-dark">
+              <td className="px-2 py-2 text-center">
+                <div className="h-3.5 w-3.5 bg-background-light rounded-sm"></div>
+              </td>
+              <td className="px-2 py-3 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-md bg-background-light"></div>
+                <div className="space-y-1">
+                  <div className="h-4 w-32 bg-background-light rounded-md"></div>
+                  <div className="h-3 w-16 bg-background-light rounded-md"></div>
+                </div>
+              </td>
+              {Array.from({ length: 6 }).map((_, j) => (
+                <td key={j} className="px-2 py-3">
+                  <div className="h-5 bg-background-light rounded-md"></div>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div className="flex justify-end items-center gap-1 mt-3">
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+      <div className="h-7 w-7 bg-background-light rounded-md"></div>
+    </div>
+  </div>
+);
 
 export const StockTable: React.FC<StockTableProps> = ({
   loading,
   displayedProducts,
   selectedItems,
-  setSelectedItems,
   searchTerm,
   getPurchaseStatus,
   onAddToCart,
   onRemove,
   cartItems = [],
   onOpenConfig,
+  onBulkAddToCart,
+  onOpenConfigModal,
+  isBulkMode,
+  onClearSelection,
+  onExportList,
+  onSelectItem,
+  onSelectAll,
 }) => {
   const [expandedProductId, setExpandedProductId] = useState<string | null>(
-    null
-  );
-  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
 
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [openActions, setOpenActions] = useState(false);
   const { getConfigProduto } = useStockConfigStore();
+  const actionsMenuRef = useOutsideClose<HTMLDivElement>(openActions, () =>
+    setOpenActions(false)
+  );
 
   const headers: { key: SortKey; label: string }[] = [
     { key: "name", label: "Produto" },
@@ -137,13 +136,10 @@ export const StockTable: React.FC<StockTableProps> = ({
   const sortedProducts = useMemo(() => {
     const enriched = displayedProducts.map((p) => ({
       ...p,
-
       salesPerDay:
         (p.salesHistory?.reduce((a, b) => a + b, 0) || 0) /
         (p.salesHistory?.length || 7),
-
       daysLeft: getDaysLeft(p),
-
       purchaseSuggestionUnits: getPurchaseSuggestionUnits(
         p,
         getConfigProduto(p.id)
@@ -164,21 +160,6 @@ export const StockTable: React.FC<StockTableProps> = ({
     selectedItems.length === paginatedProducts.length;
 
   const isIndeterminate = selectedItems.length > 0 && !allFilteredSelected;
-
-  const handleSelectAll = () => {
-    setSelectedItems((prev) => toggleSelectAll(paginatedProducts, prev));
-  };
-
-  const handleSelectItem = (id: string, index: number, shiftKey?: boolean) => {
-    setSelectedItems((prev) => {
-      const updated = shiftKey
-        ? handleShiftSelection(id, paginatedProducts, prev, lastSelectedIndex)
-        : toggleSelection(prev, id);
-      return updated;
-    });
-
-    setLastSelectedIndex(index);
-  };
 
   const toggleExpand = (id: string) => {
     setExpandedProductId((prev) => (prev === id ? null : id));
@@ -209,33 +190,29 @@ export const StockTable: React.FC<StockTableProps> = ({
     } ${sortKey === key && sortDirection === "asc" ? "rotate-180" : ""}`;
 
   if (loading) {
-    return (
-      <div className="bg-card border border-border-dark rounded-lg shadow-sm p-6 flex justify-center items-center h-64">
-        <span className="text-text-secondary flex items-center gap-2">
-          <RefreshCcw className="animate-spin" /> Carregando produtos...
-        </span>
-      </div>
-    );
+    return <StockTableSkeleton />;
   }
 
   return (
     <div className="bg-card rounded-xl border border-border-dark shadow-lg p-4 w-full">
       <div className="flex justify-between items-center pb-3 ">
-        <label className="text-xs font-semibold text-text-secondary flex items-center gap-2">
-          Itens por página:
-          <select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="border border-border-dark text-xs rounded-md px-2 py-1 bg-background text-text-primary cursor-pointer"
-          >
-            {[5, 10, 15, 20].map((n) => (
-              <option key={n}>{n}</option>
-            ))}
-          </select>
-        </label>
+        <div className="flex items-center gap-4">
+          <label className="text-xs font-semibold text-text-secondary flex items-center gap-2">
+            Itens por página:
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-border-dark text-xs rounded-md px-2 py-1 bg-background text-text-primary cursor-pointer"
+            >
+              {[5, 10, 15, 20].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <p className="text-[11px] text-text-secondary">
           Selecionados:{" "}
@@ -245,7 +222,7 @@ export const StockTable: React.FC<StockTableProps> = ({
         </p>
       </div>
 
-      <div className="border border-border-dark rounded-lg bg-background overflow-x-auto">
+      <div className="border border-border-dark rounded-lg bg-card overflow-x-auto">
         <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
           <thead className="bg-background-light border-b border-border-dark">
             <tr>
@@ -256,7 +233,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                   ref={(input) => {
                     if (input) input.indeterminate = isIndeterminate;
                   }}
-                  onChange={handleSelectAll}
+                  onChange={onSelectAll}
                   className="h-3.5 w-3.5 cursor-pointer"
                 />
               </th>
@@ -296,11 +273,12 @@ export const StockTable: React.FC<StockTableProps> = ({
               return (
                 <React.Fragment key={product.id}>
                   <tr
-                    className={`transition-colors border-b border-border-dark ${
-                      selectedItems.includes(product.id)
-                        ? "bg-background-light"
-                        : "hover:bg-background-light/70"
-                    }`}
+                    className={`border-b border-border-dark transition-colors
+                      ${
+                        selectedItems.includes(product.id)
+                          ? "bg-primary/10"
+                          : "even:bg-background-light/50 hover:bg-background dark:hover:bg-background"
+                      }`}
                   >
                     <td className="px-2 py-2 text-center">
                       <input
@@ -309,7 +287,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                         readOnly
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleSelectItem(product.id, index, e.shiftKey);
+                          onSelectItem(product.id, index, e.shiftKey);
                         }}
                         className="h-3.5 w-3.5 cursor-pointer"
                       />
@@ -375,6 +353,7 @@ export const StockTable: React.FC<StockTableProps> = ({
 
                     <td className="px-2 py-2 flex justify-center gap-1">
                       <button
+                        title="Adicionar ao Carrinho"
                         className={`p-1.5 rounded border border-border-dark text-[10px] ${
                           isInCart
                             ? "bg-green-100 text-primary"
@@ -389,6 +368,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                       </button>
 
                       <button
+                        title="Configurar Produto"
                         className="p-1.5 rounded border border-border-dark bg-background-light hover:bg-background"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -399,6 +379,7 @@ export const StockTable: React.FC<StockTableProps> = ({
                       </button>
 
                       <button
+                        title="Ver Detalhes"
                         className={`p-1.5 rounded border border-border-dark text-[10px] ${
                           isExpanded
                             ? "bg-green-100 text-primary"
@@ -516,6 +497,72 @@ export const StockTable: React.FC<StockTableProps> = ({
           </button>
         </div>
       )}
+      <ContextualActionBar
+        selectedCount={selectedItems.length}
+        onClearSelection={onClearSelection || (() => {})}
+      >
+        <div className="relative" ref={actionsMenuRef}>
+          <button
+            onClick={() => setOpenActions(!openActions)}
+            className={`
+        flex items-center gap-2 text-sm font-medium
+        border border-primary bg-primary text-white
+        px-4 py-2 rounded-lg shadow-sm 
+        hover:bg-primary-dark hover:border-primary-dark
+        focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-opacity-50
+        transition-all duration-200
+        ${openActions ? "bg-primary-dark" : ""}
+      `}
+          >
+            <MoreVertical size={16} />
+            <span>Ações</span>
+          </button>
+
+          {openActions && (
+            <div className="absolute bottom-full mb-2 right-0 w-64 origin-bottom-right bg-card dark:bg-card-800 border border-border-200 dark:border-gray-700 rounded-xl shadow-lg z-20 overflow-hidden animate-fade-slide-up">
+              <div className="p-2">
+                {/* 1. Opção: Listar Compras em Massa */}
+                <button
+                  onClick={() => {
+                    if (onBulkAddToCart) onBulkAddToCart();
+                    setOpenActions(false);
+                  }}
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150"
+                >
+                  <ClipboardList size={16} className="text-gray-500" />
+                  <span>Listar Compras em Massa</span>
+                </button>
+
+                {/* 2. Opção: Exportar Lista de Compras */}
+                <button
+                  onClick={() => {
+                    if (onExportList) onExportList();
+                    setOpenActions(false);
+                  }}
+                  className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150"
+                >
+                  <FileDown size={16} className="text-gray-500" />
+                  <span>Exportar Lista de Compras</span>
+                </button>
+
+                {/* 3. Opção: Configurar Estoque em Massa (condicional) */}
+                {!isBulkMode && (
+                  <button
+                    onClick={() => {
+                      if (onOpenConfigModal) onOpenConfigModal();
+                      setOpenActions(false);
+                    }}
+                    className="w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm text-text-primary hover:bg-background rounded-md transition-colors duration-150 border-t border-border-dark mt-2 pt-3"
+                  >
+                    <SlidersHorizontal size={16} className="text-gray-500" />
+                    <span>Configurar Estoque em Massa</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </ContextualActionBar>
     </div>
   );
 };
