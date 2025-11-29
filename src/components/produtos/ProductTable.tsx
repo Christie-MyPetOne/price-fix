@@ -2,16 +2,11 @@
 
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { ProductDetailModal } from "./ProductDetailModal";
 import {
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Snowflake,
 } from "lucide-react";
 import { Product, ProductTableProps } from "@/lib/types";
 import {
@@ -21,11 +16,36 @@ import {
   handleShiftSelection,
   paginate,
 } from "@/lib/utils";
+import { StockHealthBadge } from "../comprar/ui/StockHealthBadge";
 
-const RechartsSparkline = dynamic(
-  () => import("../charts/Charts").then((mod) => mod.RechartsSparkline),
-  { ssr: false }
-);
+const StatusBadge = ({ status }: { status?: string }) => {
+  const statusConfig: Record<string, { base: string; label: string }> = {
+    Precificado: {
+      base: "border-green-500 bg-[#22c55e] text-white",
+      label: "Precificado",
+    },
+    Pendente: {
+      base: "border-yellow-400 bg-yellow-100 text-yellow-800",
+      label: "Pendente",
+    },
+    "Não Precificado": {
+      base: "border-red-300 bg-red-100 text-red-800",
+      label: "Não Precificado",
+    },
+  };
+
+  const config = (status && statusConfig[status]) || statusConfig.Pendente;
+
+  return (
+    <div className="flex justify-center">
+      <span
+        className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border ${config.base}`}
+      >
+        {config.label}
+      </span>
+    </div>
+  );
+};
 
 export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -37,7 +57,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Product | null;
     direction: "asc" | "desc";
-  }>({ key: null, direction: "asc" });
+  }>({ key: "name", direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -78,45 +98,32 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
       sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key, direction });
   };
-
-  const StockHealthBadge = ({ status }: { status?: string }) => {
-    const healthConfig: Record<
-      string,
-      { color: string; icon: React.ElementType; label: string }
-    > = {
-      Excelente: {
-        color: "text-green-500",
-        icon: CheckCircle2,
-        label: "Excelente",
-      },
-      Moderado: {
-        color: "text-yellow-500",
-        icon: AlertTriangle,
-        label: "Moderado",
-      },
-      Risco: { color: "text-red-500", icon: XCircle, label: "Risco" },
-      Parado: { color: "text-blue-400", icon: Snowflake, label: "Parado" },
-    };
-
-    const config = healthConfig[status || "Moderado"];
-    const Icon = config.icon;
-
-    return (
-      <span
-        className={`inline-flex items-center gap-1.5 text-xs font-medium ${config.color}`}
-      >
-        <Icon size={14} /> {config.label}
-      </span>
-    );
-  };
+  const arrowClass = (key: keyof Product) =>
+    `transition-transform duration-200 ${
+      sortConfig.key === key ? "text-primary" : "opacity-40"
+    } ${
+      sortConfig.key === key && sortConfig.direction === "asc"
+        ? "rotate-180"
+        : ""
+    }`;
 
   const handleRowClick = (product: Product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
+  const headers: { key: keyof Product; label: string }[] = [
+    { key: "name", label: "Produto" },
+    { key: "status", label: "Status" },
+    { key: "stockHealthStatus", label: "Saúde" },
+    { key: "sales", label: "Vendas" },
+    { key: "price", label: "Preço" },
+    { key: "margin", label: "Margem" },
+    { key: "totalProfit", label: "Lucro Total" },
+  ];
+
   return (
-    <div className="bg-card rounded-lg border border-border-dark shadow-sm p-4 w-full">
+    <div className="bg-card rounded-xl border border-border-dark shadow-lg p-4 w-full">
       <ProductDetailModal
         product={selectedProduct}
         open={isModalOpen}
@@ -125,47 +132,38 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
           setSelectedProduct(null);
         }}
       />
-      {/* Cabeçalho superior */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
-        <label className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-2">
-          Mostrar
-          <select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="border border-border-dark text-xs rounded px-1 py-1"
-          >
-            {[5, 10, 20, 50].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-          itens
-        </label>
+      <div className="flex justify-between items-center pb-3 ">
+        <div className="flex items-center gap-4">
+          <label className="text-xs font-semibold text-text-secondary flex items-center gap-2">
+            Itens por página:
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-border-dark text-xs rounded-md px-2 py-1 bg-background text-text-primary cursor-pointer"
+            >
+              {[5, 10, 15, 20].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
-        <p className="text-[0.65rem] sm:text-xs text-text-secondary text-center sm:text-right">
+        <p className="text-[11px] text-text-secondary">
           Selecionados:{" "}
-          <span className="font-medium">{selectedIds.length}</span> - Mostrando{" "}
-          <span className="font-medium">
-            {(currentPage - 1) * rowsPerPage + 1}
-          </span>{" "}
-          a{" "}
-          <span className="font-medium">
-            {Math.min(currentPage * rowsPerPage, orderedProducts.length)}
-          </span>{" "}
-          de <span className="font-medium">{orderedProducts.length}</span>{" "}
-          produtos
+          <span className="font-semibold text-primary">
+            {selectedIds.length}
+          </span>
         </p>
       </div>
 
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left divide-border-dark min-w-[900px] lg:min-w-full">
-          <thead className="bg-background text-xs text-text uppercase">
+      <div className="border border-border-dark rounded-lg bg-card overflow-x-auto">
+        <table className="min-w-[900px] md:min-w-full table-fixed text-xs">
+          <thead className="bg-background-light border-b border-border-dark">
             <tr>
-              <th className="px-3 py-3 w-10 text-center sticky left-0 bg-background z-10">
+              <th className="w-6 px-2 py-2 text-center">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -173,52 +171,40 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     if (input) input.indeterminate = isIndeterminate;
                   }}
                   onChange={handleToggleAll}
-                  className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer bg-white"
+                  className="h-3.5 w-3.5 cursor-pointer"
                 />
               </th>
 
-              {[
-                { key: "name", label: "Produto" },
-                { key: "status", label: "Status" },
-                { key: "stockHealthStatus", label: "Saúde" },
-                { key: "sales", label: "Vendas" },
-                { key: "price", label: "Preço" },
-                { key: "margin", label: "Margem" },
-                { key: "totalProfit", label: "Lucro Total" },
-              ].map(({ key, label }) => (
+              {headers.map(({ key, label }) => (
                 <th
                   key={String(key)}
                   onClick={() => handleSort(key as keyof Product)}
-                  className={`px-3 py-3 text-left font-medium text-text-secondary cursor-pointer select-none ${
-                    key === "name" ? "min-w-[200px]" : "whitespace-nowrap"
-                  }`}
+                  className="px-3 py-3 text-sm font-semibold text-text-secondary cursor-pointer select-none whitespace-nowrap"
                 >
                   <div className="flex items-center gap-1">
                     {label}
-                    <ArrowUpDown
-                      size={14}
-                      className={`${
-                        sortConfig.key === key
-                          ? "text-green-500"
-                          : "text-gray-400 opacity-50"
-                      }`}
-                    />
+                    <ArrowUpDown size={10} className={arrowClass(key)} />
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-border-dark cursor-pointer">
+          <tbody className="cursor-pointer">
             {displayedProducts.length > 0 ? (
               displayedProducts.map((product, index) => (
                 <tr
                   key={product.id}
                   onClick={() => handleRowClick(product)}
-                  className="hover:bg-background transition-colors"
+                  className={`border-b border-border-dark transition-colors
+                      ${
+                        selectedIds.includes(product.id)
+                          ? "bg-primary/10"
+                          : "even:bg-background-light/50 hover:bg-background dark:hover:bg-background"
+                      }`}
                 >
                   <td
-                    className="px-3 py-2 text-center sticky left-0 bg-card z-10"
+                    className="px-2 py-2 text-center"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <input
@@ -229,64 +215,58 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                         e.stopPropagation();
                         handleToggleOne(product.id, index, e.shiftKey);
                       }}
-                      className="h-4 w-4 rounded border-gray-300 text-orange-500 cursor-pointer bg-white"
+                      className="h-3.5 w-3.5 cursor-pointer"
                     />
                   </td>
 
-                  <td className="px-3 py-2 flex items-center gap-2 min-w-[200px]">
-                    <div className="w-9 h-9 relative flex-shrink-0">
+                  <td className="px-2 py-2 flex items-center gap-2 truncate">
+                    <div className="w-8 h-8 rounded-md overflow-hidden border border-border-dark bg-background-light">
                       {product.image ? (
                         <Image
                           src={product.image}
-                          alt={product.name}
-                          fill
-                          className="object-cover rounded"
+                          width={32}
+                          height={32}
+                          alt=""
+                          className="object-cover w-full h-full"
                         />
                       ) : (
-                        <div className="w-full h-full bg-border-dark rounded" />
+                        <div className="w-full h-full text-[10px] flex items-center justify-center text-text-secondary">
+                          IMG
+                        </div>
                       )}
                     </div>
+
                     <div>
-                      <p className="text-xs font-medium text-text">
+                      <p className="text-sm font-semibold max-w-[200px] ">
                         {product.name}
                       </p>
-                      <p className="text-xs text-text-secondary">
-                        SKU: {product.sku}
+                      <p className="text-[10px] text-xs text-text-secondary truncate max-w-[90px]">
+                        {product.sku}
                       </p>
                     </div>
                   </td>
 
-                  <td className="px-3 py-2 text-xs font-semibold whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 rounded-full text-white text-[0.65rem] ${
-                        product.status === "Precificado"
-                          ? "bg-green-500"
-                          : product.status === "Pendente"
-                          ? "bg-yellow-500 text-black"
-                          : "bg-red-500"
-                      }`}
-                    >
-                      {product.status}
-                    </span>
+                  <td className="px-2 py-2 text-xs font-semibold whitespace-nowrap">
+                    <StatusBadge status={product.status} />
                   </td>
 
-                  <td className="px-3 py-2 text-xs whitespace-nowrap">
+                  <td className="px-2 py-2 text-center">
                     <StockHealthBadge status={product.stockHealthStatus} />
                   </td>
 
-                  <td className="px-3 py-2 text-xs text-right whitespace-nowrap">
+                  <td className="px-2 py-2 text-right font-mono text-base">
                     {product.sales}
                   </td>
 
-                  <td className="px-3 py-2 text-xs text-right">
+                  <td className="px-2 py-2 text-right font-mono text-base">
                     R$ {product.price.toFixed(2)}
                   </td>
 
-                  <td className="px-3 py-2 text-xs text-right">
+                  <td className="px-2 py-2 text-right font-mono text-base">
                     {product.margin.toFixed(2)}%
                   </td>
 
-                  <td className="px-3 py-2 text-xs text-right">
+                  <td className="px-2 py-2 text-right font-mono text-base">
                     R$ {product.totalProfit.toFixed(2)}
                   </td>
                 </tr>
@@ -294,8 +274,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
             ) : (
               <tr>
                 <td
-                  colSpan={10}
-                  className="text-center py-10 text-text-secondary"
+                  colSpan={8}
+                  className="text-center py-8 text-text-secondary"
                 >
                   Nenhum produto encontrado.
                 </td>
@@ -305,40 +285,37 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         </table>
       </div>
 
-      {/* Paginação */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-border-dark bg-card px-4 py-3 mt-2">
-          <div className="flex gap-2">
-            <button
-              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            >
-              <ChevronLeft size={16} />
-            </button>
+        <div className="flex justify-end items-center gap-1 mt-3">
+          <button
+            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            <ChevronLeft size={13} />
+          </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`p-2 rounded-md text-xs font-semibold ${
-                  page === currentPage
-                    ? "bg-primary text-white"
-                    : "ring-1 ring-border-dark hover:bg-background"
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
-              className="p-2 rounded-md ring-1 ring-border-dark hover:bg-background disabled:opacity-50"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              key={page}
+              className={`px-2 py-1 rounded text-[11px] border border-border-dark ${
+                page === currentPage
+                  ? "bg-primary text-white"
+                  : "hover:bg-background-light"
+              }`}
+              onClick={() => setCurrentPage(page)}
             >
-              <ChevronRight size={16} />
+              {page}
             </button>
-          </div>
+          ))}
+
+          <button
+            className="p-1.5 border border-border-dark rounded disabled:opacity-40"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            <ChevronRight size={13} />
+          </button>
         </div>
       )}
     </div>
