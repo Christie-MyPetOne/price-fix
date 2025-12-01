@@ -101,117 +101,134 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
         <div className="space-y-4 sm:space-y-6 text-sm">
           {activeTab === "calculator" && editableProduct && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-base sm:text-lg">
-                  Precificação
-                </h3>
-                <CalculationInputField
-                  label="Preço de Venda"
-                  value={price}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setPrice(Number(e.target.value))
-                  }
-                  unit="R$"
-                />
-                <CalculationInputField
-                  label="Custo do Produto"
-                  value={cost}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCost(Number(e.target.value))
-                  }
-                  unit="R$"
-                />
-                <CalculationInputField
-                  label="Custo de Frete"
-                  value={shipping}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setShipping(Number(e.target.value))
-                  }
-                  unit="R$"
-                />
-                <CalculationInputField
-                  label="Taxa do Marketplace"
-                  value={marketplaceFee}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setMarketplaceFee(Number(e.target.value))
-                  }
-                  unit="%"
-                />
-              </div>
-
-              <div className="space-y-4 bg-background p-4 rounded-md">
-                <h3 className="font-semibold text-base sm:text-lg">
-                  Resultados
-                </h3>
-                <div className="text-center py-2">
-                  <p className="text-sm text-text-secondary">Lucro por Venda</p>
-                  <p
-                    className={`text-2xl sm:text-3xl font-bold ${
-                      profit < 0 ? "text-error" : "text-primary"
-                    }`}
-                  >
-                    {profit.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </p>
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Coluna de Precificação */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-base sm:text-lg">
+                    Precificação
+                  </h3>
+                  <CalculationInputField
+                    label="Preço de Venda"
+                    value={price}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setPrice(Number(e.target.value))
+                    }
+                    unit="R$"
+                  />
+                  <CalculationInputField
+                    label="Custo do Produto"
+                    value={cost}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setCost(Number(e.target.value))
+                    }
+                    unit="R$"
+                  />
+                  <CalculationInputField
+                    label="Custo de Frete"
+                    value={shipping}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setShipping(Number(e.target.value))
+                    }
+                    unit="R$"
+                  />
+                  <CalculationInputField
+                    label="Taxa do Marketplace"
+                    value={marketplaceFee}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setMarketplaceFee(Number(e.target.value))
+                    }
+                    unit="%"
+                  />
                 </div>
-                <div className="text-center py-2 border-t border-border-dark">
-                  <p className="text-sm text-text-secondary">Margem de Lucro</p>
-                  <p
-                    className={`text-2xl sm:text-3xl font-bold ${
-                      margin < 0 ? "text-error" : "text-primary"
-                    }`}
-                  >
-                    {margin.toFixed(2)}%
-                  </p>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <h3 className="font-semibold text-base sm:text-lg">
-                  Simulador de Metas
-                </h3>
-                <CalculationInputField
-                  label="Para ter X% de margem..."
-                  value={targetMargin}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setTargetMargin(e.target.value)
-                  }
-                  unit="%"
-                  placeholder="Ex: 25"
-                />
-                {requiredPriceForMargin !== null && (
-                  <div className="bg-primary-dark/10 p-3 rounded-md text-center">
-                    <p className="text-xs text-primary">
-                      Preço de venda sugerido:
+                {/* Coluna de Resultados */}
+                <div className="space-y-4 bg-background-card p-4 rounded-lg border border-border-card h-fit">
+                  <h3 className="font-semibold text-base sm:text-lg text-center">
+                    Resultados
+                  </h3>
+                  <div className="text-center py-2">
+                    <p className="text-sm text-text-secondary">
+                      Lucro por Venda
                     </p>
-                    <p className="text-lg font-bold text-primary">
-                      {requiredPriceForMargin.toLocaleString("pt-BR", {
+                    <p
+                      className={`text-3xl sm:text-4xl font-bold ${
+                        profit < 0 ? "text-error" : "text-primary"
+                      }`}
+                    >
+                      {profit.toLocaleString("pt-BR", {
                         style: "currency",
                         currency: "BRL",
                       })}
                     </p>
                   </div>
-                )}
-                <CalculationInputField
-                  label="Para lucrar R$ Y..."
-                  value={targetProfit}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setTargetProfit(e.target.value)
-                  }
-                  unit="R$"
-                  placeholder="Ex: 500"
-                />
-                {salesNeededForProfit !== null && (
-                  <div className="bg-primary-dark/10 p-3 rounded-md text-center">
-                    <p className="text-xs text-primary">Vendas necessárias:</p>
-                    <p className="text-lg font-bold text-primary">
-                      {salesNeededForProfit} unidades
+                  <div className="text-center py-2 border-t-2 border-dashed border-border-dark">
+                    <p className="text-sm text-text-secondary">
+                      Margem de Lucro
+                    </p>
+                    <p
+                      className={`text-3xl sm:text-4xl font-bold ${
+                        margin < 0 ? "text-error" : "text-primary"
+                      }`}
+                    >
+                      {margin.toFixed(2)}%
                     </p>
                   </div>
-                )}
+                </div>
+              </div>
+
+              {/* Seção do Simulador de Metas */}
+              <div className="mt-8 pt-6 border-t border-border-dark">
+                <h3 className="font-semibold text-base sm:text-lg mb-4">
+                  Simulador de Metas
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <div>
+                    <CalculationInputField
+                      label="Para ter X% de margem..."
+                      value={targetMargin}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setTargetMargin(e.target.value)
+                      }
+                      unit="%"
+                      placeholder="Ex: 25"
+                    />
+                    {requiredPriceForMargin !== null && (
+                      <div className="bg-primary-dark/10 p-3 rounded-md text-center mt-2">
+                        <p className="text-xs text-primary">
+                          Preço de venda sugerido:
+                        </p>
+                        <p className="text-lg font-bold text-primary">
+                          {requiredPriceForMargin.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <CalculationInputField
+                      label="Para lucrar R$ Y..."
+                      value={targetProfit}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setTargetProfit(e.target.value)
+                      }
+                      unit="R$"
+                      placeholder="Ex: 500"
+                    />
+                    {salesNeededForProfit !== null && (
+                      <div className="bg-primary-dark/10 p-3 rounded-md text-center mt-2">
+                        <p className="text-xs text-primary">
+                          Vendas necessárias:
+                        </p>
+                        <p className="text-lg font-bold text-primary">
+                          {salesNeededForProfit} unidades
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -269,7 +286,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-end items-center mt-6 gap-3">
+        <div className="flex flex-col sm:flex-row justify-end items-center mt-6 pt-4 border-t border-border-default gap-3">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-4 py-2 rounded-md bg-background hover:bg-opacity-80 transition-colors text-text-secondary text-sm sm:text-base"
