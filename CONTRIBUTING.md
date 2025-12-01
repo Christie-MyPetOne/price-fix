@@ -7,10 +7,44 @@ Este documento define o padrão oficial para desenvolvimento. Inclui normas de *
 # 📌 1. Fluxo de Trabalho com Jira
 
 - **Cada tarefa corresponde a 1 ticket Jira**.
-- Os IDs dos tickets seguem o formato: `PROJ-123`.
+- Os IDs dos tickets seguem o formato: `PFIX-123`.
 - **Toda branch deve iniciar com o ID do ticket**.
 - Todo commit e PR deve referenciar o ticket.
 - Nada é enviado para `main` sem PR.
+
+# 1.1 Exempro
+
+- **Ticket**
+
+- PFIX-147 — Criar componente de listagem de produtos com busca
+
+- **Tipo**
+
+- feat
+
+- **Descrição**
+
+- Desenvolver o componente de listagem de produtos na aplicação PriceFix, contendo tabela, busca por nome/sku e paginação.
+
+- **Objetivo**
+
+- Permitir que o usuário visualize todos os produtos cadastrados e consiga filtrá-los rapidamente.
+
+- **Regras de Negócio**
+
+- Mostrar nome, SKU, custo, preço e margem.
+
+- Campo de busca deve aplicar filtro no front-end.
+
+- Paginação deve vir da API (/products?page=&limit=).
+
+# Subtarefas
+
+- PFIX-148 — Criar layout do componente de tabela
+
+- PFIX-149 — Criar lógica do filtro e busca
+
+- PFIX-150 — Implementar paginação usando API
 
 ---
 
@@ -28,7 +62,16 @@ develop  → Homologação / Pré-produção
 Formato:
 
 ```
+
 <tipo>/<JIRA>-<area>-<descricao>
+
+```
+
+### Exemplos
+
+```
+feature/PFIX-147-front-lista-produtos
+
 ```
 
 ### Tipos aceitos
@@ -38,27 +81,31 @@ Formato:
 - `hotfix` → correção emergencial
 - `chore` → manutenção / scripts
 
-### Exemplos por área
-
-#### Front-end
+### Front-end
 
 ```
-feature/PROJ-120-front-dashboard
-bugfix/PROJ-82-front-modal-sem-fechar
+
+feature/PFIX-120-front-dashboard
+bugfix/PFIX-82-front-modal-sem-fechar
+
 ```
 
 #### Back-end
 
 ```
-feature/PROJ-300-back-orders-endpoint
-hotfix/PROJ-12-back-timeout-db
+
+feature/PFIX-300-back-orders-endpoint
+hotfix/PFIX-12-back-timeout-db
+
 ```
 
 #### DevOps
 
 ```
-feature/PROJ-430-devops-novo-pipeline
-chore/PROJ-201-devops-ajuste-helm
+
+feature/PFIX-430-devops-novo-pipeline
+chore/PFIX-201-devops-ajuste-helm
+
 ```
 
 ---
@@ -68,7 +115,17 @@ chore/PROJ-201-devops-ajuste-helm
 Formato obrigatório:
 
 ```
+
 <tipo>(<JIRA>): mensagem curta e clara
+
+```
+
+### Exemplos
+
+```
+
+feat(PFIX-147): cria componente de listagem de produtos com busca
+
 ```
 
 ### Tipos aceitos
@@ -82,27 +139,31 @@ Formato obrigatório:
 - `ci` — pipelines
 - `build` — dependências e build
 
-### Exemplos
-
 #### Front-end
 
 ```
-feat(PROJ-120): adiciona tabela de preços
-fix(PROJ-82): corrige bug no modal
+
+feat(PFIX-120): adiciona tabela de preços
+fix(PFIX-82): corrige bug no modal
+
 ```
 
 #### Back-end
 
 ```
-feat(PROJ-300): cria rota de pedidos
-refactor(PROJ-302): reorganiza camadas de service
+
+feat(PFIX-300): cria rota de pedidos
+refactor(PFIX-302): reorganiza camadas de service
+
 ```
 
 #### DevOps
 
 ```
-ci(PROJ-411): adiciona stage de integração
-chore(PROJ-413): atualiza imagem docker
+
+ci(PFIX-411): adiciona stage de integração
+chore(PFIX-413): atualiza imagem docker
+
 ```
 
 ---
@@ -112,19 +173,25 @@ chore(PROJ-413): atualiza imagem docker
 ### Título
 
 ```
-PROJ-123 — Implementação do fluxo de login
+
+PFIX-123 — Implementação do fluxo de login
+
 ```
 
 ### Descrição padrão
 
 ```
+
 ### 🧾 O que foi feito
+
 - Descrição clara das mudanças
 
 ### 🧪 Como testar
+
 1. Passo-a-passo
 
 ### 🧩 Checklist
+
 - [ ] Código segue padrões do projeto
 - [ ] Branch nomeada corretamente
 - [ ] Commits no padrão
@@ -132,7 +199,9 @@ PROJ-123 — Implementação do fluxo de login
 - [ ] Não possui console.logs ou códigos mortos
 
 ### 🔗 Jira
-https://jiraempresa.com/browse/PROJ-123
+
+https://jiraempresa.com/browse/PFIX-123
+
 ```
 
 ---
@@ -171,3 +240,7 @@ https://jiraempresa.com/browse/PROJ-123
 5. Pipelines executam deploy automático (quando configurado)
 
 **Este documento é obrigatório para todos os colaboradores do projeto.**
+
+```
+
+```
