@@ -74,6 +74,10 @@ feature/PFIX-147-front-lista-produtos
 
 ```
 
+### Terminal
+
+git checkout -b feature/PFIX-147-front-refatorar-modal-da-tabela-compras
+
 ### Tipos aceitos
 
 - `feature` → nova funcionalidade
