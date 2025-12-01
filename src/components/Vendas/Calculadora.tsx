@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Product } from "@/lib/types";
-
-interface CalculadoraMargemProps {
-  product?: Product | null;
-}
+import { CalculadoraMargemProps } from "./lib/types";
+import { formatBRL } from "./lib/utils";
 
 export default function CalculadoraMargem({ product }: CalculadoraMargemProps) {
   const [preco, setPreco] = useState(0);
@@ -218,10 +216,7 @@ export default function CalculadoraMargem({ product }: CalculadoraMargemProps) {
             margemFinal >= 0 ? "text-green-600" : "text-red-600"
           }`}
         >
-          {margemFinal.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })}
+          {formatBRL(margemFinal)}
         </p>
       </div>
     </div>

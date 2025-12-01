@@ -1,9 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { MargensChartProps } from "@/lib/types";
-
-const formatBRL = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+import { formatBRL } from "./lib/utils";
 
 export default function MargensChart({
   buckets,

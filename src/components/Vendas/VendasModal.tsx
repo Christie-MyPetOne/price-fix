@@ -5,6 +5,7 @@ import Image from "next/image";
 import { VendasModalProps } from "@/lib/types";
 import Modal from "../ui/Modal";
 import { Package, FileText, Info, Percent } from "lucide-react";
+import { formatBRL } from "./lib/utils";
 
 export const VendasModal: React.FC<VendasModalProps> = ({
   open,
@@ -12,12 +13,6 @@ export const VendasModal: React.FC<VendasModalProps> = ({
   sale,
 }) => {
   if (!sale) return null;
-
-  const formatBRL = (value?: number) =>
-    (value ?? 0).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
 
   return (
     <Modal

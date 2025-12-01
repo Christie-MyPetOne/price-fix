@@ -3,10 +3,8 @@
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import { Sale } from "@/lib/types";
-
-interface ResumoCardsProps {
-  sales: Sale[];
-}
+import { ResumoCardsProps } from "./lib/types";
+import { formatBRL } from "./lib/utils";
 
 export default function ResumoCards({ sales }: ResumoCardsProps) {
   const totalFaturado = sales.reduce(
@@ -30,10 +28,7 @@ export default function ResumoCards({ sales }: ResumoCardsProps) {
       <Card className="bg-card p-4 sm:p-6">
         <h1 className="font-bold text-xl sm:text-2xl">Faturamento</h1>
         <p className="mt-3 sm:mt-4 text-lg sm:text-xl font-semibold">
-          R$
-          {totalFaturado.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}
+          {formatBRL(totalFaturado)}
         </p>
       </Card>
 
