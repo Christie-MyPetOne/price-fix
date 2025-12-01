@@ -68,21 +68,6 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
     });
   }
 
-  function selectAll() {
-    setVisible(new Set(series.map((s) => s.key)));
-    setLineVisible(true);
-  }
-
-  function invertSelection() {
-    setVisible((prev) => {
-      const next = new Set<string>();
-      series.forEach((s) => {
-        if (!prev.has(s.key)) next.add(s.key);
-      });
-      return next;
-    });
-    setLineVisible((v) => !v);
-  }
 
   const lineStroke = String(lineColor ?? line?.color ?? "#2563EB");
 
@@ -162,22 +147,7 @@ export const GraficoPeR: React.FC<GraficoPeRLinhaProps> = ({
             </div>
           )}
 
-          <div className="ml-2 inline-flex gap-2">
-            <button
-              onClick={selectAll}
-              className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
-              type="button"
-            >
-              Todos
-            </button>
-            <button
-              onClick={invertSelection}
-              className="h-7 px-2 inline-flex items-center rounded-full border border-border-dark text-xs hover:bg-muted"
-              type="button"
-            >
-              Inverter
-            </button>
-          </div>
+          
         </div>
       </div>
 

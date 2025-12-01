@@ -71,10 +71,13 @@ PFIX-147-front-modal-da-tabela-compras
 
 git checkout -b PFIX-147-front-modal-da-tabela-compras
 
+<<<<<<< HEAD
 ### Subir para o GitHub
 
 git push -u origin PFIX-147-front-modal-da-tabela-compras
 
+=======
+>>>>>>> df9083bf23cd3918f7326dcb395c9f417adb6357
 ### Front-end
 
 ```
