@@ -50,47 +50,32 @@ Este documento define o padrão oficial para desenvolvimento. Inclui normas de *
 
 # 🌿 2. Padrão de Branches
 
-### Branches principais
-
-```
-main     → Produção
-develop  → Homologação / Pré-produção
-```
-
 ### Branches de desenvolvimento
 
 Formato:
 
 ```
 
-<tipo>/<JIRA>-<area>-<descricao>
+<JIRA>-<area>-<descricao>
 
 ```
 
 ### Exemplos
 
 ```
-feature/PFIX-147-front-lista-produtos
+PFIX-147-front-modal-da-tabela-compras
 
 ```
 
 ### Terminal
 
-git checkout -b feature/PFIX-147-front-refatorar-modal-da-tabela-compras
-
-### Tipos aceitos
-
-- `feature` → nova funcionalidade
-- `bugfix` → correção de bug
-- `hotfix` → correção emergencial
-- `chore` → manutenção / scripts
+git checkout -b PFIX-147-front-modal-da-tabela-compras
 
 ### Front-end
 
 ```
 
-feature/PFIX-120-front-dashboard
-bugfix/PFIX-82-front-modal-sem-fechar
+PFIX-120-front-dashboard
 
 ```
 
@@ -98,8 +83,7 @@ bugfix/PFIX-82-front-modal-sem-fechar
 
 ```
 
-feature/PFIX-300-back-orders-endpoint
-hotfix/PFIX-12-back-timeout-db
+PFIX-300-back-orders-endpoint
 
 ```
 
@@ -107,8 +91,7 @@ hotfix/PFIX-12-back-timeout-db
 
 ```
 
-feature/PFIX-430-devops-novo-pipeline
-chore/PFIX-201-devops-ajuste-helm
+PFIX-430-devops-novo-pipeline
 
 ```
 
@@ -148,7 +131,6 @@ feat(PFIX-147): cria componente de listagem de produtos com busca
 ```
 
 feat(PFIX-120): adiciona tabela de preços
-fix(PFIX-82): corrige bug no modal
 
 ```
 
@@ -157,7 +139,6 @@ fix(PFIX-82): corrige bug no modal
 ```
 
 feat(PFIX-300): cria rota de pedidos
-refactor(PFIX-302): reorganiza camadas de service
 
 ```
 
@@ -166,7 +147,6 @@ refactor(PFIX-302): reorganiza camadas de service
 ```
 
 ci(PFIX-411): adiciona stage de integração
-chore(PFIX-413): atualiza imagem docker
 
 ```
 
@@ -202,38 +182,8 @@ PFIX-123 — Implementação do fluxo de login
 - [ ] Tests atualizados ou adicionados
 - [ ] Não possui console.logs ou códigos mortos
 
-### 🔗 Jira
-
-https://jiraempresa.com/browse/PFIX-123
 
 ```
-
----
-
-# 🧩 5. Padrões por Área
-
-## Front-end
-
-- Usar componentes reutilizáveis
-- Evitar lógica no JSX
-- Sempre tipar (Typescript)
-- Criar testes quando envolver regras de negócio
-
-## Back-end
-
-- Separar camadas: controller → service → repository
-- Respeitar contratos e DTOs
-- Validar entradas sempre
-- Cobrir endpoints críticos com testes
-
-## DevOps
-
-- Pipelines devem ser versionados
-- Evitar segredos em texto plano
-- Utilizar padrões de nomenclatura para recursos cloud
-- Automação sempre que possível
-
----
 
 # 🚀 6. Processo de Merge
 
